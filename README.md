@@ -7,6 +7,12 @@ Builds on top of Nix.
 
 ## Features
 
+### Integrations
+
+* nix-shell
+* nix flakes
+* direnv
+
 ### A `devshell-menu`
 
 When entering new development environments, it would be nice if it was
@@ -19,14 +25,6 @@ environment changes. This requires to record what version of the MOTD the
 developer has seen and only show the new entries.
 
 ### `devshell.toml`
-
-## Integrations
-
-* nix-shell
-* nix flakes
-* direnv
-
-## Features
 
 ### Bash completion by default
 
