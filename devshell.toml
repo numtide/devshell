@@ -1,0 +1,45 @@
+[main]
+# This is the name of your environment. It should usually map to the project
+# name.
+name = "mkDevShell"
+
+# Add packages from nixpkgs here. Use `nix search nixpkgs <term>` to find the
+# package that you need.
+#
+# NOTE: don't forget to put commas between items! :)
+packages = [
+  "nixpkgs-fmt"
+]
+
+# Message Of The Day (MOTD) is displayed when entering the environment with an
+# interactive shell. By default it will show the project name.
+#
+# motd = ""
+
+# Use this section to set environment variables to have in the environment.
+#
+# NOTE: all the values are escaped
+[env]
+FOO = 1
+
+# These are bash-specific configurations. The idea is to maybe support other
+# shell environments in the future, although it is not the case right now.
+[bash]
+
+# Loaded after the environment setup. Useful to set dynamic environment
+# variables.
+extra = """
+export BAR=$FOO
+"""
+
+# Only loaded in interactive shells. NOTE: `nix-shell -c "ls"` is interactive
+interactive = """
+
+"""
+
+# Setup bash aliases. These are only available in the interactive
+# environments.
+#
+# TODO: rename to [bash.aliases]?
+[aliases.hello]
+command = 'echo hello'
