@@ -1,37 +1,64 @@
 # devshell - a shell for developers.
 
-When switching from project to project, a common issue is to get all the
-development dependencies.
+**STATUS: unstable**
 
-Builds on top of Nix.
+The goal of this project is to put nix-shell on steroids.
 
 ## Features
 
-### Integrations
+### Compatible
 
 * nix-shell
 * nix flakes
 * direnv
 
-### A `devshell-menu`
+### Clean environment
 
-When entering new development environments, it would be nice if it was
-possible to type a standard command and get a list of the available tools.
+Replace:
+```
+direnv: export +AR +AS +CC +CONFIG_SHELL +CXX +HOST_PATH +IN_NIX_SHELL +LD +NIX_BINTOOLS +NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_BUILD_CORES +NIX_BUILD_TOP +NIX_CC +NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_CFLAGS_COMPILE +NIX_ENFORCE_NO_NATIVE +NIX_HARDENING_ENABLE +NIX_INDENT_MAKE +NIX_LDFLAGS +NIX_STORE +NM +OBJCOPY +OBJDUMP +RANLIB +READELF +RUSTC +SIZE +SOURCE_DATE_EPOCH +STRINGS +STRIP +TEMP +TEMPDIR +TMP +TMPDIR +buildInputs +buildPhase +builder +builtDependencies +cargo_bins_jq_filter +cargo_build_options +cargo_options +cargo_release +cargo_test_options +cargoconfig +checkPhase +configureFlags +configurePhase +cratePaths +crate_sources +depsBuildBuild +depsBuildBuildPropagated +depsBuildTarget +depsBuildTargetPropagated +depsHostHost +depsHostHostPropagated +depsTargetTarget +depsTargetTargetPropagated +doCheck +doInstallCheck +docPhase +dontAddDisableDepTrack +dontUseCmakeConfigure +installPhase +name +nativeBuildInputs +out +outputs +patches +preInstallPhases +propagatedBuildInputs +propagatedNativeBuildInputs +remapPathPrefix +shell +src +stdenv +strictDeps +system +version ~PATH
+```
+With:
+```
+direnv: export +DEVSHELL_DIR +DEVSHELL_ROOT +IN_NIX_SHELL ~PATH
+```
+
+* `DEVSHELL_DIR` contains all the programs.
+* `DEVSHELL_ROOT` points to the project root.
+
+### Common utilities
+
+* `devshell-menu` - list all the programs available
+* `devshell-root` - `cd` back to the project root.
 
 ### MOTD
 
-Similar to the dev menu, to keep developers informed of the development
-environment changes. This requires to record what version of the MOTD the
-developer has seen and only show the new entries.
+When running `nix-shell` or `nix develop`, print a welcome message for new
+developers:
 
-### `devshell.toml`
+```
+### Welcome to mkDevShell ####
+
+Commands:
+  devshell-menu
+  devshell-root
+  nixpkgs-fmt
+
+Aliases:
+  hello
+```
+
+### Configurable with a TOML file
+
+Don't ask the users to learn Nix straight out of the box. Nix is still
+available for more advanced use-cases.
 
 ### Bash completion by default
 
 Life is not complete otherwise. Huhu.
 
 Packages that contain bash completions will automatically be loaded by the
-devshell.
+devshell in `nix-shell` or `nix develop` modes.
 
 ## TODO
 
