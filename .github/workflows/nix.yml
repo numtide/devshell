@@ -1,0 +1,26 @@
+name: Nix
+on: [ push ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Nix Flakes doesn't work on shallow clones
+          fetch-depth: 0
+      - uses: cachix/install-nix-action@v10
+        with:
+          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20200618_377345e/install
+      - run: echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf
+      - uses: cachix/cachix-action@v6
+        with:
+          name: numtide
+          signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+      - run: nix flake check
+      - run: nix develop -c echo OK
+      - name: Run nix flake archive
+        run: |
+          set -euo pipefail
+          nix flake archive --json | \
+            jq -r '.path,(.inputs|to_entries[].value.path)' | \
+            cachix push numtide
