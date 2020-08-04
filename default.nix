@@ -78,6 +78,7 @@ let
 
         # Prepend the devshell root to the PATH
         export PATH=$DEVSHELL_DIR/bin:$PATH
+        export NIXPKGS_PATH=${pkgs.path}
 
         # Load installed profiles
         for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
