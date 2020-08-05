@@ -94,19 +94,19 @@ let
         if [[ $- == *i* ]]; then
 
         devshell-menu() {
-          echo "Commands:"
-          echo "  devshell-menu"
-          echo "  devshell-root"
+          echo "# Commands"
+          echo "devshell-menu"
+          echo "devshell-root"
 
           if [[ -d "$DEVSHELL_DIR/bin" ]]; then
-            ( cd "$DEVSHELL_DIR/bin" && ${coreutils}/bin/ls -x ) | ${gnused}/bin/sed 's/^/  /g'
+            ( cd "$DEVSHELL_DIR/bin" && ${coreutils}/bin/ls -x )
           fi
 
           if [[ ${toString (builtins.length (builtins.attrNames aliases))} -gt 0 ]]; then
             echo
-            echo "Aliases:"
+            echo "# Aliases"
             cat <<ALIASES
-          ${builtins.concatStringsSep "\n  " (builtins.attrNames aliases)}
+        ${builtins.concatStringsSep "\n" (builtins.attrNames aliases)}
         ALIASES
           fi
         }
