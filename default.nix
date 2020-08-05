@@ -99,7 +99,7 @@ let
           echo "  devshell-root"
 
           if [[ -d "$DEVSHELL_DIR/bin" ]]; then
-            ( cd "$DEVSHELL_DIR/bin" && ls ) | ${gnused}/bin/sed 's/^/  /g'
+            ( cd "$DEVSHELL_DIR/bin" && ${coreutils}/bin/ls -x ) | ${gnused}/bin/sed 's/^/  /g'
           fi
 
           if [[ ${toString (builtins.length (builtins.attrNames aliases))} -gt 0 ]]; then
