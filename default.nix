@@ -52,7 +52,7 @@ let
     , # ignore this unless you plan on using nix-shell
       inNixShell ? _inNixShell
     , # fill this with a message of the day or welcome message
-      motd ? "\n### Welcome to ${name} ####\n"
+      motd ? "\n### Welcome to ${name} ####\n$(devshell-menu)"
     , # list of derivations to merge into the environment
       packages ? [ ]
     , # environment variables to add to the ... environment
@@ -120,11 +120,9 @@ let
         # that distinction because `nix-shell -c "cmd"` is running in
         # interactive mode.
         devshell-prompt() {
-          cat <<'MOTD'
+          cat <<MOTD
         ${motd}
         MOTD
-          # Print a menu
-          devshell-menu
           # Make it a noop
           devshell-prompt() { :; }
         }
