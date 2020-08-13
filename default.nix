@@ -13,6 +13,7 @@
 let
   _inNixShell = inNixShell;
 
+  bashBin = "${bashInteractive}/bin";
   bashPath = "${bashInteractive}/bin/bash";
 
   # transform the env vars into bash instructions
@@ -41,12 +42,6 @@ let
   # * nix-shell
   # * flake app
   # * direnv integration
-  #
-  # TODO:
-  # * a lot more testing
-  # * add --pure mode that makes sense
-  # * remove /path-not-set from the PATH. build-env sets this fake PATH.
-  #   https://github.com/nixos/nix/blob/flakes/src/libstore/build.cc
   mkDevShell =
     { name ? "devshell"
     , # ignore this unless you plan on using nix-shell
@@ -76,8 +71,11 @@ let
         # Set all the passed environment variables
         ${envToBash env}
 
-        # Prepend the devshell root to the PATH
-        export PATH=$DEVSHELL_DIR/bin:$PATH
+        # Prepend the PATH with the devshell dir and bash
+        PATH=''${PATH#/path-not-set:}
+        PATH=''${PATH#${bashBin}:}
+        export PATH=$DEVSHELL_DIR/bin:${bashBin}:$PATH
+
         export NIXPKGS_PATH=${pkgs.path}
 
         # Load installed profiles
