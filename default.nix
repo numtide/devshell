@@ -8,11 +8,8 @@
 , writeText
 , writeTextFile
 , writeShellScriptBin
-, inNixShell ? false
 }:
 let
-  _inNixShell = inNixShell;
-
   bashBin = "${bashInteractive}/bin";
   bashPath = "${bashInteractive}/bin/bash";
 
@@ -44,8 +41,6 @@ let
   # * direnv integration
   mkDevShell =
     { name ? "devshell"
-    , # ignore this unless you plan on using nix-shell
-      inNixShell ? _inNixShell
     , # fill this with a message of the day or welcome message
       motd ? "\n### Welcome to ${name} ####\n$(devshell-menu)"
     , # list of derivations to merge into the environment
@@ -152,11 +147,9 @@ let
       '';
 
       # This is our entrypoint for everything!
-      #
-      # Use a naked derivation so that nix-shell can be made to be broken on
-      # purpose. We want to enforce the use of the `inNixShell` feature there.
-      devShell = derivation {
-        inherit name system;
+      devShellBin = derivation {
+        inherit system;
+        name = "${name}-bin";
 
         # Define our own minimal builder.
         builder = bashPath;
@@ -221,15 +214,18 @@ let
       # Use this to define a flake app for the environment.
       flakeApp = {
         type = "app";
-        program = "${devShell}";
+        program = "${devShellBin}";
       };
 
       # Use a naked derivation to limit the amount of noise passed to nix-shell.
-      nixShellEnv = derivation {
-        inherit system;
-        name = "${name}-nix-shell";
+      devShell = derivation {
+        inherit name system;
+
         # `nix develop` actually checks and uses builder. And it must be bash.
         builder = bashPath;
+        # bring in the dependencies on `nix-build`
+        args = [ "-ec" "${coreutils}/bin/ln -s ${devShellBin} $out" ];
+
         # $stdenv/setup is loaded by nix-shell during startup.
         # https://github.com/nixos/nix/blob/377345e26f1ac4bbc87bb21debcc52a1d03230aa/src/nix-build/nix-build.cc#L429-L432
         stdenv = writeTextFile {
@@ -261,17 +257,13 @@ let
           fi
 
           # Load the dev shell environment
-          source "${devShell}"
+          source "${devShellBin}"
         '';
       };
 
-      out =
-        if inNixShell then
-          nixShellEnv
-        else
-          devShell // {
-            inherit flakeApp;
-          };
+      out = devShell // {
+        inherit flakeApp;
+      };
     in
     out
   ;

@@ -1,8 +1,6 @@
 # Used to test the shell
-{ inNixShell ? false
-, pkgs ? import <nixpkgs> { }
-}:
+{ pkgs ? import <nixpkgs> { } }:
 let
-  mkDevShell = pkgs.callPackage ./. { inherit inNixShell; };
+  mkDevShell = pkgs.callPackage ./. { };
 in
 mkDevShell.fromTOML ./devshell.toml

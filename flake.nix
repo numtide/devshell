@@ -1,19 +1,15 @@
 {
   description = "mkDevShell";
 
-  outputs = { self, nixpkgs }: {
-    overlay = import ./overlay.nix;
-
-    defaultApp.x86_64-linux = (import ./shell.nix {
-      inNixShell = false;
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
-    }
-    ).flakeApp;
-
-    devShell.x86_64-linux = import ./shell.nix {
-      inNixShell = true;
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+  outputs = { self, nixpkgs }:
+    let
+      devshell = import ./shell.nix {
+        pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      };
+    in
+    {
+      overlay = import ./overlay.nix;
+      defaultApp.x86_64-linux = devshell.flakeApp;
+      devShell.x86_64-linux = devshell;
     };
-
-  };
 }
