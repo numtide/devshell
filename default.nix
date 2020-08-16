@@ -24,8 +24,8 @@ let
 
   commandsToBash = commands:
     let
-      op = { name, alias ? "", help ? "" }:
-        if alias == "" then "" else
+      op = { name, alias, ... }:
+        if alias == null || alias == "" then "" else
         "alias ${name}=${lib.escapeShellArg (toString alias)}";
     in
     builtins.concatStringsSep "\n" (map op commands)
@@ -40,13 +40,7 @@ let
 
   commandsToMenu = commands:
     let
-      commands_ =
-        [
-          { name = "devshell-menu"; help = "print this menu"; }
-          { name = "devshell-root"; help = "change directory to root"; }
-        ] ++ commands;
-
-      commandsSorted = builtins.sort (a: b: a.name < b.name) commands_;
+      commandsSorted = builtins.sort (a: b: a.name < b.name) commands;
 
       commandLengths =
         map ({ name, ... }: builtins.stringLength name) commandsSorted;
@@ -58,11 +52,11 @@ let
           commandLengths
       ;
 
-      op = { name, alias ? "", help ? "" }:
+      op = { name, help, ... }:
         let
           len = maxCommandLength - (builtins.stringLength name);
         in
-        if help == "" then
+        if help == null || help == "" then
           name
         else
           "${pad name len} - ${help}"
@@ -78,23 +72,24 @@ let
   # * nix-shell
   # * flake app
   # * direnv integration
-  mkDevShell =
-    { name ? "devshell"
-    , # fill this with a message of the day or welcome message
-      motd ? "$(devshell-menu)"
-    , # list of derivations to merge into the environment
-      packages ? [ ]
-    , # environment variables to add to the ... environment
-      env ? { }
-    , # extra bash configuration
-      bash ? {
-        extra = "";
-        interactive = "";
-      }
-    , # commands
-      commands ? [ ]
-    }:
+  mkDevShell = module:
     let
+      config = (lib.evalModules {
+        modules = [ ./options.nix module ];
+        args = {
+          inherit pkgs;
+        };
+      }).config;
+
+      inherit (config)
+        bash
+        commands
+        env
+        motd
+        name
+        packages
+        ;
+
       envDrv = buildEnv {
         name = "${name}-env";
         paths = packages;
@@ -313,18 +308,21 @@ let
       packages = map resolveKey (data.packages or [ ]);
     });
 
-  # Build the devshell from a TOML declaration
-  fromTOML = path:
+  importTOML = path:
     let
       data = builtins.fromTOML (builtins.readFile path);
     in
-    fromData ((data.main or { }) // (builtins.removeAttrs data [ "main" ]))
-  ;
+    (data.main or { }) // (builtins.removeAttrs data [ "main" ]);
+
+  # Build the devshell from a TOML declaration
+  fromTOML = path:
+    fromData (importTOML path);
 in
 {
   inherit
     fromData
     fromTOML
+    importTOML
     mkDevShell
     ;
 

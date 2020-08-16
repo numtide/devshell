@@ -7,9 +7,7 @@ name = "mkDevShell"
 # package that you need.
 #
 # NOTE: don't forget to put commas between items! :)
-packages = [
-  "nixpkgs-fmt"
-]
+packages = []
 
 # Message Of The Day (MOTD) is displayed when entering the environment with an
 # interactive shell. By default it will show the project name.
@@ -39,10 +37,11 @@ interactive = """
 
 # Declare commands that are available in the environment.
 [[commands]]
-name = "hello"
 help = "prints hello"
+name = "hello"
 alias = "echo hello"
 
 [[commands]]
-name = "nixpkgs-fmt"
 help = "used to format Nix code"
+name = "nixpkgs-fmt"
+package = "nixpkgs-fmt"
