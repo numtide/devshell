@@ -22,15 +22,54 @@ let
       )
   ;
 
-  aliasToBash = { name, command }:
-    "alias ${name}=${lib.escapeShellArg (toString command)}";
+  commandsToBash = commands:
+    let
+      op = { name, alias ? "", help ? "" }:
+        if alias == "" then "" else
+        "alias ${name}=${lib.escapeShellArg (toString alias)}";
+    in
+    builtins.concatStringsSep "\n" (map op commands)
+  ;
 
-  aliasesToBash = aliases:
-    builtins.concatStringsSep "\n"
-      (lib.mapAttrsToList
-        (name: val: aliasToBash ({ inherit name; } // val))
-        aliases
-      )
+  pad = str: num:
+    if num > 0 then
+      pad "${str} " (num - 1)
+    else
+      str
+  ;
+
+  commandsToMenu = commands:
+    let
+      commands_ =
+        [
+          { name = "devshell-menu"; help = "print this menu"; }
+          { name = "devshell-root"; help = "change directory to root"; }
+        ] ++ commands;
+
+      commandsSorted = builtins.sort (a: b: a.name < b.name) commands_;
+
+      commandLengths =
+        map ({ name, ... }: builtins.stringLength name) commandsSorted;
+
+      maxCommandLength =
+        builtins.foldl'
+          (max: v: if v > max then v else max)
+          0
+          commandLengths
+      ;
+
+      op = { name, alias ? "", help ? "" }:
+        let
+          len = maxCommandLength - (builtins.stringLength name);
+        in
+        if help == "" then
+          name
+        else
+          "${pad name len} - ${help}"
+      ;
+
+    in
+    builtins.concatStringsSep "\n" (map op commandsSorted)
   ;
 
   # A developer shell that works in all scenarios
@@ -42,7 +81,7 @@ let
   mkDevShell =
     { name ? "devshell"
     , # fill this with a message of the day or welcome message
-      motd ? "\n### Welcome to ${name} ####\n$(devshell-menu)"
+      motd ? "$(devshell-menu)"
     , # list of derivations to merge into the environment
       packages ? [ ]
     , # environment variables to add to the ... environment
@@ -52,7 +91,8 @@ let
         extra = "";
         interactive = "";
       }
-    , aliases ? { }
+    , # commands
+      commands ? { }
     }:
     let
       envDrv = buildEnv {
@@ -87,21 +127,13 @@ let
         if [[ $- == *i* ]]; then
 
         devshell-menu() {
+          echo "### 🔨 Welcome to ${name} ####"
+          echo
           echo "# Commands"
-          echo "devshell-menu"
-          echo "devshell-root"
-
-          if [[ -d "$DEVSHELL_DIR/bin" ]]; then
-            ( cd "$DEVSHELL_DIR/bin" && ${coreutils}/bin/ls -x )
-          fi
-
-          if [[ ${toString (builtins.length (builtins.attrNames aliases))} -gt 0 ]]; then
-            echo
-            echo "# Aliases"
-            cat <<ALIASES
-        ${builtins.concatStringsSep "\n" (builtins.attrNames aliases)}
-        ALIASES
-          fi
+          echo
+          cat <<'DEVSHELL_MENU'
+        ${commandsToMenu commands}
+        DEVSHELL_MENU
         }
 
         # Type `devshell-root` to go back to the project root
@@ -113,9 +145,9 @@ let
         # that distinction because `nix-shell -c "cmd"` is running in
         # interactive mode.
         devshell-prompt() {
-          cat <<MOTD
+          cat <<DEVSHELL_PROMPT
         ${motd}
-        MOTD
+        DEVSHELL_PROMPT
           # Make it a noop
           devshell-prompt() { :; }
         }
@@ -139,7 +171,7 @@ let
           [[ -f "$file" ]] && source "$file"
         done
 
-        ${aliasesToBash aliases}
+        ${commandsToBash commands}
 
         ${bash.interactive or ""}
 

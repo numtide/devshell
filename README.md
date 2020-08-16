@@ -121,15 +121,14 @@ When running `nix-shell` or `nix develop`, `mkDevShell` prints a welcome
 message:
 
 ```
-### Welcome to mkDevShell ####
+### 🔨 Welcome to mkDevShell ####
 
-Commands:
-  devshell-menu
-  devshell-root
-  nixpkgs-fmt
+# Commands
 
-Aliases:
-  hello
+devshell-menu - print this menu
+devshell-root - change directory to root
+hello         - prints hello
+nixpkgs-fmt   - used to format Nix code
 ```
 
 ### Configurable with a TOML file

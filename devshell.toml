@@ -37,9 +37,12 @@ interactive = """
 
 """
 
-# Setup bash aliases. These are only available in the interactive
-# environments.
-#
-# TODO: rename to [bash.aliases]?
-[aliases.hello]
-command = 'echo hello'
+# Declare commands that are available in the environment.
+[[commands]]
+name = "hello"
+help = "prints hello"
+alias = "echo hello"
+
+[[commands]]
+name = "nixpkgs-fmt"
+help = "used to format Nix code"
