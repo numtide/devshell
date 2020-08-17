@@ -111,7 +111,7 @@ let
         PATH=''${PATH#${bashBin}:}
         export PATH=$DEVSHELL_DIR/bin:${bashBin}:$PATH
 
-        export NIXPKGS_PATH=${pkgs.path}
+        export NIXPKGS_PATH=${toString pkgs.path}
 
         # Load installed profiles
         for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
