@@ -123,9 +123,7 @@ let
 
         devshell-menu() {
           echo "### 🔨 Welcome to ${name} ####"
-          echo
-          echo "# Commands"
-          echo
+          echo "[commands]"
           cat <<'DEVSHELL_MENU'
         ${commandsToMenu commands}
         DEVSHELL_MENU
