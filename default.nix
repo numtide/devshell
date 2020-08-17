@@ -293,18 +293,8 @@ let
     out
   ;
 
-  resolveKey = key:
-    let
-      attrs = builtins.filter builtins.isString (builtins.split "\\." key);
-    in
-    builtins.foldl' (sum: attr: sum.${attr}) pkgs attrs
-  ;
-
   # Build the devshell from pure JSON-like data
-  fromData = data:
-    mkDevShell (data // {
-      packages = map resolveKey (data.packages or [ ]);
-    });
+  fromData = data: mkDevShell data;
 
   importTOML = path: builtins.fromTOML (builtins.readFile path);
 

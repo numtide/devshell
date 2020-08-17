@@ -1,10 +1,17 @@
 { lib, pkgs, config, ... }:
 with lib;
 let
+  resolveKey = key:
+    let
+      attrs = builtins.filter builtins.isString (builtins.split "\\." key);
+    in
+    builtins.foldl' (sum: attr: sum.${attr}) pkgs attrs
+  ;
+
   # Because we want to be able to push pure JSON-like data into the
   # environment.
   strOrPackage =
-    types.coercedTo types.str (str: pkgs.${str}) types.package;
+    types.coercedTo types.str resolveKey types.package;
 
   # These are all the options available for the commands.
   commandOptions = {
