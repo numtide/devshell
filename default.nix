@@ -308,15 +308,10 @@ let
       packages = map resolveKey (data.packages or [ ]);
     });
 
-  importTOML = path:
-    let
-      data = builtins.fromTOML (builtins.readFile path);
-    in
-    (data.main or { }) // (builtins.removeAttrs data [ "main" ]);
+  importTOML = path: builtins.fromTOML (builtins.readFile path);
 
   # Build the devshell from a TOML declaration
-  fromTOML = path:
-    fromData (importTOML path);
+  fromTOML = path: fromData (importTOML path);
 in
 {
   inherit
