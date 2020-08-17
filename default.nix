@@ -92,7 +92,7 @@ let
         interactive = "";
       }
     , # commands
-      commands ? { }
+      commands ? [ ]
     }:
     let
       envDrv = buildEnv {
