@@ -140,6 +140,14 @@ let
     '';
   };
 
+  # Returns a list of all the input derivation ... for a derivation.
+  inputsOf = drv:
+    (drv.buildInputs or [ ]) ++
+    (drv.nativeBuildInputs or [ ]) ++
+    (drv.propagatedBuildInputs or [ ]) ++
+    (drv.propagatedNativeBuildInputs or [ ])
+  ;
+
 in
 {
   options.devshell = {
@@ -227,6 +235,15 @@ in
       '';
     };
 
+    packagesFrom = mkOption {
+      type = types.listOf strOrPackage;
+      default = [ ];
+      description = ''
+        Add all the build dependencies from the listed packages to the
+        environment.
+      '';
+    };
+
     shell = mkOption {
       internal = true;
       type = types.package;
@@ -236,6 +253,8 @@ in
 
   config.devshell = {
     package = devshell_dir;
+
+    packages = foldl' (sum: drv: sum ++ (inputsOf drv)) [ ] cfg.packagesFrom;
 
     startup = {
       motd = noDepEntry ''
