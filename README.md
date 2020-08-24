@@ -66,7 +66,9 @@ packages = [ "go" ]
 GO111MODULE = "on"
 ```
 
-But there is more to it, see below:
+And more, see below.
+
+Eventually all of this will be added back to nixpkgs once it becomes stable.
 
 ## Features
 
