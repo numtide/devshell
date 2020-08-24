@@ -11,6 +11,11 @@ packages = [
   "mdsh",
 ]
 
+# Expose all the dependencies from a package to the environment.
+packagesFrom = [
+  "direnv"
+]
+
 # Message Of The Day (MOTD) is displayed when entering the environment with an
 # interactive shell. By default it will show the project name.
 #
