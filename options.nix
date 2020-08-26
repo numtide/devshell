@@ -117,6 +117,7 @@ in
           };
         };
       };
+      default = { };
     };
 
     env = mkOption {
