@@ -199,10 +199,6 @@ let
         envScript = ''
           #!${bashPath}
           # Script that sets-up the environment. Can be both sourced or invoked.
-          #
-          # Usage: source @out@      # load the environment in the current shell
-          # Usage: @out@             # start a bash sub-shell
-          # Usage: @out@ <cmd> [...] # run a command in the environment
 
           # This is the directory that contains our dependencies
           export DEVSHELL_DIR=${envDrv}
@@ -220,12 +216,25 @@ let
           # Be strict!
           set -euo pipefail
 
-          # TODO: add --help menu?
-          # TODO: add --pure functionality?
-
           if [[ $# = 0 ]]; then
             # Start an interactive shell
             exec "${bashPath}" --rcfile "${bashrc}" --noprofile
+          elif [[ $1 == "-h" || $1 == "--help" ]]; then
+            cat <<USAGE
+          Usage: ${name}
+            source $0               # load the environment in the current bash
+            $0 -h | --help          # show this help
+            $0 [--pure]             # start a bash sub-shell
+            $0 [--pure] <cmd> [...] # run a command in the environment
+
+          Options:
+            * --pure : execute the script in a clean environment
+          USAGE
+            exit
+          elif [[ $1 == "--pure" ]]; then
+            # re-execute the script in a clean environment
+            shift
+            exec -c "$0" "$@"
           else
             # Start a script
             source "${bashrc}"
