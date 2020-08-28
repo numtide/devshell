@@ -258,7 +258,7 @@ let
         # `nix develop` actually checks and uses builder. And it must be bash.
         builder = bashPath;
         # bring in the dependencies on `nix-build`
-        args = [ "-ec" "${coreutils}/bin/ln -s ${devShellBin} $out" ];
+        args = [ "-ec" "${coreutils}/bin/ln -s ${devShellBin} $out; exit 0" ];
 
         # $stdenv/setup is loaded by nix-shell during startup.
         # https://github.com/nixos/nix/blob/377345e26f1ac4bbc87bb21debcc52a1d03230aa/src/nix-build/nix-build.cc#L429-L432
