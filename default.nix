@@ -2,7 +2,6 @@
 , bashInteractive
 , buildEnv
 , coreutils
-, gnused
 , pkgs
 , system
 , writeText
@@ -13,7 +12,7 @@ let
   bashBin = "${bashInteractive}/bin";
   bashPath = "${bashInteractive}/bin/bash";
 
-  # transform the env vars into bash instructions
+  # Transform the env vars into bash exports
   envToBash = env:
     builtins.concatStringsSep "\n"
       (lib.mapAttrsToList
@@ -106,13 +105,13 @@ let
         PATH=''${PATH#${bashBin}:}
         export PATH=$DEVSHELL_DIR/bin:${bashBin}:$PATH
 
+        # Expose the path to nixpkgs
         export NIXPKGS_PATH=${toString pkgs.path}
 
         # Load installed profiles
         for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
-          # if that folder doesn't exist, bash loves to return the whole glob
-          [[ -e "$file" ]] || continue
-          source "$file"
+          # If that folder doesn't exist, bash loves to return the whole glob
+          [[ -f "$file" ]] && source "$file"
         done
 
         # Use this to set even more things with bash
@@ -137,14 +136,14 @@ let
         # Print information if the prompt is every displayed. We have to make
         # that distinction because `nix-shell -c "cmd"` is running in
         # interactive mode.
-        devshell-prompt() {
+        __devshell-prompt() {
           cat <<DEVSHELL_PROMPT
         ${motd}
         DEVSHELL_PROMPT
           # Make it a noop
-          devshell-prompt() { :; }
+          __devshell-prompt() { :; }
         }
-        PROMPT_COMMAND=devshell-prompt''${PROMPT_COMMAND+;$PROMPT_COMMAND}
+        PROMPT_COMMAND=__devshell-prompt''${PROMPT_COMMAND+;$PROMPT_COMMAND}
 
         # Set a cool PS1
         if [[ -n "$PS1" ]]; then
@@ -171,29 +170,21 @@ let
         fi # Interactive session
       '';
 
-      # This is our entrypoint for everything!
+      # This is our entry-point for everything!
       devShellBin = derivation {
         inherit system;
         name = "${name}-bin";
 
         # Define our own minimal builder.
         builder = bashPath;
-        args = [ "-ec" ". $buildScriptPath" ];
-        buildScript = ''
-          ${coreutils}/bin/cp $envScriptPath $out
-          ${coreutils}/bin/chmod +x $out
-        '';
-
-        # Break the stdenv on purpose to avoid nix-shell here
-        stdenv = writeTextFile {
-          name = "devshell-stdenv";
-          destination = "/setup";
-          text = ''
-            echo "!!!!!! This is not meant to happen !!!!!!"
-            echo "TODO: explain how to propagate inNixShell"
-            exit 1
-          '';
-        };
+        args = [
+          "-ec"
+          ''
+            ${coreutils}/bin/cp $envScriptPath $out &&
+            ${coreutils}/bin/chmod +x $out;
+            exit 0
+          ''
+        ];
 
         # The actual devshell wrapper script
         envScript = ''
@@ -242,7 +233,7 @@ let
           fi
         '';
 
-        passAsFile = [ "buildScript" "envScript" ];
+        passAsFile = [ "envScript" ];
       };
 
       # Use this to define a flake app for the environment.
@@ -257,7 +248,7 @@ let
 
         # `nix develop` actually checks and uses builder. And it must be bash.
         builder = bashPath;
-        # bring in the dependencies on `nix-build`
+        # Bring in the dependencies on `nix-build`
         args = [ "-ec" "${coreutils}/bin/ln -s ${devShellBin} $out; exit 0" ];
 
         # $stdenv/setup is loaded by nix-shell during startup.
@@ -279,11 +270,9 @@ let
           # Remove all the unnecessary noise that is set by the build env
           unset NIX_BUILD_TOP NIX_BUILD_CORES NIX_BUILD_TOP NIX_STORE
           unset TEMP TEMPDIR TMP TMPDIR
-          unset builder name stdenv system out
-          unset shellHook
+          unset builder name out shellHook stdenv system
           # Flakes stuff
-          unset dontAddDisableDepTrack
-          unset outputs
+          unset dontAddDisableDepTrack outputs
 
           # For `nix develop`
           if [[ "$SHELL" == "/noshell" ]]; then
