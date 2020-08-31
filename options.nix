@@ -16,7 +16,7 @@ let
   # These are all the options available for the commands.
   commandOptions = {
     name = mkOption {
-      type = types.nullOr types.str;
+      type = types.str;
       # default = null;
       description = ''
         Name of this command. Defaults to attribute name in commands.
