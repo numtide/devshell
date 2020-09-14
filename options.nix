@@ -8,6 +8,41 @@ let
     builtins.foldl' (sum: attr: sum.${attr}) pkgs attrs
   ;
 
+  pad = str: num:
+    if num > 0 then
+      pad "${str} " (num - 1)
+    else
+      str
+  ;
+
+  commandsToMenu = commands:
+    let
+      commandsSorted = builtins.sort (a: b: a.name < b.name) commands;
+
+      commandLengths =
+        map ({ name, ... }: builtins.stringLength name) commandsSorted;
+
+      maxCommandLength =
+        builtins.foldl'
+          (max: v: if v > max then v else max)
+          0
+          commandLengths
+      ;
+
+      op = { name, help, ... }:
+        let
+          len = maxCommandLength - (builtins.stringLength name);
+        in
+        if help == null || help == "" then
+          name
+        else
+          "${pad name len} - ${help}"
+      ;
+
+    in
+    builtins.concatStringsSep "\n" (map op commandsSorted)
+  ;
+
   # Because we want to be able to push pure JSON-like data into the
   # environment.
   strOrPackage =
@@ -31,13 +66,11 @@ let
       '';
     };
 
-    alias = mkOption {
+    command = mkOption {
       type = types.nullOr types.str;
       default = null;
       description = ''
-        If defined, will define an alias for the command.
-
-        Aliases are only usable in Bash, in interactive mode.
+        If defined, it will define a script for the command.
       '';
     };
 
@@ -148,13 +181,15 @@ in
   config = {
     commands = [
       {
-        help = "print this menu";
+        help = "prints this menu";
         name = "devshell-menu";
-      }
-      {
-        help = "change directory to root";
-        name = "devshell-root";
-        alias = ''cd "$DEVSHELL_ROOT"'';
+        command = ''
+          echo -e "\e[38;5;202m 🔨 Welcome to ${config.name} \e[0m"
+          echo "[commands]"
+          cat <<'DEVSHELL_MENU'
+          ${commandsToMenu config.commands}
+          DEVSHELL_MENU
+        '';
       }
     ];
 

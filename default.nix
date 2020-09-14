@@ -21,50 +21,6 @@ let
       )
   ;
 
-  commandsToBash = commands:
-    let
-      op = { name, alias, ... }:
-        if alias == null || alias == "" then "" else
-        "alias ${name}=${lib.escapeShellArg (toString alias)}";
-    in
-    builtins.concatStringsSep "\n" (map op commands)
-  ;
-
-  pad = str: num:
-    if num > 0 then
-      pad "${str} " (num - 1)
-    else
-      str
-  ;
-
-  commandsToMenu = commands:
-    let
-      commandsSorted = builtins.sort (a: b: a.name < b.name) commands;
-
-      commandLengths =
-        map ({ name, ... }: builtins.stringLength name) commandsSorted;
-
-      maxCommandLength =
-        builtins.foldl'
-          (max: v: if v > max then v else max)
-          0
-          commandLengths
-      ;
-
-      op = { name, help, ... }:
-        let
-          len = maxCommandLength - (builtins.stringLength name);
-        in
-        if help == null || help == "" then
-          name
-        else
-          "${pad name len} - ${help}"
-      ;
-
-    in
-    builtins.concatStringsSep "\n" (map op commandsSorted)
-  ;
-
   # A developer shell that works in all scenarios
   #
   # * nix-build
@@ -90,9 +46,18 @@ let
         ;
 
       envDrv = buildEnv {
-        name = "${name}-env";
-        paths = packages;
         # TODO: support passing more arguments here
+        name = "${name}-env";
+        paths =
+          let
+            op =
+              { name, command, ... }:
+              if command == null || command == "" then [ ]
+              else [
+                (writeShellScriptBin name (toString command))
+              ];
+          in
+          (builtins.concatMap op commands) ++ packages;
       };
 
       # write a bash profile to load
@@ -117,29 +82,25 @@ let
         # Use this to set even more things with bash
         ${bash.extra or ""}
 
+        __devshell-motd() {
+          cat <<DEVSHELL_PROMPT
+        ${motd}
+        DEVSHELL_PROMPT
+        }
+
+        # Print the motd in direnv
+        if [[ ''${DIRENV_IN_ENVRC:-} = 1 ]]; then
+          __devshell-motd
+        fi
+
         # Interactive sessions
         if [[ $- == *i* ]]; then
-
-        devshell-menu() {
-          echo "### 🔨 Welcome to ${name} ####"
-          echo "[commands]"
-          cat <<'DEVSHELL_MENU'
-        ${commandsToMenu commands}
-        DEVSHELL_MENU
-        }
-
-        # Type `devshell-root` to go back to the project root
-        devshell-root() {
-          cd "$DEVSHELL_ROOT"
-        }
 
         # Print information if the prompt is every displayed. We have to make
         # that distinction because `nix-shell -c "cmd"` is running in
         # interactive mode.
         __devshell-prompt() {
-          cat <<DEVSHELL_PROMPT
-        ${motd}
-        DEVSHELL_PROMPT
+          __devshell-motd
           # Make it a noop
           __devshell-prompt() { :; }
         }
@@ -155,15 +116,13 @@ let
               echo " $path "
             fi
           }
-          PS1='\[\033[0;32;40m\][${name}]$(rel_root)\$\[\033[0m\] '
+          PS1='\[\033[38;5;202m\][${name}]$(rel_root)\$\[\033[0m\] '
         fi
 
         # Load bash completions
         for file in "$DEVSHELL_DIR/share/bash-completion/completions/"* ; do
           [[ -f "$file" ]] && source "$file"
         done
-
-        ${commandsToBash commands}
 
         ${bash.interactive or ""}
 

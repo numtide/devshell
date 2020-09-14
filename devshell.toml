@@ -38,7 +38,7 @@ interactive = """
 [[commands]]
 help = "prints hello"
 name = "hello"
-alias = "echo hello"
+command = "echo hello"
 
 [[commands]]
 help = "used to format Nix code"
