@@ -15,6 +15,12 @@ let
       str
   ;
 
+  # Nix strings only support \t, \r and \n as escape codes, so use JSON to get
+  # the escape code.
+  esc = builtins.fromJSON ''"\u001B"'';
+  ansiOrange = "${esc}[38;5;202m";
+  ansiReset = "${esc}[0m";
+
   commandsToMenu = commands:
     let
       commandsSorted = builtins.sort (a: b: a.name < b.name) commands;
@@ -97,7 +103,10 @@ in
     # TODO: rename motd to something better.
     motd = mkOption {
       type = types.str;
-      default = "$(devshell-menu)";
+      default = ''
+        ${ansiOrange}🔨 Welcome to ${config.name}${ansiReset}
+        $(devshell-menu)
+      '';
       description = ''
         Message Of The Day.
 
@@ -184,7 +193,6 @@ in
         help = "prints this menu";
         name = "devshell-menu";
         command = ''
-          echo -e "\e[38;5;202m 🔨 Welcome to ${config.name} \e[0m"
           echo "[commands]"
           cat <<'DEVSHELL_MENU'
           ${commandsToMenu config.commands}
