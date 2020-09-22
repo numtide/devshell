@@ -17,9 +17,10 @@ let
 
   # Nix strings only support \t, \r and \n as escape codes, so use JSON to get
   # the escape code.
-  esc = builtins.fromJSON ''"\u001B"'';
-  ansiOrange = "${esc}[38;5;202m";
-  ansiReset = "${esc}[0m";
+  # Only works for nix >= 3.0
+  #esc = builtins.fromJSON ''"\u001B"'';
+  #ansiOrange = "${esc}[38;5;202m";
+  #ansiReset = "${esc}[0m";
 
   commandsToMenu = commands:
     let
@@ -103,8 +104,12 @@ in
     # TODO: rename motd to something better.
     motd = mkOption {
       type = types.str;
+#      default = ''
+#        ${ansiOrange}🔨 Welcome to ${config.name}${ansiReset}
+#        $(devshell-menu)
+#      '';
       default = ''
-        ${ansiOrange}🔨 Welcome to ${config.name}${ansiReset}
+        🔨 Welcome to ${config.name}
         $(devshell-menu)
       '';
       description = ''
