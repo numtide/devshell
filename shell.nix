@@ -1,3 +1,4 @@
+#!/usr/bin/env nix-build
 # Used to test the shell
 { pkgs ? import <nixpkgs> { } }:
 let

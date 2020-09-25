@@ -6,7 +6,9 @@ name = "mkDevShell"
 # package that you need.
 #
 # NOTE: don't forget to put commas between items! :)
-packages = []
+packages = [
+  "go"
+]
 
 # Message Of The Day (MOTD) is displayed when entering the environment with an
 # interactive shell. By default it will show the project name.
