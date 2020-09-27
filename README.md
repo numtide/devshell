@@ -2,9 +2,16 @@
 
 **STATUS: unstable**
 
-This project is for [Nix](https://nixos.org/nix) users. In short, it's a
-`pkgs.mkShell` replacement. Eventually, it will find its way into `nixpkgs`
-once it has become stable.
+The goal of this project is to simplify per-project developer environments.
+
+Imagine, a new employee joins the company, or somebody transfers teams, or
+somebody wants to contribute to one of your Open Source projects. It
+should take them 10 minutes to clone the repo and get all of the development
+dependencies.
+
+## Documentation
+
+See [docs](docs)
 
 ## Story time!
 
@@ -156,7 +163,6 @@ development dependencies is as easy as:
 ```sh
 nix-build shell.nix | cachix push <mycache>
 ```
-
 ## TODO
 
 A lot of things!
@@ -174,11 +180,6 @@ Write integration tests for all of the use-cases.
 This requires some coordination with the repository structure. To keep the
 dev closure small, it would be nice to be able to load some of the
 dependencies on demand.
-
-### --pure mode
-
-Sometimes you want to run things in a slightly more pure mode. For example in
-a CI environment, to make sure that all the dev dependencies are captured.
 
 ### Doctor / nix version check
 
