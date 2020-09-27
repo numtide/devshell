@@ -1,4 +1,4 @@
-# devshell - a shared developer shell
+# devshell - per project developer environments.
 
 **STATUS: unstable**
 

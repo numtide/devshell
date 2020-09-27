@@ -1,4 +1,4 @@
-# devshell - a mkShell for developers.
+# devshell - per project developer environments.
 
 **STATUS: unstable**
 
