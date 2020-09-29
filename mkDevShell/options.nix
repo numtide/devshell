@@ -15,11 +15,8 @@ let
       str
   ;
 
-  # Nix strings only support \t, \r and \n as escape codes, so use JSON to get
-  # the escape code.
-  esc = builtins.fromJSON ''"\u001B"'';
-  ansiOrange = "${esc}[38;5;202m";
-  ansiReset = "${esc}[0m";
+  ansiBoldOrange = "$(tput setaf 202)";
+  ansiReset = "$(tput sgr0)";
 
   commandsToMenu = commands:
     let
@@ -104,7 +101,7 @@ in
     motd = mkOption {
       type = types.str;
       default = ''
-        ${ansiOrange}🔨 Welcome to ${config.name}${ansiReset}
+        ${ansiBoldOrange}🔨 Welcome to ${config.name}${ansiReset}
         $(devshell-menu)
       '';
       description = ''
