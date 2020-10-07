@@ -24,6 +24,18 @@ packages = [
 #
 # motd = ""
 
+# This setting helps to add a project's shared *development* root CA
+# to host's local trust stores by instrumenting the mkcert third party tool.
+# Defining this section also adds `mkcert` to the available packages.
+# Set to the path where mkcert-generated CAROOT files are expected to exist
+#
+# NOTES:
+# - be careful to only put *development* certificates under version control
+# - create those files with the devshell generated *-install-CA command
+# - optionally put this path under .gitignore, if you want users to
+#   generate certificates themselves on first clone (using *-install-CA)
+# dev-ca-path = "./dev-ca"
+
 # Use this section to set environment variables to have in the environment.
 #
 # NOTE: all the values are escaped
@@ -60,6 +72,13 @@ package = "nixpkgs-fmt"
 help = "github utility"
 name = "hub"
 package = "gitAndTools.hub"
+
+# These settings help to manage local DNS overrides via
+# instrumentation of the hostcl third party tool.
+# Defining this section also adds `hostctl` to the available packages.
+[static-dns]
+test.domain.local = 172.0.0.1
+shared.domain.link-local = 169.254.0.5
 ```
 
 ## Schema
@@ -83,6 +102,8 @@ The name field is optional and defaults to `devshell`.
 
 ### The `motd` field
 
+### The `dev-ca-path` field
+
 ### The `env` section
 
 ### The `bash.extra` field
@@ -95,4 +116,6 @@ The name field is optional and defaults to `devshell`.
 * `help`:
 * `name`:
 * `package`:
+
+### The `dns` section
 
