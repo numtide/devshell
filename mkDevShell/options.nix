@@ -236,7 +236,7 @@ in
           DEVSHELL_MENU
         '';
       }
-    ] ++ instrumentedCommands;
+    ];
 
     packages =
       lib.unique (
