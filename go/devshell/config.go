@@ -22,12 +22,14 @@ type configCommand struct {
 }
 
 type config struct {
-	Name     string                 `toml:"name"`
-	Packages []string               `toml:"packages"`
-	Motd     *string                `toml:"motd"`
-	Env      map[string]interface{} `toml:"env"`
-	Bash     configBash             `toml:"bash,omitempty"`
-	Commands []configCommand        `toml:"commands"`
+	Name      string                 `toml:"name"`
+	Packages  []string               `toml:"packages"`
+	Motd      *string                `toml:"motd"`
+	DevCaPath *string                `toml:"dev-ca-path,omitempty"`
+	Env       map[string]interface{} `toml:"env"`
+	Bash      configBash             `toml:"bash,omitempty"`
+	Commands  []configCommand        `toml:"commands"`
+	StaticDNS map[string]interface{} `toml:"static-dns,omitempty"`
 }
 
 func configLoad(path string) (*config, error) {
