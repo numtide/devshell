@@ -1,7 +1,7 @@
 { lib, pkgs, config, ... }:
 with lib;
 let
-  instrumentedCommands = (import ./instrumentation.nix) {lib, pkgs, config};
+  instrumentedCommands = import ./instrumentation.nix { inherit lib pkgs config; };
 
   resolveKey = key:
     let
