@@ -117,5 +117,5 @@ The name field is optional and defaults to `devshell`.
 * `name`:
 * `package`:
 
-### The `dns` section
+### The `static-dns` section
 
