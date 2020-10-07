@@ -1,4 +1,4 @@
-{ nixpkgs ? <nixpkgs>
+{ nixpkgs ? import ./nix/nixpkgs.nix
 , system ? builtins.currentSystem
 }:
 import nixpkgs {

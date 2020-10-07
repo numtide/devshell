@@ -1,7 +1,4 @@
 #!/usr/bin/env nix-build
 # Used to test the shell
-{ pkgs ? import <nixpkgs> { } }:
-let
-  mkDevShell = pkgs.callPackage ./. { };
-in
-mkDevShell.fromTOML ./devshell.toml
+{ pkgs ? import ./. { } }:
+pkgs.mkDevShell.fromTOML ./devshell.toml

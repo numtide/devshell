@@ -13,9 +13,8 @@
       # Real developers use Linux for development :-p
       system = "x86_64-linux";
 
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ (import ./overlay.nix) ];
+      pkgs = import ./. {
+        inherit nixpkgs system;
       };
     in
     {
