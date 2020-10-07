@@ -1,5 +1,5 @@
 final: prev:
 {
-  devshell = prev.callPackage ./go/devshell { };
-  mkDevShell = prev.callPackage ./. { };
+  devshell = prev.callPackage ./devshell { };
+  mkDevShell = prev.callPackage ./mkDevShell { };
 }
