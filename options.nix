@@ -1,6 +1,8 @@
 { lib, pkgs, config, ... }:
 with lib;
 let
+  instrumentedCommands = (import ./instrumentation.nix) {lib, pkgs, config};
+
   resolveKey = key:
     let
       attrs = builtins.filter builtins.isString (builtins.split "\\." key);
@@ -115,6 +117,27 @@ in
       '';
     };
 
+    # exclusively consumed by command instrumentation
+    dev-ca-path = mkOption {
+      type = types.str;
+      default = "";
+      description = ''
+        Path to a development CA.
+
+        Users can load/unload this dev CA easily and cleanly into their local
+        trust stores via a wrapper around mkcert third party tool so that browsers
+        and other tools would accept issued certificates under this CA as valid.
+
+        Use cases:
+         - Ship static dev certificates under version control and make them trusted
+           on user machines: add the rootCA under version control alongside the
+           your dev certificates.
+         - Provide users with easy and reliable CA bootstrapping through the mkcert
+           command: exempt this path from version control via .gitignore and have
+           users  easily and reliably bootstrap a dev CA infrastructure on first use.
+      '';
+    };
+
     commands = mkOption {
       type = types.listOf (types.submodule { options = commandOptions; });
       default = [ ];
@@ -185,6 +208,23 @@ in
       '';
     };
 
+    # exclusively consumed by command instrumentation
+    static-dns = mkOption {
+      type = types.attrs;
+      default = { };
+      description = ''
+        A list of static DNS entries, for which to enable instrumentation.
+
+        Users can enable/disable listed static DNS easily and cleanly
+        via a wrapper around the hostctl third party tool.
+      '';
+      example = {
+        "test.domain.local" = "172.0.0.1";
+        "shared.domain.link-local" = "169.254.0.5";
+      };
+    };
+
+
   };
 
   config = {
@@ -195,14 +235,18 @@ in
         command = ''
           echo "[commands]"
           cat <<'DEVSHELL_MENU'
-          ${commandsToMenu config.commands}
+          ${commandsToMenu (config.commands ++ instrumentedCommands)}
           DEVSHELL_MENU
         '';
       }
-    ];
+    ] ++ instrumentedCommands;
 
     packages =
-      builtins.filter (x: x != null)
-        (map (x: x.package) config.commands);
+      lib.unique (
+        builtins.filter (x: x != null)
+          (map (x: x.package)
+            (config.commands ++ instrumentedCommands)
+          )
+        );
   };
 }
