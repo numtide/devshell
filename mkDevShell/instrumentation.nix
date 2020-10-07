@@ -47,7 +47,7 @@ let
       '';
   };
 in
-if static-dns == null || static-dns == "" then []
-else [ fqdnsActivate fqdnsDeactivate ] ++
-if dev-ca-path == null || dev-ca-path == "" then []
-else [ installProjectCA uninstallProjectCA ];
+(if static-dns == null || static-dns == "" then []
+else [ fqdnsActivate fqdnsDeactivate ]) ++
+(if dev-ca-path == null || dev-ca-path == "" then []
+else [ installProjectCA uninstallProjectCA ])

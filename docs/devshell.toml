@@ -69,5 +69,5 @@ package = "gitAndTools.hub"
 # instrumentation of the hostcl third party tool.
 # Defining this section also adds `hostctl` to the available packages.
 [static-dns]
-test.domain.local = 172.0.0.1
-shared.domain.link-local = 169.254.0.5
+test.domain.local = "172.0.0.1"
+shared.domain.link-local = "169.254.0.5"
