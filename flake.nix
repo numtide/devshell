@@ -1,5 +1,5 @@
 {
-  description = "mkDevShell";
+  description = "devshell";
 
   outputs = { self }:
     let
