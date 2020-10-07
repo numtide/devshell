@@ -12,10 +12,9 @@ import (
 
 const shellNix = `
 let
-	pkgs = import <nixpkgs> {};
-	mkDevShell = pkgs.callPackage <devshell> {};
+	pkgs = import <devshell> {};
 in
-mkDevShell.fromTOML ./devshell.toml
+pkgs.mkDevShell.fromTOML ./devshell.toml
 `
 
 var cmdEnter = &cli.Command{
