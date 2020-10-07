@@ -1,0 +1,3 @@
+# mimick use case where users are expected to boostrap their dev ca
+# this is also better for testing devhsell ca bootstrapping
+dev-ca

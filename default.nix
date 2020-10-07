@@ -3,5 +3,8 @@
 }:
 import nixpkgs {
   inherit system;
-  overlays = [ (import ./overlay.nix) ];
+  overlays = [
+    (import ./overlay.nix)
+    (import ./extensions/overlay.nix)
+  ];
 }
