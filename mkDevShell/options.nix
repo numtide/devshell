@@ -240,10 +240,13 @@ in
 
     packages =
       lib.unique (
-        builtins.filter (x: x != null)
-          (map (x: x.package)
-            (config.commands ++ instrumentedCommands)
+        builtins.filter
+          (x: x != null)
+          (
+            map
+              (x: x.package)
+              (config.commands ++ instrumentedCommands)
           )
-        );
+      );
   };
 }
