@@ -6,7 +6,7 @@ let
     static-dns
     ;
   installProjectCA = {
-    name = "${name}-install-ca";
+    name = "install-ca";
     help = "install dev CA";
     package = pkgs.mkcert;
     command = ''
@@ -16,7 +16,7 @@ let
     '';
   };
   uninstallProjectCA = {
-    name = "${name}-uninstall-ca";
+    name = "uninstall-ca";
     help = "uninstall dev CA";
     package = pkgs.mkcert;
     command = ''
@@ -32,7 +32,7 @@ let
     );
   # since this temporarily modifies /etc/hosts, use of sudo can't be avoided
   fqdnsActivate = {
-    name = "${name}-dns-activate";
+    name = "dns-activate";
     help = "activate pre-configured static dns";
     package = pkgs.hostctl;
     command = ''
@@ -41,7 +41,7 @@ let
     '';
   };
   fqdnsDeactivate = {
-    name = "${name}-dns-deactivate";
+    name = "dns-deactivate";
     help = "deactivate pre-configured static dns";
     package = pkgs.hostctl;
     command = ''
