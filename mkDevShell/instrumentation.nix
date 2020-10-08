@@ -8,6 +8,7 @@ let
   installProjectCA = {
     name = "ca-install";
     help = "install dev CA";
+    category = "host state";
     package = pkgs.mkcert;
     command = ''
       echo "$(tput bold)Installing the ${name}'s dev CA into local trust stores via mkcert command ...$(tput sgr0)"
@@ -18,6 +19,7 @@ let
   uninstallProjectCA = {
     name = "ca-uninstall";
     help = "uninstall dev CA";
+    category = "host state";
     package = pkgs.mkcert;
     command = ''
       echo "$(tput bold)Purging the ${name}'s dev CA from local trust stores via mkcert command ...$(tput sgr0)"
@@ -33,6 +35,7 @@ let
   # since this temporarily modifies /etc/hosts, use of sudo can't be avoided
   fqdnsActivate = {
     name = "dns-activate";
+    category = "host state";
     help = "activate pre-configured static dns";
     package = pkgs.hostctl;
     command = ''
@@ -42,6 +45,7 @@ let
   };
   fqdnsDeactivate = {
     name = "dns-deactivate";
+    category = "host state";
     help = "deactivate pre-configured static dns";
     package = pkgs.hostctl;
     command = ''

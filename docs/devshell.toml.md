@@ -67,11 +67,13 @@ command = "echo hello"
 help = "used to format Nix code"
 name = "nixpkgs-fmt"
 package = "nixpkgs-fmt"
+category = "formatters"
 
 [[commands]]
 help = "github utility"
 name = "hub"
 package = "gitAndTools.hub"
+category = "utilities"
 
 # These settings help to manage local DNS overrides via
 # instrumentation of the hostcl third party tool.
