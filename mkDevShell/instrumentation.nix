@@ -6,21 +6,21 @@ let
     static-dns
     ;
   installProjectCA = {
-    name = "install-ca";
+    name = "ca-install";
     help = "install dev CA";
     package = pkgs.mkcert;
     command = ''
-      echo "$(tput bold)Installing the project's dev CA into local trust stores via mkcert command ...$(tput sgr0)"
+      echo "$(tput bold)Installing the ${name}'s dev CA into local trust stores via mkcert command ...$(tput sgr0)"
       export CAROOT=${dev-ca-path}
       ${pkgs.mkcert}/bin/mkcert -install
     '';
   };
   uninstallProjectCA = {
-    name = "uninstall-ca";
+    name = "ca-uninstall";
     help = "uninstall dev CA";
     package = pkgs.mkcert;
     command = ''
-      echo "$(tput bold)Purging the project's dev CA from local trust stores via mkcert command ...$(tput sgr0)"
+      echo "$(tput bold)Purging the ${name}'s dev CA from local trust stores via mkcert command ...$(tput sgr0)"
       export CAROOT=${dev-ca-path}
       ${pkgs.mkcert}/bin/mkcert -uninstall
     '';

@@ -232,7 +232,7 @@ in
         command = ''
           echo "[commands]"
           cat <<'DEVSHELL_MENU'
-          ${commandsToMenu (config.commands ++ instrumentedCommands)}
+          ${commandsToMenu config.commands}
           DEVSHELL_MENU
         '';
       }
@@ -245,7 +245,7 @@ in
           (
             map
               (x: x.package)
-              (config.commands ++ instrumentedCommands)
+              config.commands
           )
       );
   };
