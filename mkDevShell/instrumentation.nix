@@ -26,7 +26,9 @@ let
       '';
   };
 
-  etcHosts = writeText "${name}-etchosts" concatStringsSep "\n" servicenames;
+  etcHosts = pkgs.writeText "${name}-etchosts"
+    (lib.concatStringsSep "\n"
+      (lib.mapAttrsToList (name: value: value + " " + name) static-dns));
   # since this temporarily modifies /etc/hosts, use of sudo can't be avoided
   fqdnsActivate = {
     name = "${name}-dns-activate";
