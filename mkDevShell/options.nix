@@ -104,7 +104,7 @@ in
       type = types.str;
       default = ''
         ${ansiBoldOrange}🔨 Welcome to ${config.name}${ansiReset}
-        $(devshell-menu)
+        $(menu)
       '';
       description = ''
         Message Of The Day.
@@ -228,7 +228,7 @@ in
     commands = [
       {
         help = "prints this menu";
-        name = "devshell-menu";
+        name = "menu";
         command = ''
           echo "[commands]"
           cat <<'DEVSHELL_MENU'
