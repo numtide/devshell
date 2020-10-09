@@ -55,6 +55,7 @@ command = "echo hello"
 help = "used to format Nix code"
 name = "nixpkgs-fmt"
 package = "nixpkgs-fmt"
+category = "formatters"
 
 [[commands]]
 help = "github utility"

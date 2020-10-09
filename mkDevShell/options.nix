@@ -20,10 +20,8 @@ let
 
   commandsToMenu = commands:
     let
-      commandsSorted = builtins.sort (a: b: a.name < b.name) commands;
-
       commandLengths =
-        map ({ name, ... }: builtins.stringLength name) commandsSorted;
+        map ({ name, ... }: builtins.stringLength name) commands;
 
       maxCommandLength =
         builtins.foldl'
@@ -32,18 +30,36 @@ let
           commandLengths
       ;
 
-      op = { name, help, ... }:
-        let
-          len = maxCommandLength - (builtins.stringLength name);
-        in
-        if help == null || help == "" then
-          name
-        else
-          "${pad name len} - ${help}"
-      ;
+      commandCategories = lib.unique (
+        (zipAttrsWithNames [ "category" ] (name: vs: vs) commands).category
+      );
 
+      commandByCategoriesSorted =
+        builtins.attrValues (lib.genAttrs
+          commandCategories
+          (category: lib.nameValuePair category (builtins.sort
+            (a: b: a.name < b.name)
+            (builtins.filter
+              (x: x.category == category)
+              commands
+            )
+          ))
+        );
+
+      opCat = { name, value }:
+        let
+          opCmd = { name, help, ...}:
+            let
+              len = maxCommandLength - (builtins.stringLength name);
+            in
+            if help == null || help == "" then
+              name
+            else
+              "${pad name len} - ${help}";
+        in
+         "\n[${name}]\n" + builtins.concatStringsSep "\n" (map opCmd value);
     in
-    builtins.concatStringsSep "\n" (map op commandsSorted)
+    builtins.concatStringsSep "\n" (map opCat commandByCategoriesSorted)
   ;
 
   # Because we want to be able to push pure JSON-like data into the
@@ -58,6 +74,15 @@ let
       # default = null;
       description = ''
         Name of this command. Defaults to attribute name in commands.
+      '';
+    };
+
+    category = mkOption {
+      type = types.str;
+      default = "general commands";
+      description = ''
+        Set a free text category under which this command is grouped
+        and shown in the help menu.
       '';
     };
 
@@ -193,7 +218,6 @@ in
         help = "prints this menu";
         name = "menu";
         command = ''
-          echo "[commands]"
           cat <<'DEVSHELL_MENU'
           ${commandsToMenu config.commands}
           DEVSHELL_MENU
