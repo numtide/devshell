@@ -1,6 +1,6 @@
 { nixpkgs ? import ./nix/nixpkgs.nix
 , system ? builtins.currentSystem
-, overlays ? []
+, overlays ? [ ]
 }:
 import nixpkgs {
   inherit system;

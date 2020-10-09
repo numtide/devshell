@@ -48,7 +48,7 @@ let
 
       opCat = { name, value }:
         let
-          opCmd = { name, help, ...}:
+          opCmd = { name, help, ... }:
             let
               len = maxCommandLength - (builtins.stringLength name);
             in
@@ -57,7 +57,7 @@ let
             else
               "${pad name len} - ${help}";
         in
-         "\n[${name}]\n" + builtins.concatStringsSep "\n" (map opCmd value);
+        "\n[${name}]\n" + builtins.concatStringsSep "\n" (map opCmd value);
     in
     builtins.concatStringsSep "\n" (map opCat commandByCategoriesSorted)
   ;
@@ -226,7 +226,8 @@ in
     ];
 
     packages =
-      builtins.filter (x: x != null)
+      builtins.filter
+        (x: x != null)
         (map (x: x.package) config.commands);
   };
 }
