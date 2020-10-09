@@ -164,6 +164,9 @@ in
       default = { };
       description = ''
         Environment variables to add to the environment.
+
+        If the value is null, it will unset the environment variable.
+        Otherwise, the value will be converted to string before being set.
       '';
       example = {
         GO111MODULE = "on";
