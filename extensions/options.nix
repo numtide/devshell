@@ -15,7 +15,7 @@ let
     category = "host state";
     package = pkgs.mkcert;
     command = ''
-      echo "$(tput bold)Installing the ${name}'s dev CA into local trust stores via mkcert command ...$(tput sgr0)"
+      echo "$(tput bold)Installing ${name}'s dev CA into local trust stores via mkcert command ...$(tput sgr0)"
       export CAROOT=${dev-ca-path}
       ${pkgs.mkcert}/bin/mkcert -install
     '';
@@ -26,7 +26,7 @@ let
     category = "host state";
     package = pkgs.mkcert;
     command = ''
-      echo "$(tput bold)Purging the ${name}'s dev CA from local trust stores via mkcert command ...$(tput sgr0)"
+      echo "$(tput bold)Purging ${name}'s dev CA from local trust stores via mkcert command ...$(tput sgr0)"
       export CAROOT=${dev-ca-path}
       ${pkgs.mkcert}/bin/mkcert -uninstall
     '';
@@ -72,8 +72,8 @@ let
 
         Use cases:
          - Ship static dev certificates under version control and make them trusted
-           on user machines: add the rootCA under version control alongside the
-           your dev certificates.
+           on user machines: add the rootCA under version control alongside  your
+           dev certificates.
          - Provide users with easy and reliable CA bootstrapping through the mkcert
            command: exempt this path from version control via .gitignore and have
            users  easily and reliably bootstrap a dev CA infrastructure on first use.
