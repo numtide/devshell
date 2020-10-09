@@ -16,7 +16,7 @@ let
     package = pkgs.mkcert;
     command = ''
       echo "$(tput bold)Installing ${name}'s dev CA into local trust stores via mkcert command ...$(tput sgr0)"
-      export CAROOT=${dev-ca-path}
+      export CAROOT=$DEVSHELL_ROOT${dev-ca-path}
       ${pkgs.mkcert}/bin/mkcert -install
     '';
   };
@@ -27,7 +27,7 @@ let
     package = pkgs.mkcert;
     command = ''
       echo "$(tput bold)Purging ${name}'s dev CA from local trust stores via mkcert command ...$(tput sgr0)"
-      export CAROOT=${dev-ca-path}
+      export CAROOT=$DEVSHELL_ROOT${dev-ca-path}
       ${pkgs.mkcert}/bin/mkcert -uninstall
     '';
   };
@@ -116,4 +116,5 @@ in
         else [ installProjectCA uninstallProjectCA ]
       );
   };
+  bash.extra = "export CAROOT=$DEVSHELL_ROOT/${dev-ca-path}";
 }
