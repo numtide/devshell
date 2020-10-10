@@ -227,7 +227,8 @@ in
     ];
 
     packages =
-      builtins.filter (x: x != null)
+      builtins.filter
+        (x: x != null)
         (map (x: x.package) config.commands);
   };
 }
