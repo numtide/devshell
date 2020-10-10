@@ -54,3 +54,9 @@ help = "github utility"
 name = "hub"
 package = "gitAndTools.hub"
 category = "utilites"
+
+[[commands]]
+help = "golang linter"
+name = "golangci-lint"
+package = "golangci-lint"
+category = "linters"

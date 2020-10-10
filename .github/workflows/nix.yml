@@ -16,6 +16,7 @@ jobs:
         with:
           name: numtide
           signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+      - run: $(nix-build shell.nix) --pure /usr/bin/env HOME=$HOME golangci-lint run
       - run: nix flake check
       - run: nix develop -c echo OK
       - name: Run nix flake archive
