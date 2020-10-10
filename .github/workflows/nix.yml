@@ -1,8 +1,26 @@
 name: Nix
-on: [ push ]
+on: [ push, pull_request ]
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v11
+      - uses: cachix/cachix-action@v6
+        with:
+          name: numtide
+          signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+      - run: $(nix-build shell.nix) --pure /usr/bin/env HOME=$HOME golangci-lint run
+      - run: nix-shell --run "echo OK"
+      - run: nix-build -A devshell
+  flakes:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ] # macos-latest is not working right now
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -10,14 +28,13 @@ jobs:
           fetch-depth: 0
       - uses: cachix/install-nix-action@v11
         with:
-          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20200618_377345e/install
-      - run: echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf
+          install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-3.0pre20201007_5257a25/install
+          extra_nix_config: |
+            experimental-features = nix-command flakes
       - uses: cachix/cachix-action@v6
         with:
           name: numtide
           signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
-      - run: $(nix-build shell.nix) --pure /usr/bin/env HOME=$HOME golangci-lint run
-      - run: nix-build -A devshell
       - run: nix flake check
       - run: nix develop -c echo OK
       - name: Run nix flake archive
