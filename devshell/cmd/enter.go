@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -17,7 +17,8 @@ in
 pkgs.mkDevShell.fromTOML ./devshell.toml
 `
 
-var cmdEnter = &cli.Command{
+// Enter command
+var Enter = &cli.Command{
 	Name:    "enter",
 	Aliases: []string{"e"},
 	Usage:   "builds and enters the shell",
