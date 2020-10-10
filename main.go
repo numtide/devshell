@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/numtide/devshell/devshell/cmd"
+	"github.com/numtide/devshell/cmd"
 )
 
 func main() {

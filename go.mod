@@ -1,4 +1,4 @@
-module github.com/numtide/devshell/devshell
+module github.com/numtide/devshell
 
 go 1.15
 
