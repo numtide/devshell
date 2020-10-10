@@ -4,8 +4,9 @@ let
   resolveKey = key:
     let
       attrs = builtins.filter builtins.isString (builtins.split "\\." key);
+      op = sum: attr: sum.${attr} or (throw "package \"${key}\" not found");
     in
-    builtins.foldl' (sum: attr: sum.${attr}) pkgs attrs
+    builtins.foldl' op pkgs attrs
   ;
 
   pad = str: num:
@@ -48,7 +49,7 @@ let
 
       opCat = { name, value }:
         let
-          opCmd = { name, help, ...}:
+          opCmd = { name, help, ... }:
             let
               len = maxCommandLength - (builtins.stringLength name);
             in
@@ -57,7 +58,7 @@ let
             else
               "${pad name len} - ${help}";
         in
-         "\n[${name}]\n" + builtins.concatStringsSep "\n" (map opCmd value);
+        "\n[${name}]\n" + builtins.concatStringsSep "\n" (map opCmd value);
     in
     builtins.concatStringsSep "\n" (map opCat commandByCategoriesSorted)
   ;
