@@ -112,13 +112,13 @@ let
       '';
     };
   };
+
   serviceOptions = {
     name = mkOption {
       type = types.str;
     };
     command = mkOption {
-      type = types.nullOr types.str;
-      default = null;
+      type = types.str;
     };
   };
 in
