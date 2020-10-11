@@ -1,6 +1,6 @@
 { buildGoModule }:
 let
-  source = import ../nix/source.nix;
+  source = import ./nix/source.nix;
 in
 buildGoModule {
   name = "devshell";
@@ -9,6 +9,8 @@ buildGoModule {
     allow = [
       ./go.mod
       ./go.sum
+      ./cmd
+      ./config
       (source.matchExt "go")
     ];
   };

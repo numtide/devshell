@@ -1,28 +1,21 @@
-package main
+package cmd
 
 import (
-	"log"
 	"os"
 
 	"github.com/urfave/cli/v2"
 )
 
-func run() error {
+// Execute the main command
+func Execute() error {
 	app := &cli.App{
 		Name:        "devshell",
 		Description: "THE developer shell",
 		Commands: []*cli.Command{
-			cmdEnter,
-			cmdInit,
+			Enter,
+			Init,
 		},
 	}
 
 	return app.Run(os.Args)
-}
-
-func main() {
-	err := run()
-	if err != nil {
-		log.Fatal(err)
-	}
 }

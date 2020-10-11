@@ -1,5 +1,5 @@
 final: prev:
 {
-  devshell = prev.callPackage ./devshell { };
+  devshell = prev.callPackage ./devshell.nix { };
   mkDevShell = prev.callPackage ./mkDevShell { };
 }

@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"os"
@@ -6,14 +6,17 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-const configFile = "devshell.toml"
+// FileName ...
+const FileName = "devshell.toml"
 
-type configBash struct {
+// Bash ...
+type Bash struct {
 	Extra       string `toml:"extra,omitempty"`
 	Interactive string `toml:"interactive,omitempty"`
 }
 
-type configCommand struct {
+// Command ...
+type Command struct {
 	Alias   string `toml:"alias,omitempty"`
 	Command string `toml:"command,omitempty"`
 	Help    string `toml:"help,omitempty"`
@@ -21,22 +24,24 @@ type configCommand struct {
 	Package string `toml:"package,omitempty"`
 }
 
-type config struct {
+// Config ...
+type Config struct {
 	Name     string                 `toml:"name"`
 	Packages []string               `toml:"packages"`
 	Motd     *string                `toml:"motd"`
 	Env      map[string]interface{} `toml:"env"`
-	Bash     configBash             `toml:"bash,omitempty"`
-	Commands []configCommand        `toml:"commands"`
+	Bash     Bash                   `toml:"bash,omitempty"`
+	Commands []Command              `toml:"commands"`
 }
 
-func configLoad(path string) (*config, error) {
+// Load ...
+func Load(path string) (*Config, error) {
 	r, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 
-	c := &config{}
+	c := &Config{}
 	err = toml.NewDecoder(r).Decode(c)
 	if err != nil {
 		return nil, err
@@ -45,7 +50,8 @@ func configLoad(path string) (*config, error) {
 	return c, err
 }
 
-func configPrint(c *config) string {
+// Print ...
+func Print(c *Config) string {
 	b, err := toml.Marshal(c)
 	if err != nil {
 		panic(err) // should never happen

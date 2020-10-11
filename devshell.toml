@@ -56,6 +56,12 @@ package = "gitAndTools.hub"
 category = "utilites"
 
 [[commands]]
+help = "golang linter"
+name = "golangci-lint"
+package = "golangci-lint"
+category = "linters"
+
+[[commands]]
 name = "hello-loop"
 command = "while true; do hello; sleep 1; done"
 

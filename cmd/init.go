@@ -1,19 +1,17 @@
-package main
+package cmd
 
 import (
-	"os"
 	"path/filepath"
+
+	"github.com/numtide/devshell/config"
 
 	"github.com/urfave/cli/v2"
 )
 
-const initHeader = `
-# See https://github.com/numtide/devshell
-`
-
-var cmdInit = &cli.Command{
+// Init command
+var Init = &cli.Command{
 	Name:  "init",
-	Usage: "creates a new " + configFile + " file",
+	Usage: "creates a new " + config.FileName + " file",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:  "name",
@@ -37,21 +35,6 @@ var cmdInit = &cli.Command{
 			name = filepath.Base(p2)
 		}
 
-		// Generate the config
-		cfg := &config{
-			Name: name,
-		}
-		cfgStr := initHeader + configPrint(cfg)
-
-		// Write the config file
-		w, err := os.Create(filepath.Join(p, configFile))
-		if err != nil {
-			return err
-		}
-		_, err = w.WriteString(cfgStr)
-		if err != nil {
-			return err
-		}
-		return w.Close()
+		return config.Init(p, name)
 	},
 }
