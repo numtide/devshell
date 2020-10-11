@@ -54,3 +54,11 @@ help = "github utility"
 name = "hub"
 package = "gitAndTools.hub"
 category = "utilites"
+
+[[commands]]
+name = "hello-loop"
+command = "while true; do hello; sleep 1; done"
+
+[[services]]
+name = "hello-printer"
+command = "hello-loop"

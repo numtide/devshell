@@ -111,6 +111,15 @@ let
       '';
     };
   };
+  serviceOptions = {
+    name = mkOption {
+      type = types.str;
+    };
+    command = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+  };
 in
 {
   options = {
@@ -157,6 +166,11 @@ in
           }
         ]
       '';
+    };
+
+    services = mkOption {
+      type = types.listOf (types.submodule { options = serviceOptions; });
+      default = [ ];
     };
 
     bash = mkOption {
