@@ -17,6 +17,16 @@ in
 pkgs.mkDevShell.fromTOML ./devshell.toml
 `
 
+func run(name string, args ...string) (string, error) {
+	cmd := exec.Command(name, args...)
+	cmd.Stderr = os.Stderr
+	out, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", name, err)
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
 // Enter command
 var Enter = &cli.Command{
 	Name:    "enter",
@@ -39,12 +49,14 @@ var Enter = &cli.Command{
 		paths := c.StringSlice("I")
 		shellFile := filepath.Join(path, "shell.nix")
 
-		args := []string{"-v"}
+		args := []string{"--show-trace"}
 		exists, err := fileExists(shellFile)
 		if err != nil {
 			return err
 		}
-		if !exists {
+		if exists {
+			args = append(args, shellFile)
+		} else {
 			args = append(args, "--expr", shellNix)
 		}
 		for _, p := range paths {
@@ -52,18 +64,17 @@ var Enter = &cli.Command{
 		}
 
 		// instantiate eval
-		out, err := exec.Command("nix-instantiate", args...).Output()
+		drvPath, err := run("nix-instantiate", args...)
 		if err != nil {
-			return fmt.Errorf("nix-instantiate: %w", err)
+			return err
 		}
-		drvPath := strings.TrimSpace(string(out))
+		// remove the surrounding quotes
 		drvPath = strings.Trim(drvPath, "\"")
 		// realize
-		out, err = exec.Command("nix-store", "--realize", drvPath).Output()
+		outPath, err := run("nix-store", "--realize", drvPath)
 		if err != nil {
-			return fmt.Errorf("nix-store: %w", err)
+			return err
 		}
-		outPath := strings.TrimSpace(string(out))
 		// execute
 		cmd := exec.Command(outPath, c.Args().Slice()...)
 		cmd.Stdin = os.Stdin
