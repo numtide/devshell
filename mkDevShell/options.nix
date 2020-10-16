@@ -16,8 +16,11 @@ let
       str
   ;
 
-  ansiBoldOrange = "$(tput setaf 202)";
-  ansiReset = "$(tput sgr0)";
+  # Nix strings only support \t, \r and \n as escape codes, so actually store
+  # the literal escape "ESC" code.
+  esc = "";
+  ansiOrange = "${esc}[38;5;202m";
+  ansiReset = "${esc}[0m";
 
   commandsToMenu = commands:
     let
@@ -127,7 +130,7 @@ in
     motd = mkOption {
       type = types.str;
       default = ''
-        ${ansiBoldOrange}🔨 Welcome to ${config.name}${ansiReset}
+        ${ansiOrange}🔨 Welcome to ${config.name}${ansiReset}
         $(menu)
       '';
       description = ''
