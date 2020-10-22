@@ -21,6 +21,7 @@ let
   esc = "";
   ansiOrange = "${esc}[38;5;202m";
   ansiReset = "${esc}[0m";
+  ansiBold = "${esc}[1m";
 
   commandsToMenu = commands:
     let
@@ -57,13 +58,13 @@ let
               len = maxCommandLength - (builtins.stringLength name);
             in
             if help == null || help == "" then
-              name
+              "  ${name}"
             else
-              "${pad name len} - ${help}";
+              "  ${pad name len} - ${help}";
         in
-        "\n[${name}]\n" + builtins.concatStringsSep "\n" (map opCmd value);
+        "\n${ansiBold}[${name}]${ansiReset}\n\n" + builtins.concatStringsSep "\n" (map opCmd value);
     in
-    builtins.concatStringsSep "\n" (map opCat commandByCategoriesSorted)
+    builtins.concatStringsSep "\n" (map opCat commandByCategoriesSorted) + "\n"
   ;
 
   # Because we want to be able to push pure JSON-like data into the
@@ -222,9 +223,8 @@ in
         help = "prints this menu";
         name = "menu";
         command = ''
-          cat <<'DEVSHELL_MENU'
-          ${commandsToMenu config.commands}
-          DEVSHELL_MENU
+          menu="${commandsToMenu config.commands}"
+          echo -e "$menu"
         '';
       }
     ];
