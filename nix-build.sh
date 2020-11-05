@@ -35,8 +35,7 @@ fi
 
 #
 nix_exec() (
-  # shellcheck disable=SC2030,SC2031
-  name=$1
+  local name=$1
   shift
   exec -a "$name" "$nix_bin_path" "$@"
 )
