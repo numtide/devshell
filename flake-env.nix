@@ -1,6 +1,6 @@
 { buildEnv, nixUnstable, git }:
 buildEnv {
-name = "flake-env";
+  name = "flake-env";
   paths = [
     git
     nixUnstable

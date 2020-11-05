@@ -1,4 +1,4 @@
-{ nixpkgs ? import ./nix/nixpkgs.nix
+{ nixpkgs ? <nixpkgs> # import ./nix/nixpkgs.nix
 , system ? builtins.currentSystem
 , overlays ? [ ]
 }:
