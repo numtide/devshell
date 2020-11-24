@@ -70,6 +70,11 @@ let
         PATH=''${PATH#${bashBin}:}
         export PATH=$DEVSHELL_DIR/bin:${bashBin}:$PATH
 
+        # Fill with sensible default for Ubuntu
+        : "''${XDG_DATA_DIRS:=/usr/local/share:/usr/share}"
+        # This is used by bash-completions to find new completions on demand
+        export XDG_DATA_DIRS=$DEVSHELL_DIR/share:$XDG_DATA_DIRS
+
         # Expose the path to nixpkgs
         export NIXPKGS_PATH=${toString pkgs.path}
 
@@ -118,11 +123,6 @@ let
           }
           PS1='\[\033[38;5;202m\][${name}]$(rel_root)\$\[\033[0m\] '
         fi
-
-        # Load bash completions
-        for file in "$DEVSHELL_DIR/share/bash-completion/completions/"* ; do
-          [[ -f "$file" ]] && source "$file"
-        done
 
         ${bash.interactive or ""}
 
