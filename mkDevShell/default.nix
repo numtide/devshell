@@ -50,8 +50,8 @@ let
         name = "${name}-env";
         paths =
           let
-            op =
-              { name, command, ... }:
+            op = { name, command, ... }:
+              assert lib.assertMsg (name != command) "[[commands]]: ${name} cannot be set to both the `name` and the `command` attributes. Did you mean to use the `package` attribute?";
               if command == null || command == "" then [ ]
               else [
                 (writeShellScriptBin name (toString command))
