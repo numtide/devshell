@@ -60,3 +60,11 @@ help = "golang linter"
 name = "golangci-lint"
 package = "golangci-lint"
 category = "linters"
+
+[[commands]]
+name = "hello-loop"
+command = "while true; do hello; sleep 1; done"
+
+[[services]]
+name = "hello-printer"
+command = "hello-loop"

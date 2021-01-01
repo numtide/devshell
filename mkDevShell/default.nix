@@ -39,6 +39,7 @@ let
       inherit (config)
         bash
         commands
+        services
         env
         motd
         name
@@ -57,8 +58,40 @@ let
                 (writeShellScriptBin name (toString command))
               ];
           in
-          (builtins.concatMap op commands) ++ packages;
+          (builtins.concatMap op commands) ++ packages ++ [ serviceViewer ];
       };
+
+      sessionName = "${name}-sessions";
+      serviceRunner = let
+        makeService = service: ''
+          echo "Starting service ${service.name}"
+          ${pkgs.tmux}/bin/tmux new-window -n '${service.name}' -t '${sessionName}' '${service.command}'
+        '';
+      in pkgs.writeShellScript "service-runner" ''
+        # In case user is running multiple terminals with the same devshell
+        ${pkgs.tmux}/bin/tmux list-sessions | grep '^${sessionName}: ' && exit 0
+
+        ${pkgs.tmux}/bin/tmux new-session -d -s '${sessionName}'
+        ${lib.strings.concatStringsSep
+          "\n"
+          (map
+            makeService
+            services
+          )
+        }
+      '';
+      serviceViewer = writeShellScriptBin "service-viewer" ''
+        serviceName="$1"
+        case "$serviceName" in
+        ${lib.strings.concatStrings (map (service: "${service.name})\n;;\n") services)}
+        *)
+          echo "Invalid service name. Choose one of ${lib.strings.concatStringsSep "\n" (map (service: service.name) services)}"
+          exit 1
+          ;;
+        esac
+
+        ${pkgs.tmux}/bin/tmux select-window -t '${sessionName}':"$serviceName" \; a -t '${sessionName}'
+      '';
 
       # write a bash profile to load
       bashrc = writeText "${name}-bashrc" ''
@@ -77,6 +110,13 @@ let
 
         # Expose the path to nixpkgs
         export NIXPKGS_PATH=${toString pkgs.path}
+
+        function stopServices {
+          echo "Cleaning up services"
+          ${pkgs.tmux}/bin/tmux kill-session -t '${sessionName}'
+        }
+        trap stopServices EXIT
+        ${serviceRunner}
 
         # Load installed profiles
         for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
