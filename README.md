@@ -1,4 +1,4 @@
-# devshell - per project developer environments.
+# devshell - like virtualenv, but for all the languages.
 
 **STATUS: unstable**
 
