@@ -3,7 +3,7 @@ package cmd
 import (
 	"path/filepath"
 
-	"github.com/numtide/devshell/config"
+	"github.com/numtide/devshell/devshell/config"
 
 	"github.com/urfave/cli/v2"
 )

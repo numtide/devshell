@@ -1,4 +1,5 @@
-/devshell
+# go
+/devshell/devshell
 
 # goreleaser
 /dist

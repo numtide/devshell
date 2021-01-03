@@ -30,7 +30,7 @@ let
   mkDevShell = module:
     let
       config = (lib.evalModules {
-        modules = [ ./options.nix module ];
+        modules = [ ./modules/base.nix module ];
         args = {
           inherit pkgs;
         };

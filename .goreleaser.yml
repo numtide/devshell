@@ -2,11 +2,12 @@
 # behavior.
 before:
   hooks:
-    - go mod download
+    - bash -c "cd devshell && go mod download"
 builds:
   - env:
       - CGO_ENABLED=0
     mod_timestamp: '{{ .CommitTimestamp }}'
+    dir: devshell
     goos:
       - darwin
       - freebsd
