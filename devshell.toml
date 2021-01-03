@@ -8,6 +8,7 @@ name = "devshell"
 # NOTE: don't forget to put commas between items! :)
 packages = [
   "go",
+  "goreleaser",
   "mdsh",
 ]
 
