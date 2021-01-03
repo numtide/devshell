@@ -1,16 +1,16 @@
 { buildGoModule }:
 let
-  source = import ./nix/source.nix;
+  source = import ./source.nix;
 in
 buildGoModule {
   name = "devshell";
   src = source.filter {
-    path = ./.;
+    path = ../devshell;
     allow = [
-      ./go.mod
-      ./go.sum
-      ./cmd
-      ./config
+      ../devshell/go.mod
+      ../devshell/go.sum
+      ../devshell/cmd
+      ../devshell/config
       (source.matchExt "go")
     ];
   };

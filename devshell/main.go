@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/numtide/devshell/cmd"
+	"github.com/numtide/devshell/devshell/cmd"
 )
 
 // These values are automatically set by `goreleaser` or can be set with

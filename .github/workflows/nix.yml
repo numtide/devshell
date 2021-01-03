@@ -1,5 +1,10 @@
 name: Nix
-on: [ push, pull_request, workflow_dispatch ]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
 jobs:
   build:
     strategy:
@@ -13,9 +18,9 @@ jobs:
         with:
           name: numtide
           signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
-      - run: $(nix-build shell.nix) --pure /usr/bin/env HOME=$HOME golangci-lint run
+      - run: $(nix-build shell.nix) --pure /usr/bin/env HOME=$HOME bash -c "cd devshell && golangci-lint run"
       - run: nix-shell --run "echo OK"
-      - run: nix-build -A devshell
+      - run: nix-build nix -A devshell
   flakes:
     strategy:
       matrix:
