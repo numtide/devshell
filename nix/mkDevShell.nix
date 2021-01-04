@@ -29,14 +29,17 @@ let
   # * direnv integration
   mkDevShell = module:
     let
-      config = (lib.evalModules {
-        modules = [ ./modules/base.nix module ];
+      modules = lib.evalModules {
+        modules = [
+          ./modules/base.nix
+          module
+        ];
         args = {
           inherit pkgs;
         };
-      }).config;
+      };
 
-      inherit (config)
+      inherit (modules.config)
         bash
         commands
         env
@@ -247,7 +250,7 @@ let
       };
 
       out = devShell // {
-        inherit flakeApp;
+        inherit flakeApp modules;
       };
     in
     out
