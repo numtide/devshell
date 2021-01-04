@@ -8,12 +8,10 @@ All the arguments below are optional.
 ```toml
 # This is the name of your environment. It should usually map to the project
 # name.
-name = "mkDevShell"
+name = "my-project"
 
 # Add packages from nixpkgs here. Use `nix search nixpkgs <term>` to find the
 # package that you need.
-#
-# NOTE: don't forget to put commas between items! :)
 packages = [
   "go",
   "mdsh",
@@ -61,6 +59,7 @@ category = "formatters"
 help = "github utility"
 name = "hub"
 package = "gitAndTools.hub"
+category = "utilites"
 ```
 
 ## Schema

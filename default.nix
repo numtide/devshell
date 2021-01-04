@@ -7,6 +7,7 @@ let
 in
 rec {
   devshell = pkgs.callPackage ./nix/devshell.nix { inherit source; };
+  devshell-docs = pkgs.callPackage ./nix/mdbook.nix { inherit source; };
   mkDevShell = pkgs.callPackage ./nix/mkDevShell.nix { };
 
   # This project's shell
