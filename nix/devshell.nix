@@ -1,7 +1,4 @@
-{ buildGoModule }:
-let
-  source = import ./source.nix;
-in
+{ buildGoModule, source }:
 buildGoModule {
   name = "devshell";
   src = source.filter {
