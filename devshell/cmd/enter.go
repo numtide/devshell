@@ -30,8 +30,12 @@ func run(name string, args ...string) (string, error) {
 // Enter command
 var Enter = &cli.Command{
 	Name:    "enter",
-	Aliases: []string{"e"},
+	Aliases: []string{"run", "e"},
 	Usage:   "builds and enters the shell",
+	Description: `
+	Enter the shell. If extra arguments are passed, run as a command inside
+	the development environment instead.
+	`,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:  "path",
