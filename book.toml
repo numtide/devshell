@@ -1,0 +1,6 @@
+[book]
+authors = ["zimbatm"]
+language = "en"
+multilingual = false
+src = "docs"
+title = "devshell"

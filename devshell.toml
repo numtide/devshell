@@ -10,6 +10,7 @@ packages = [
   "go",
   "goreleaser",
   "mdsh",
+  "mdbook",
 ]
 
 # Message Of The Day (MOTD) is displayed when entering the environment with an
