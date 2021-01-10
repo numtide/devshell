@@ -11,7 +11,7 @@ rec {
   # Evaluate the devshell module
   eval = import ./modules pkgs;
 
-  # Loads a Nix module from TOML
+  # Loads a Nix module from TOML.
   importTOML = file:
     let
       dir = builtins.dirOf file;
@@ -23,8 +23,12 @@ rec {
       config = builtins.removeAttrs data [ "imports" ];
     };
 
-  # Build the devshell from a TOML declaration
+  # Build the devshell from a TOML declaration.
   fromTOML = path: mkShell (importTOML path);
+
+  # A utility to build a "naked" nix-shell environment that doesn't contain
+  # all of the default environment variables. This is mostly for internal use.
+  mkNakedShell = pkgs.callPackage ./nix/mkNakedShell.nix { };
 
   # A developer shell that works in all scenarios
   #
