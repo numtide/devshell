@@ -15,10 +15,11 @@ name = "devshell"
 #
 # NOTE: don't forget to put commas between items! :)
 packages = [
+  "diffutils", # used by golangci-lint
   "go",
   "goreleaser",
-  "mdsh",
   "mdbook",
+  "mdsh",
 ]
 
 # Use this section to set environment variables to have in the environment.
