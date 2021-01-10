@@ -25,7 +25,7 @@ func Init(path string, name string, force bool) error {
 	if err == nil && !force {
 		return fmt.Errorf("%s already exists", file)
 	}
-	
+
 	// Write the config file
 	w, err := os.Create(file)
 	if err != nil {
