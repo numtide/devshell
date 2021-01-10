@@ -7,14 +7,17 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/numtide/devshell/devshell/config"
+
 	"github.com/urfave/cli/v2"
 )
 
+// TODO: embed <devshell> with the executable.
 const shellNix = `
 let
 	pkgs = import <devshell> {};
 in
-pkgs.mkDevShell.fromTOML ./devshell.toml
+pkgs.mkDevShell.fromTOML %s
 `
 
 func run(name string, args ...string) (string, error) {
@@ -40,7 +43,7 @@ var Enter = &cli.Command{
 		&cli.StringFlag{
 			Name:  "path",
 			Usage: "path to the project root",
-			Value: ".",
+			Value: "",
 		},
 		&cli.StringSliceFlag{
 			Name:  "I",
@@ -49,37 +52,53 @@ var Enter = &cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
-		path := c.String("path")
-		paths := c.StringSlice("I")
-		shellFile := filepath.Join(path, "shell.nix")
+		var err error
 
 		args := []string{"--show-trace"}
-		exists, err := fileExists(shellFile)
+		path := c.String("path")
+		paths := c.StringSlice("I")
+
+		if path == "" {
+			path, err = os.Getwd()
+			if err != nil {
+				return err
+			}
+		}
+		path, err = filepath.Abs(path)
 		if err != nil {
 			return err
 		}
-		if exists {
-			args = append(args, shellFile)
-		} else {
-			args = append(args, "--expr", shellNix)
+
+		// Search for the config if it doesn't exist
+		file, ret := config.Search(path)
+
+		// Prepare arguments
+		switch ret {
+		case config.SearchNix:
+			args = append(args, file)
+		case config.SearchTOML:
+			args = append(args, "--expr", fmt.Sprintf(shellNix, file))
+		case config.SearchNone:
+			return fmt.Errorf("no devshell found in %s", path)
 		}
+
 		for _, p := range paths {
 			args = append(args, "-I", p)
 		}
 
-		// instantiate eval
+		// Instantiate eval
 		drvPath, err := run("nix-instantiate", args...)
 		if err != nil {
 			return err
 		}
-		// remove the surrounding quotes
+		// Remove the surrounding quotes
 		drvPath = strings.Trim(drvPath, "\"")
-		// realize
+		// Realize
 		outPath, err := run("nix-store", "--realize", drvPath)
 		if err != nil {
 			return err
 		}
-		// execute
+		// Execute
 		cmd := exec.Command(outPath, c.Args().Slice()...)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
