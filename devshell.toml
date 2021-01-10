@@ -7,10 +7,11 @@ name = "devshell"
 #
 # NOTE: don't forget to put commas between items! :)
 packages = [
+  "diffutils", # used by golangci-lint
   "go",
   "goreleaser",
-  "mdsh",
   "mdbook",
+  "mdsh",
 ]
 
 # Message Of The Day (MOTD) is displayed when entering the environment with an
