@@ -1,12 +1,16 @@
-{ stdenv, mdbook, source }:
+{ mdbook
+, stdenv
+}:
+let
+  source = import ../nix/source.nix;
+in
 stdenv.mkDerivation {
   name = "devshell-docs";
   buildInputs = [ mdbook ];
   src = source.filter {
-    path = ../.;
+    path = ./.;
     allow = [
-      ../book.toml
-      ../docs
+      ./book.toml
       (source.matchExt "md")
     ];
   };

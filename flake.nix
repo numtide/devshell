@@ -24,14 +24,12 @@
 
       forSystem = system:
         let
-          pkgs = import ./. { inherit system; };
+          devshell = import ./. { inherit system; };
         in
-        rec {
-          defaultPackage = pkgs.devshell;
-
-          legacyPackages = pkgs;
-
-          devShell = pkgs.devshell-shell;
+        {
+          defaultPackage = devshell.cli;
+          legacyPackages = devshell;
+          devShell = devshell.fromTOML ./devshell.toml;
         };
     in
     {

@@ -6,6 +6,7 @@ All the arguments below are optional.
 
 [$ ./devshell.toml](./devshell.toml) as toml
 ```toml
+[devshell]
 # This is the name of your environment. It should usually map to the project
 # name.
 name = "my-project"
@@ -25,7 +26,7 @@ packages = [
 # Use this section to set environment variables to have in the environment.
 #
 # NOTE: all the values are escaped
-[env]
+[environment.variables]
 FOO = 1
 
 # These are bash-specific configurations. The idea is to maybe support other

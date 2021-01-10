@@ -2,5 +2,5 @@
 authors = ["zimbatm"]
 language = "en"
 multilingual = false
-src = "docs"
+src = "."
 title = "devshell"
