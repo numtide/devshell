@@ -33,6 +33,7 @@ let
         env
       );
 
+  # Builds DEVSHELL_DIR
   envDrv = buildEnv {
     name = "devshell-env";
     paths = cfg.paths;
@@ -42,6 +43,9 @@ let
   bashrc = writeText "devshell-bashrc" ''
     # Set all the passed environment variables
     ${envToBash config.environment.variables}
+
+    # This is the directory that contains our dependencies
+    export DEVSHELL_DIR=${envDrv}
 
     # Prepend the PATH with the devshell dir and bash
     PATH=''${PATH#/path-not-set:}
@@ -125,8 +129,6 @@ let
       #!${bashPath}
       # Script that sets-up the environment. Can be both sourced or invoked.
 
-      # This is the directory that contains our dependencies
-      export DEVSHELL_DIR=${envDrv}
       # It assums that the shell is always loaded from the root of the project
       # Store that for later usage.
       export DEVSHELL_ROOT=$PWD
