@@ -3,11 +3,12 @@
 # name.
 name = "devshell"
 
-[environment]
 # Message Of The Day (MOTD) is displayed when entering the environment with an
 # interactive shell. By default it will show the project name.
 #
 # motd = ""
+
+[environment]
 
 # Add packages from nixpkgs here. Use `nix search nixpkgs <term>` to find the
 # package that you need.

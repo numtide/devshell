@@ -14,14 +14,6 @@ let
 
   ansi = import ../nix/ansi.nix;
 
-  mkNakedShell = pkgs.callPackage ../nix/mkNakedShell.nix { };
-
-  # Use this to define a flake app for the environment.
-  mkFlakeApp = bin: {
-    type = "app";
-    program = "${bin}";
-  };
-
   bashBin = "${bashInteractive}/bin";
   bashPath = "${bashInteractive}/bin/bash";
 
@@ -33,13 +25,21 @@ let
         env
       );
 
-  # Builds DEVSHELL_DIR
+  # Use this to define a flake app for the environment.
+  mkFlakeApp = bin: {
+    type = "app";
+    program = "${bin}";
+  };
+
+  mkNakedShell = pkgs.callPackage ../nix/mkNakedShell.nix { };
+
+  # Builds the DEVSHELL_DIR with all the dependencies
   envDrv = buildEnv {
     name = "devshell-env";
     paths = cfg.paths;
   };
 
-  # write a bash profile to load
+  # Write a bash profile to load
   bashrc = writeText "devshell-bashrc" ''
     # Set all the passed environment variables
     ${envToBash config.environment.variables}
