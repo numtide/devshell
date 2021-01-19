@@ -80,7 +80,7 @@ let
     PROMPT_COMMAND=__devshell-prompt''${PROMPT_COMMAND+;$PROMPT_COMMAND}
 
     # Set a cool PS1
-    if [[ -n "$PS1" ]]; then
+    if [[ -n "''${DEVSHELL_ROOT:-}" ]]; then
       # Print the path relative to $DEVSHELL_ROOT
       rel_root() {
         local path
@@ -89,8 +89,13 @@ let
           echo " $path "
         fi
       }
-      PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
+    else
+      # If DEVSHELL_ROOT is unset, print only the current directory name
+      rel_root() {
+        echo " \W "
+      }
     fi
+    PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
 
     ${config.bash.interactive or ""}
 
