@@ -1,3 +1,4 @@
+[devshell]
 # This is the name of your environment. It should usually map to the project
 # name.
 name = "my-project"

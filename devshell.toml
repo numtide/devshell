@@ -1,6 +1,12 @@
+[devshell]
 # This is the name of your environment. It should usually map to the project
 # name.
 name = "devshell"
+
+# Message Of The Day (MOTD) is displayed when entering the environment with an
+# interactive shell. By default it will show the project name.
+#
+# motd = ""
 
 # Add packages from nixpkgs here. Use `nix search nixpkgs <term>` to find the
 # package that you need.
@@ -13,11 +19,6 @@ packages = [
   "mdbook",
   "mdsh",
 ]
-
-# Message Of The Day (MOTD) is displayed when entering the environment with an
-# interactive shell. By default it will show the project name.
-#
-# motd = ""
 
 # Use this section to set environment variables to have in the environment.
 #

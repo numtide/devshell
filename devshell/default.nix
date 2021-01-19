@@ -1,13 +1,17 @@
-{ buildGoModule, source }:
+{ buildGoModule }:
+let
+  # Small src cleaner.
+  source = import ../nix/source.nix;
+in
 buildGoModule {
   name = "devshell";
   src = source.filter {
-    path = ../devshell;
+    path = ./.;
     allow = [
-      ../devshell/go.mod
-      ../devshell/go.sum
-      ../devshell/cmd
-      ../devshell/config
+      ./go.mod
+      ./go.sum
+      ./cmd
+      ./config
       (source.matchExt "go")
     ];
   };

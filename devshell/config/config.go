@@ -24,14 +24,19 @@ type Command struct {
 	Package string `toml:"package,omitempty"`
 }
 
+// Devshell ...
+type Devshell struct {
+	Name     string   `toml:"name"`
+	Packages []string `toml:"packages"`
+	Motd     *string  `toml:"motd"`
+}
+
 // Config ...
 type Config struct {
-	Name     string                 `toml:"name"`
-	Packages []string               `toml:"packages"`
-	Motd     *string                `toml:"motd"`
-	Env      map[string]interface{} `toml:"env"`
 	Bash     Bash                   `toml:"bash,omitempty"`
 	Commands []Command              `toml:"commands"`
+	Devshell Devshell               `toml:"devshell,omitempty"`
+	Env      map[string]interface{} `toml:"env"`
 }
 
 // Load ...

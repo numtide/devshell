@@ -13,7 +13,9 @@ const initHeader = `# See https://github.com/numtide/devshell
 func Init(path string, name string, force bool) error {
 	// Generate the config
 	cfg := &Config{
-		Name: name,
+		Devshell: Devshell{
+			Name: name,
+		},
 	}
 	cfgStr := initHeader + Print(cfg)
 

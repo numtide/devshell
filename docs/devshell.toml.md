@@ -6,6 +6,7 @@ All the arguments below are optional.
 
 [$ ./devshell.toml](./devshell.toml) as toml
 ```toml
+[devshell]
 # This is the name of your environment. It should usually map to the project
 # name.
 name = "my-project"

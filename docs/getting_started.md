@@ -16,6 +16,7 @@ file:
 
 ```console
 $ devshell init
+config file created
 ```
 
 Now you can enter the developer shell for the project:

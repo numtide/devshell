@@ -61,7 +61,7 @@ jobs:
           name: numtide
           signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
       - run: |
-          nix-build -A devshell-docs
+          nix-build -A docs
           cp -r "$(readlink ./result)" book
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/master'
