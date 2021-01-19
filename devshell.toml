@@ -8,8 +8,6 @@ name = "devshell"
 #
 # motd = ""
 
-[environment]
-
 # Add packages from nixpkgs here. Use `nix search nixpkgs <term>` to find the
 # package that you need.
 #
@@ -25,8 +23,8 @@ packages = [
 # Use this section to set environment variables to have in the environment.
 #
 # NOTE: all the values are escaped
-[environment.variables]
-FOO = 1
+[env]
+FOO=1
 
 # These are bash-specific configurations. The idea is to maybe support other
 # shell environments in the future, although it is not the case right now.

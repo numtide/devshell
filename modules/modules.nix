@@ -3,10 +3,9 @@
 }:
 let
   modules = [
-    ./bash.nix
+    ./back-compat.nix
     ./commands.nix
     ./devshell.nix
-    ./environment.nix
   ];
 
   pkgsModule = { config, ... }: {
@@ -17,4 +16,4 @@ let
     };
   };
 in
-modules ++ [ pkgsModule ]
+[ pkgsModule ] ++ modules

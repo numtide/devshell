@@ -129,9 +129,24 @@ in
       help = "prints this menu";
       name = "menu";
       command = ''
-        menu="${commandsToMenu config.commands}"
-        echo -e "$menu"
+        echo -e "${commandsToMenu config.commands}"
       '';
     }
   ];
+
+  # Add the commands to the devshell packages. Either as wrapper scripts, or
+  # the whole package.
+  config.devshell.packages =
+    let
+      op = { name, command, package, ... }:
+        assert lib.assertMsg (name != command) "[[commands]]: ${name} cannot be set to both the `name` and the `command` attributes. Did you mean to use the `package` attribute?";
+        if package == null then
+          assert lib.assertMsg (command != null && command != "") "[[commands]]: ${name} expected either a command or package attribute.";
+          [ (pkgs.writeShellScriptBin name (toString command)) ]
+        else
+        # TODO: check that the `name` binary exists in the package
+          [ package ]
+      ;
+    in
+    (lib.concatMap op config.commands);
 }

@@ -3,19 +3,14 @@ with lib;
 let
   cfg = config.devshell;
 
-  inherit (pkgs)
-    bashInteractive
-    buildEnv
-    coreutils
-    system
-    writeScriptBin
-    writeText
-    ;
-
   ansi = import ../nix/ansi.nix;
 
-  bashBin = "${bashInteractive}/bin";
-  bashPath = "${bashInteractive}/bin/bash";
+  bashBin = "${cfg.bashPackage}/bin";
+  bashPath = "${cfg.bashPackage}/bin/bash";
+
+  # Because we want to be able to push pure JSON-like data into the
+  # environment.
+  strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
 
   # Transform the env vars into bash exports
   envToBash = env:
@@ -33,19 +28,13 @@ let
 
   mkNakedShell = pkgs.callPackage ../nix/mkNakedShell.nix { };
 
-  # Builds the DEVSHELL_DIR with all the dependencies
-  envDrv = buildEnv {
-    name = "devshell-env";
-    paths = cfg.paths;
-  };
-
   # Write a bash profile to load
-  bashrc = writeText "devshell-bashrc" ''
+  env = pkgs.writeText "devshell-env.bash" ''
     # Set all the passed environment variables
-    ${envToBash config.environment.variables}
+    ${envToBash config.env}
 
-    # This is the directory that contains our dependencies
-    export DEVSHELL_DIR=${envDrv}
+    # Expose the folder that contains the assembled environment.
+    export DEVSHELL_DIR=@devshellDir@
 
     # Prepend the PATH with the devshell dir and bash
     PATH=''${PATH#/path-not-set:}
@@ -80,7 +69,7 @@ let
     # Interactive sessions
     if [[ $- == *i* ]]; then
 
-    # Print information if the prompt is every displayed. We have to make
+    # Print information if the prompt is displayed. We have to make
     # that distinction because `nix-shell -c "cmd"` is running in
     # interactive mode.
     __devshell-prompt() {
@@ -95,7 +84,7 @@ let
       # Print the path relative to $DEVSHELL_ROOT
       rel_root() {
         local path
-        path=$(${coreutils}/bin/realpath --relative-to "$DEVSHELL_ROOT" "$PWD")
+        path=$(${pkgs.coreutils}/bin/realpath --relative-to "$DEVSHELL_ROOT" "$PWD")
         if [[ $path != . ]]; then
           echo " $path "
         fi
@@ -108,76 +97,76 @@ let
     fi # Interactive session
   '';
 
-  # This is our entry-point for everything!
-  activationPackage = derivation {
-    inherit system;
-    name = "${cfg.name}-bin";
-
-    # Define our own minimal builder.
-    builder = bashPath;
-    args = [
-      "-ec"
-      ''
-        ${coreutils}/bin/cp $envScriptPath $out &&
-        ${coreutils}/bin/chmod +x $out;
-        exit 0
-      ''
-    ];
-
-    # The actual devshell wrapper script
-    envScript = ''
-      #!${bashPath}
-      # Script that sets-up the environment. Can be both sourced or invoked.
-
-      # It assums that the shell is always loaded from the root of the project
-      # Store that for later usage.
-      export DEVSHELL_ROOT=$PWD
-
-      # If the file is sourced, skip all of the rest and just source the
-      # bashrc
-      if [[ $0 != "''${BASH_SOURCE[0]}" ]]; then
-        source "${bashrc}"
-        return
-      fi
-
-      # Be strict!
-      set -euo pipefail
-
-      if [[ $# = 0 ]]; then
-        # Start an interactive shell
-        exec "${bashPath}" --rcfile "${bashrc}" --noprofile
-      elif [[ $1 == "-h" || $1 == "--help" ]]; then
-        cat <<USAGE
-      Usage: ${cfg.name}
-        source $0               # load the environment in the current bash
-        $0 -h | --help          # show this help
-        $0 [--pure]             # start a bash sub-shell
-        $0 [--pure] <cmd> [...] # run a command in the environment
-
-      Options:
-        * --pure : execute the script in a clean environment
-      USAGE
-        exit
-      elif [[ $1 == "--pure" ]]; then
-        # re-execute the script in a clean environment
-        shift
-        exec -c "$0" "$@"
-      else
-        # Start a script
-        source "${bashrc}"
-        exec -- "$@"
-      fi
+  # Builds the DEVSHELL_DIR with all the dependencies
+  devshellDir = pkgs.buildEnv {
+    name = "devshell-dir";
+    paths = cfg.packages;
+    postBuild = ''
+      cp ${env} $out/env.bash
+      substituteInPlace $out/env.bash --subst-var-by devshellDir $out
     '';
-
-    passAsFile = [ "envScript" ];
   };
+
+
+  # This is our entry-point for everything!
+  entrypoint = pkgs.writeShellScript "${cfg.name}-entrypoint" ''
+    #!${bashPath}
+    # Script that sets-up the environment. Can be both sourced or invoked.
+
+    # It assums that the shell is always loaded from the root of the project.
+    # Store that for later usage.
+    export DEVSHELL_ROOT=$PWD
+
+    # If the file is sourced, skip all of the rest and just source the env
+    # script.
+    if [[ $0 != "''${BASH_SOURCE[0]}" ]]; then
+      source "${devshellDir}/env.bash"
+      return
+    fi
+
+    # Be strict!
+    set -euo pipefail
+
+    if [[ $# = 0 ]]; then
+      # Start an interactive shell
+      exec "${bashPath}" --rcfile "${devshellDir}/env.bash" --noprofile
+    elif [[ $1 == "-h" || $1 == "--help" ]]; then
+      cat <<USAGE
+    Usage: ${cfg.name}
+      source $0               # load the environment in the current bash
+      $0 -h | --help          # show this help
+      $0 [--pure]             # start a bash sub-shell
+      $0 [--pure] <cmd> [...] # run a command in the environment
+
+    Options:
+      * --pure : execute the script in a clean environment
+    USAGE
+      exit
+    elif [[ $1 == "--pure" ]]; then
+      # re-execute the script in a clean environment
+      shift
+      exec -c "$0" "$@"
+    else
+      # Start a script
+      source "${devshellDir}/env.bash"
+      exec -- "$@"
+    fi
+  '';
 in
 {
   options.devshell = {
-    activationPackage = mkOption {
+    bashPackage = mkOption {
+      type = strOrPackage;
+      default = pkgs.bashInteractive;
+      description = "Version of bash to use in the project";
+    };
+
+    entrypoint = mkOption {
       internal = true;
       type = types.package;
-      description = "The package containing the complete activation script.";
+      description = ''
+        This package contains a script that loads the current environment.
+      '';
     };
 
     # TODO: rename motd to something better.
@@ -203,10 +192,10 @@ in
       '';
     };
 
-    paths = mkOption {
-      internal = true;
-      type = types.listOf types.package;
-      description = "List of packages.";
+    packages = mkOption {
+      type = types.listOf strOrPackage;
+      default = [ ];
+      description = "The set of packages to appear in the project environment.";
     };
 
     shell = mkOption {
@@ -217,14 +206,15 @@ in
   };
 
   config.devshell = {
-    activationPackage = activationPackage;
+    entrypoint = entrypoint;
 
     # Use a naked derivation to limit the amount of noise passed to nix-shell.
     shell = mkNakedShell {
       name = cfg.name;
-      script = cfg.activationPackage;
+      script = cfg.entrypoint;
       passthru = {
-        flakeApp = mkFlakeApp activationPackage;
+        inherit config;
+        flakeApp = mkFlakeApp entrypoint;
       };
     };
   };

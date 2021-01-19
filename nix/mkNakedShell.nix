@@ -24,6 +24,7 @@ in
 { name
 , # A path to a script that will be loaded by the shell
   script
+, meta ? { }
 , passthru ? { }
 }:
 (derivation {
@@ -57,4 +58,4 @@ in
     # Load the script environment
     source "${script}"
   '';
-}) // passthru
+}) // { inherit meta passthru; } // passthru

@@ -1,5 +1,0 @@
-# See https://github.com/numtide/devshell
-name = "devshell"
-packages = []
-
-[env]
