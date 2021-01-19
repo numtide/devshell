@@ -26,7 +26,7 @@ packages = [
 # Use this section to set environment variables to have in the environment.
 #
 # NOTE: all the values are escaped
-[environment.variables]
+[env]
 FOO = 1
 
 # These are bash-specific configurations. The idea is to maybe support other

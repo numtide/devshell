@@ -24,7 +24,7 @@ packages = [
 #
 # NOTE: all the values are escaped
 [env]
-FOO=1
+FOO = 1
 
 # These are bash-specific configurations. The idea is to maybe support other
 # shell environments in the future, although it is not the case right now.
