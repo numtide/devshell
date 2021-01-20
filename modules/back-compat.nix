@@ -60,21 +60,15 @@ with lib;
     };
   };
 
-  config = {
-    # Expose the path to nixpkgs
-    env.NIXPKGS_PATH = toString pkgs.path;
-
-    devshell =
-      {
-        packages = config.packages;
-        startup.bash_extra = noDepEntry config.bash.extra;
-        interactive.bash_interactive = noDepEntry config.bash.interactive;
-      }
-      // (lib.optionalAttrs (config.motd != null) { motd = config.motd; })
-      // (lib.optionalAttrs (config.name != null) { name = config.name; })
-      # TODO: move bash.extra into the activation script
-      # TODO: move bash.interactive into the activation script
-      # TODO: move env to its own module
-    ;
-  };
+  # Copy the values over to the devshell module
+  config.devshell =
+    {
+      env = config.env;
+      packages = config.packages;
+      startup.bash_extra = noDepEntry config.bash.extra;
+      interactive.bash_interactive = noDepEntry config.bash.interactive;
+    }
+    // (lib.optionalAttrs (config.motd != null) { motd = config.motd; })
+    // (lib.optionalAttrs (config.name != null) { name = config.name; })
+  ;
 }

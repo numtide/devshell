@@ -56,7 +56,7 @@ let
   # Write a bash profile to load
   env = pkgs.writeText "devshell-env.bash" ''
     # Set all the passed environment variables
-    ${envToBash config.env}
+    ${envToBash cfg.env}
 
     # Expose the folder that contains the assembled environment.
     export DEVSHELL_DIR=@devshellDir@
@@ -147,6 +147,15 @@ in
       '';
     };
 
+    env = mkOption {
+      internal = true;
+      default = { };
+      type = types.attrs;
+      description = ''
+        Don't use this, it will be replaced soon.
+      '';
+    };
+
     startup = mkOption {
       type = types.attrsOf (types.submodule { options = entryOptions; });
       default = { };
@@ -202,6 +211,9 @@ in
   };
 
   config.devshell = {
+    # Expose the path to nixpkgs
+    env.NIXPKGS_PATH = toString pkgs.path;
+
     entrypoint = entrypoint;
 
     startup = {
