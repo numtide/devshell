@@ -1,7 +1,7 @@
 # Evaluate the devshell environment
 pkgs:
 { configuration
-, lib ? pkgs.stdenv.lib
+, lib ? pkgs.lib
 , extraSpecialArgs ? { }
 }:
 let
