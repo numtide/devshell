@@ -28,6 +28,31 @@ let
 
   mkNakedShell = pkgs.callPackage ../nix/mkNakedShell.nix { };
 
+  addAttributeName = prefix:
+    mapAttrs (k: v: v // {
+      text = ''
+        #### ${prefix}.${k}
+        ${v.text}
+      '';
+    });
+
+  entryOptions = {
+    text = mkOption {
+      type = types.str;
+      description = ''
+        Script to run.
+      '';
+    };
+
+    deps = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        A list of other steps that this one depends on.
+      '';
+    };
+  };
+
   # Write a bash profile to load
   env = pkgs.writeText "devshell-env.bash" ''
     # Set all the passed environment variables
@@ -37,67 +62,16 @@ let
     export DEVSHELL_DIR=@devshellDir@
 
     # Prepend the PATH with the devshell dir and bash
-    PATH=''${PATH#/path-not-set:}
+    PATH=''${PATH%:/path-not-set}
     PATH=''${PATH#${bashBin}:}
     export PATH=$DEVSHELL_DIR/bin:${bashBin}:$PATH
 
-    # Fill with sensible default for Ubuntu
-    : "''${XDG_DATA_DIRS:=/usr/local/share:/usr/share}"
-    # This is used by bash-completions to find new completions on demand
-    export XDG_DATA_DIRS=$DEVSHELL_DIR/share:$XDG_DATA_DIRS
-
-    # Load installed profiles
-    for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
-      # If that folder doesn't exist, bash loves to return the whole glob
-      [[ -f "$file" ]] && source "$file"
-    done
-
-    # Use this to set even more things with bash
-    ${config.bash.extra or ""}
-
-    __devshell-motd() {
-      cat <<DEVSHELL_PROMPT
-    ${cfg.motd}
-    DEVSHELL_PROMPT
-    }
-
-    # Print the motd in direnv
-    if [[ ''${DIRENV_IN_ENVRC:-} = 1 ]]; then
-      __devshell-motd
-    fi
+    ${textClosureMap id (addAttributeName "startup" cfg.startup) (attrNames cfg.startup)}
 
     # Interactive sessions
     if [[ $- == *i* ]]; then
 
-    # Print information if the prompt is displayed. We have to make
-    # that distinction because `nix-shell -c "cmd"` is running in
-    # interactive mode.
-    __devshell-prompt() {
-      __devshell-motd
-      # Make it a noop
-      __devshell-prompt() { :; }
-    }
-    PROMPT_COMMAND=__devshell-prompt''${PROMPT_COMMAND+;$PROMPT_COMMAND}
-
-    # Set a cool PS1
-    if [[ -n "''${DEVSHELL_ROOT:-}" ]]; then
-      # Print the path relative to $DEVSHELL_ROOT
-      rel_root() {
-        local path
-        path=$(${pkgs.coreutils}/bin/realpath --relative-to "$DEVSHELL_ROOT" "$PWD")
-        if [[ $path != . ]]; then
-          echo " $path "
-        fi
-      }
-    else
-      # If DEVSHELL_ROOT is unset, print only the current directory name
-      rel_root() {
-        echo " \W "
-      }
-    fi
-    PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
-
-    ${config.bash.interactive or ""}
+    ${textClosureMap id (addAttributeName "interactive" cfg.interactive) (attrNames cfg.interactive)}
 
     fi # Interactive session
   '';
@@ -111,7 +85,6 @@ let
       substituteInPlace $out/env.bash --subst-var-by devshellDir $out
     '';
   };
-
 
   # This is our entry-point for everything!
   entrypoint = pkgs.writeShellScript "${cfg.name}-entrypoint" ''
@@ -174,6 +147,24 @@ in
       '';
     };
 
+    startup = mkOption {
+      type = types.attrsOf (types.submodule { options = entryOptions; });
+      default = { };
+      internal = true;
+      description = ''
+        A list of scripts to execute on startup.
+      '';
+    };
+
+    interactive = mkOption {
+      type = types.attrsOf (types.submodule { options = entryOptions; });
+      default = { };
+      internal = true;
+      description = ''
+        A list of scripts to execute on interactive startups.
+      '';
+    };
+
     # TODO: rename motd to something better.
     motd = mkOption {
       type = types.str;
@@ -212,6 +203,69 @@ in
 
   config.devshell = {
     entrypoint = entrypoint;
+
+    startup = {
+      load_profiles = noDepEntry ''
+        # Load installed profiles
+        for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
+          # If that folder doesn't exist, bash loves to return the whole glob
+          [[ -f "$file" ]] && source "$file"
+        done
+      '';
+
+      # TODO: split into a different module
+      XDG = noDepEntry ''
+        # Fill with sensible default for Ubuntu
+        : "''${XDG_DATA_DIRS:=/usr/local/share:/usr/share}"
+        # This is used by bash-completions to find new completions on demand
+        export XDG_DATA_DIRS=$DEVSHELL_DIR/share:$XDG_DATA_DIRS
+      '';
+
+      motd = noDepEntry ''
+        __devshell-motd() {
+          cat <<DEVSHELL_PROMPT
+        ${cfg.motd}
+        DEVSHELL_PROMPT
+        }
+
+        # Print the motd in direnv
+        if [[ ''${DIRENV_IN_ENVRC:-} = 1 ]]; then
+          __devshell-motd
+        else
+          # Print information if the prompt is displayed. We have to make
+          # that distinction because `nix-shell -c "cmd"` is running in
+          # interactive mode.
+          __devshell-prompt() {
+            __devshell-motd
+            # Make it a noop
+            __devshell-prompt() { :; }
+          }
+          PROMPT_COMMAND=__devshell-prompt''${PROMPT_COMMAND+;$PROMPT_COMMAND}
+        fi
+      '';
+    };
+
+    interactive = {
+      PS1 = noDepEntry ''
+        # Set a cool PS1
+        if [[ -n "''${DEVSHELL_ROOT:-}" ]]; then
+          # Print the path relative to $DEVSHELL_ROOT
+          rel_root() {
+            local path
+            path=$(${pkgs.coreutils}/bin/realpath --relative-to "$DEVSHELL_ROOT" "$PWD")
+            if [[ $path != . ]]; then
+              echo " $path "
+            fi
+          }
+        else
+          # If DEVSHELL_ROOT is unset, print only the current directory name
+          rel_root() {
+            echo " \W "
+          }
+        fi
+        PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
+      '';
+    };
 
     # Use a naked derivation to limit the amount of noise passed to nix-shell.
     shell = mkNakedShell {
