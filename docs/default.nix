@@ -1,4 +1,5 @@
 { mdbook
+, modules-docs
 , stdenv
 }:
 let
@@ -16,6 +17,7 @@ stdenv.mkDerivation {
   };
 
   buildPhase = ''
+    cp ${modules-docs.markdown} devshell.toml.md
     mdbook build
   '';
 
