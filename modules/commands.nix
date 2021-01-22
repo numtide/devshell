@@ -13,8 +13,39 @@ let
     else
       str;
 
-  commandsToMenu = commands:
+  # Fill in default options for a command.
+  commandToPackage = cmd:
+    assert lib.assertMsg (cmd.command == null || cmd.name != cmd.command) "[[commands]]: ${toString cmd.name} cannot be set to both the `name` and the `command` attributes. Did you mean to use the `package` attribute?";
+    assert lib.assertMsg (cmd.package != null || (cmd.command != null && cmd.command != "")) "[[commands]]: ${name} expected either a command or package attribute.";
+    if cmd.package == null then
+      pkgs.writeShellScriptBin cmd.name cmd.command
+    else
+      cmd.package;
+
+  commandsToMenu = cmds:
     let
+      cleanName = { name, package, ... }@cmd:
+        assert lib.assertMsg (cmd.name != null || cmd.package != null) "[[commands]]: some command is missing both a `name` or `package` attribute.";
+        # Fallback to the package pname if the name is unset
+        let
+          name =
+            if cmd.name == null then
+              cmd.package.pname or (builtins.parseDrvName cmd.package.name).name
+            else
+              cmd.name;
+
+          help =
+            if cmd.help == null then
+              cmd.package.meta.description or ""
+            else
+              cmd.help;
+        in
+        cmd // {
+          inherit name help;
+        };
+
+      commands = map cleanName cmds;
+
       commandLengths =
         map ({ name, ... }: builtins.stringLength name) commands;
 
@@ -34,15 +65,14 @@ let
           commandCategories
           (category: lib.nameValuePair category (builtins.sort
             (a: b: a.name < b.name)
-            (builtins.filter
-              (x: x.category == category)
-              commands
-            )
+            (builtins.filter (x: x.category == category) commands)
           ))
         );
 
-      opCat = { name, value }:
+      opCat = kv:
         let
+          category = kv.name;
+          cmd = kv.value;
           opCmd = { name, help, ... }:
             let
               len = maxCommandLength - (builtins.stringLength name);
@@ -52,15 +82,15 @@ let
             else
               "  ${pad name len} - ${help}";
         in
-        "\n${ansi.bold}[${name}]${ansi.reset}\n\n" + builtins.concatStringsSep "\n" (map opCmd value);
+        "\n${ansi.bold}[${category}]${ansi.reset}\n\n" + builtins.concatStringsSep "\n" (map opCmd cmd);
     in
     builtins.concatStringsSep "\n" (map opCat commandByCategoriesSorted) + "\n";
 
   # These are all the options available for the commands.
   commandOptions = {
     name = mkOption {
-      type = types.str;
-      # default = null;
+      type = types.nullOr types.str;
+      default = null;
       description = ''
         Name of this command. Defaults to attribute name in commands.
       '';
@@ -136,17 +166,6 @@ in
 
   # Add the commands to the devshell packages. Either as wrapper scripts, or
   # the whole package.
-  config.devshell.packages =
-    let
-      op = { name, command, package, ... }:
-        assert lib.assertMsg (name != command) "[[commands]]: ${name} cannot be set to both the `name` and the `command` attributes. Did you mean to use the `package` attribute?";
-        if package == null then
-          assert lib.assertMsg (command != null && command != "") "[[commands]]: ${name} expected either a command or package attribute.";
-          [ (pkgs.writeShellScriptBin name (toString command)) ]
-        else
-        # TODO: check that the `name` binary exists in the package
-          [ package ]
-      ;
-    in
-    (lib.concatMap op config.commands);
+  config.devshell.packages = map commandToPackage config.commands;
+  # config.devshell.motd = "$(motd)";
 }

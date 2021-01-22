@@ -48,8 +48,6 @@ name = "hello"
 command = "echo hello"
 
 [[commands]]
-help = "used to format Nix code"
-name = "nixpkgs-fmt"
 package = "nixpkgs-fmt"
 category = "formatters"
 
@@ -61,6 +59,5 @@ category = "utilites"
 
 [[commands]]
 help = "golang linter"
-name = "golangci-lint"
 package = "golangci-lint"
 category = "linters"
