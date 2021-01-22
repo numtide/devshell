@@ -6,6 +6,15 @@ let
     ./back-compat.nix
     ./commands.nix
     ./devshell.nix
+    ./modules-docs.nix
+    {
+      # Configure modules-docs
+      config.modules-docs.roots = [{
+        url = "https://github.com/numtide/devshell";
+        path = ../.;
+        branch = "master";
+      }];
+    }
   ];
 
   pkgsModule = { config, ... }: {

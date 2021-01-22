@@ -21,7 +21,5 @@ in
 
   activationPackage = module.config.devshell.activationPackage;
 
-  docs = module.config.devshell.docs;
-
   shell = module.config.devshell.shell;
 }

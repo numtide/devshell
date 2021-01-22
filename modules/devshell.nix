@@ -134,8 +134,10 @@ in
 {
   options.devshell = {
     bashPackage = mkOption {
+      internal = true;
       type = strOrPackage;
       default = pkgs.bashInteractive;
+      defaultText = "pkgs.bashInteractive";
       description = "Version of bash to use in the project";
     };
 

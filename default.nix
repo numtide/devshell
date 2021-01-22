@@ -5,8 +5,11 @@ rec {
   # CLI
   cli = pkgs.callPackage ./devshell { };
 
+  # Get the modules documentation from an empty evaluation
+  modules-docs = (eval { configuration = { }; }).config.modules-docs;
+
   # Docs
-  docs = pkgs.callPackage ./docs { };
+  docs = pkgs.callPackage ./docs { inherit modules-docs; };
 
   # Evaluate the devshell module
   eval = import ./modules pkgs;

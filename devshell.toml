@@ -17,7 +17,7 @@ packages = [
   "go",
   "goreleaser",
   "mdbook",
-  "mdsh",
+  "webfs",
 ]
 
 # Use this section to set environment variables to have in the environment.
