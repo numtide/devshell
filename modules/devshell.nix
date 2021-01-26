@@ -181,7 +181,7 @@ in
       type = types.str;
       default = ''
         ${ansi.orange}🔨 Welcome to ${cfg.name}${ansi.reset}
-        $(menu)
+        $(type -p menu &>/dev/null && menu)
       '';
       description = ''
         Message Of The Day.
