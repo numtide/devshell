@@ -120,7 +120,7 @@ let
       # TODO: handle opt.relatedPackages. What is it for?
       optToMd = opt:
         ''
-          ## ${opt.name}
+          ## `${opt.name}`
 
         ''
         + (lib.optionalString opt.internal "\n**internal**\n")
