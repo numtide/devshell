@@ -202,7 +202,12 @@ in
     packages = mkOption {
       type = types.listOf strOrPackage;
       default = [ ];
-      description = "The set of packages to appear in the project environment.";
+      description = ''
+        The set of packages to appear in the project environment.
+
+        Those packages come from https://nixos.org/NixOS/nixpkgs and can be
+        searched by going to https://search.nixos.org/packages
+      '';
     };
 
     shell = mkOption {
