@@ -107,7 +107,7 @@ let
       # remove. Don't touch other existing hooks.
       elif [[ "$dst_hook" == ${builtins.storeDir}/* ]]; then
         has_update
-        rm -v "$dst_hook"
+        rm -v "$target_hook_dir/$name"
       fi
     done
     if [[ $update != 0 ]]; then
