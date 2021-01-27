@@ -26,21 +26,6 @@ packages = [
 [env]
 FOO = 1
 
-# These are bash-specific configurations. The idea is to maybe support other
-# shell environments in the future, although it is not the case right now.
-[bash]
-
-# Loaded after the environment setup. Useful to set dynamic environment
-# variables.
-extra = """
-export BAR=$FOO
-"""
-
-# Only loaded in interactive shells. NOTE: `nix-shell -c "ls"` is interactive
-interactive = """
-
-"""
-
 # Declare commands that are available in the environment.
 [[commands]]
 help = "prints hello"

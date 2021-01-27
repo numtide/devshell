@@ -9,6 +9,7 @@ with lib;
 {
   options = {
     bash.extra = mkOption {
+      internal = true;
       type = types.lines;
       default = "";
       description = ''
@@ -17,6 +18,7 @@ with lib;
     };
 
     bash.interactive = mkOption {
+      internal = true;
       type = types.lines;
       default = "";
       description = ''
@@ -42,21 +44,21 @@ with lib;
     };
 
     motd = mkOption {
+      internal = true;
       type = types.nullOr types.str;
       default = null;
-      internal = true;
     };
 
     name = mkOption {
+      internal = true;
       type = types.nullOr types.str;
       default = null;
-      internal = true;
     };
 
     packages = mkOption {
+      internal = true;
       type = types.listOf strOrPackage;
       default = [ ];
-      internal = true;
     };
   };
 
