@@ -93,8 +93,8 @@ let
     # Iterate over all the hooks we know of
     for name in ${toString (filter (name: name != "enable") (attrNames cfg))}; do
       # Resolve all the symlinks
-      src_hook=$(readlink -f "$source_hook_dir/$name")
-      dst_hook=$(readlink -f "$target_hook_dir/$name")
+      src_hook=$(readlink -f "$source_hook_dir/$name" || true)
+      dst_hook=$(readlink -f "$target_hook_dir/$name" || true)
 
       # If the hook hasn't changed, skip
       if [[ "$src_hook" == "$dst_hook" ]]; then
