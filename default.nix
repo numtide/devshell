@@ -11,6 +11,9 @@ rec {
   # Docs
   docs = pkgs.callPackage ./docs { inherit modules-docs; };
 
+  # Tests
+  tests = import ./tests { inherit pkgs system; };
+
   # Evaluate the devshell module
   eval = import ./modules pkgs;
 
