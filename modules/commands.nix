@@ -7,6 +7,10 @@ let
   # environment.
   strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
 
+  writeDefaultShellScript = import ../nix/writeDefaultShellScript.nix {
+    inherit (pkgs) lib writeTextFile bash;
+  };
+
   pad = str: num:
     if num > 0 then
       pad "${str} " (num - 1)
@@ -18,7 +22,12 @@ let
     assert lib.assertMsg (cmd.command == null || cmd.name != cmd.command) "[[commands]]: ${toString cmd.name} cannot be set to both the `name` and the `command` attributes. Did you mean to use the `package` attribute?";
     assert lib.assertMsg (cmd.package != null || (cmd.command != null && cmd.command != "")) "[[commands]]: ${name} expected either a command or package attribute.";
     if cmd.package == null then
-      pkgs.writeShellScriptBin cmd.name cmd.command
+      writeDefaultShellScript
+        {
+          name = cmd.name;
+          text = cmd.command;
+          binPrefix = true;
+        }
     else
       cmd.package;
 
@@ -117,7 +126,15 @@ let
       type = types.nullOr types.str;
       default = null;
       description = ''
-        If defined, it will define a script for the command.
+        If defined, it will add a script with the name of the command, and the
+        content of this value.
+
+        By default it generates a bash script, unless a different shebang is
+        provided.
+      '';
+      example = ''
+        #!/usr/bin/env python
+        print("Hello")
       '';
     };
 
