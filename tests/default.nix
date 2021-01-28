@@ -6,6 +6,7 @@ let
   attrs = { inherit pkgs devshell; };
 in
 { recurseForDerivations = true; }
+// (import ./commands.nix attrs)
 // (import ./devshell.nix attrs)
 // (import ./git-hooks.nix attrs)
 // (import ./modules-docs.nix attrs)
