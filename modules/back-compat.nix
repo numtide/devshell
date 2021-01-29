@@ -57,7 +57,9 @@ with lib;
   # Copy the values over to the devshell module
   config.devshell =
     {
-      env = config.env;
+      env = map
+        (name: { name = name; value = config.env.${name}; })
+        (lib.attrNames config.env);
       packages = config.packages;
       startup.bash_extra = noDepEntry config.bash.extra;
       interactive.bash_interactive = noDepEntry config.bash.interactive;

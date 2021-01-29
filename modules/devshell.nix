@@ -12,13 +12,22 @@ let
   # environment.
   strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
 
-  # Transform the env vars into bash exports
-  envToBash = env:
-    builtins.concatStringsSep "\n"
-      (lib.mapAttrsToList
-        (k: v: "export ${k}=${lib.escapeShellArg (toString v)}")
-        env
-      );
+  envToBash = { name, value, eval, prefix }@args:
+    let
+      vals = filter (key: args.${key} != null) [ "value" "eval" "prefix" ];
+      valType = head vals;
+    in
+    assert assertMsg ((length vals) > 0) "[[environ]]: ${name} expected one of value, eval or prefix to be set.";
+    assert assertMsg ((length vals) < 2) "[[environ]]: ${name} expected only one of value, eval or prefix to be set. Not ${toString vals}";
+    assert assertMsg (!(name == "PATH" && valType == "value")) "[[environ]]: ${name} should not override the value. Use 'prefix' instead.";
+    if valType == "value" then
+      "export ${name}=${escapeShellArg (toString value)}"
+    else if valType == "eval" then
+      "export ${name}=${eval}"
+    else if valType == "prefix" then
+      ''export ${name}=$(${pkgs.coreutils}/bin/realpath "${prefix}")''${${name}+:''${${name}}}''
+    else
+      throw "BUG in the environ.nix module. This should never be reached.";
 
   # Use this to define a flake app for the environment.
   mkFlakeApp = bin: {
@@ -53,11 +62,33 @@ let
     };
   };
 
-  # Write a bash profile to load
-  env = pkgs.writeText "devshell-env.bash" ''
-    # Set all the passed environment variables
-    ${envToBash cfg.env}
+  envOptions = {
+    name = mkOption {
+      type = types.str;
+      description = "Name of the environment variable";
+    };
 
+    value = mkOption {
+      type = with types; nullOr (oneOf [ str int bool ]);
+      default = null;
+      description = "Shell-escaped value to set";
+    };
+
+    eval = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "Like value but not escaped";
+    };
+
+    prefix = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = "prepend to PATH-like environment variables";
+    };
+  };
+
+  # Write a bash profile to load
+  envBash = pkgs.writeText "devshell-env.bash" ''
     # Expose the folder that contains the assembled environment.
     export DEVSHELL_DIR=@devshellDir@
 
@@ -65,6 +96,8 @@ let
     PATH=''${PATH%:/path-not-set}
     PATH=''${PATH#${bashBin}:}
     export PATH=$DEVSHELL_DIR/bin:${bashBin}:$PATH
+
+    ${concatStringsSep "\n" (map envToBash cfg.env)}
 
     ${textClosureMap id (addAttributeName "startup" cfg.startup) (attrNames cfg.startup)}
 
@@ -81,7 +114,7 @@ let
     name = "devshell-dir";
     paths = cfg.packages;
     postBuild = ''
-      cp ${env} $out/env.bash
+      cp ${envBash} $out/env.bash
       substituteInPlace $out/env.bash --subst-var-by devshellDir $out
     '';
   };
@@ -150,11 +183,26 @@ in
     };
 
     env = mkOption {
-      internal = true;
-      default = { };
-      type = types.attrs;
+      type = types.listOf (types.submodule { options = envOptions; });
+      default = [ ];
       description = ''
-        Don't use this, it will be replaced soon.
+        Add environment variables to the shell.
+      '';
+      example = literalExample ''
+        [
+          {
+            name = "HTTP_PORT";
+            value = 8080;
+          }
+          {
+            name = "PATH";
+            prefix = "bin";
+          }
+          {
+            name = "XDG_CACHE_DIR";
+            eval = "$DEVSHELL_ROOT/.cache";
+          }
+        ]
       '';
     };
 
@@ -218,10 +266,22 @@ in
   };
 
   config.devshell = {
-    # Expose the path to nixpkgs
-    env.NIXPKGS_PATH = toString pkgs.path;
-
     entrypoint = entrypoint;
+
+    env = [
+      # Expose the path to nixpkgs
+      {
+        name = "NIXPKGS_PATH";
+        value = toString pkgs.path;
+      }
+
+      # This is used by bash-completions to find new completions on demand
+      {
+        name = "XDG_DATA_DIRS";
+        eval =
+          ''$DEVSHELL_DIR/share''${XDG_DATA_DIRS:-:/usr/local/share:/usr/share}''${XDG_DATA_DIRS+:$XDG_DATA_DIRS}'';
+      }
+    ];
 
     startup = {
       load_profiles = noDepEntry ''
@@ -230,14 +290,6 @@ in
           # If that folder doesn't exist, bash loves to return the whole glob
           [[ -f "$file" ]] && source "$file"
         done
-      '';
-
-      # TODO: split into a different module
-      XDG = noDepEntry ''
-        # Fill with sensible default for Ubuntu
-        : "''${XDG_DATA_DIRS:=/usr/local/share:/usr/share}"
-        # This is used by bash-completions to find new completions on demand
-        export XDG_DATA_DIRS=$DEVSHELL_DIR/share:$XDG_DATA_DIRS
       '';
 
       motd = noDepEntry ''
