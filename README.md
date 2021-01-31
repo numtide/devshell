@@ -2,6 +2,8 @@
 
 **STATUS: unstable**
 
+[![Devshell Dev Environment](https://img.shields.io/badge/nix-devshell-blue?logo=NixOS&labelColor=ccc)](https://github.com/numtide/devshell)
+
 The goal of this project is to simplify per-project developer environments.
 
 Imagine, a new employee joins the company, or somebody transfers teams, or
