@@ -10,4 +10,5 @@ in
 // (import ./devshell.nix attrs)
 // (import ./git-hooks.nix attrs)
 // (import ./modules-docs.nix attrs)
+// (import ./nix-shell.nix attrs)
   // { }
