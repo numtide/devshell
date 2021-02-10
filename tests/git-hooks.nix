@@ -1,4 +1,4 @@
-{ pkgs, devshell }:
+{ pkgs, devshell, runTest }:
 {
   # Basic git.hooks module tests
   git-hooks-1 =
@@ -17,27 +17,25 @@
         git.hooks.enable = true;
       };
     in
-    pkgs.runCommand "git-hooks-1" { nativeBuildInputs = [ pkgs.git ]; } ''
+    runTest "git-hooks-1" { nativeBuildInputs = [ pkgs.git ]; } ''
       git init
 
       # The hook doesn't exist yet
-      [[ ! -L .git/hooks/pre-commit ]]
+      assert_fail -L .git/hooks/pre-commit
 
       # Load the devshell
       source ${shell1}
 
       # The hook has been install
-      [[ -L .git/hooks/pre-commit ]]
+      assert -L .git/hooks/pre-commit
 
       # The hook outputs what we want
-      [[ $(.git/hooks/pre-commit) == "PRE-COMMIT" ]]
+      assert "$(.git/hooks/pre-commit)" == "PRE-COMMIT"
 
       # Load the new config
       source ${shell2}
 
       # The hook should have been uninstalled
-      [[ ! -L .git/hooks/pre-commit ]]
-
-      touch $out
+      assert_fail -L .git/hooks/pre-commit
     '';
 }

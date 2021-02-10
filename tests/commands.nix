@@ -1,4 +1,4 @@
-{ pkgs, devshell }:
+{ pkgs, devshell, runTest }:
 {
   # Basic devshell usage
   commands-1 =
@@ -29,7 +29,7 @@
         ];
       };
     in
-    pkgs.runCommand "devshell-1" { } ''
+    runTest "devshell-1" { } ''
       # Load the devshell
       source ${shell}
 
@@ -40,14 +40,12 @@
       type -p python-script
       type -p git
 
-      [[ $(bash-script) == hello-bash ]]
+      assert "$(bash-script)" == hello-bash
 
       # Check that the shebang is correct. We can't execute it inside of the
       # sandbox because /usr/bin/env doesn't exist.
       #
       # Ideally it would be rewritten with patchShebang.
-      [[ $(head -n1 "$(type -p python-script)") == "#!/usr/bin/env python3" ]]
-
-      touch $out
+      assert "$(head -n1 "$(type -p python-script)")" == "#!/usr/bin/env python3"
     '';
 }
