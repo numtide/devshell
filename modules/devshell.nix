@@ -77,13 +77,23 @@ let
     eval = mkOption {
       type = types.nullOr types.str;
       default = null;
-      description = "Like value but not escaped";
+      description = ''
+        Like value but not evaluated by Bash. This allows to inject other
+        variable names or even commands using the `$()` notation.
+      '';
+      example = "$OTHER_VAR";
     };
 
     prefix = mkOption {
       type = types.nullOr types.str;
       default = null;
-      description = "prepend to PATH-like environment variables";
+      description = ''
+        Prepend to PATH-like environment variables.
+
+        For example name = "PATH"; prefix = "bin"; will expand the path of
+        ./bin and prepend it to the PATH, separated by ':'.
+      '';
+      example = "bin";
     };
   };
 
