@@ -20,21 +20,6 @@ with lib;
       default = "";
     };
 
-    env = mkOption {
-      type = types.attrs;
-      default = { };
-      description = ''
-        Environment variables to add to the environment.
-
-        If the value is null, it will unset the environment variable.
-        Otherwise, the value will be converted to string before being set.
-      '';
-      example = {
-        GO111MODULE = "on";
-        HTTP_PORT = 8080;
-      };
-    };
-
     motd = mkOption {
       internal = true;
       type = types.nullOr types.str;
@@ -57,9 +42,6 @@ with lib;
   # Copy the values over to the devshell module
   config.devshell =
     {
-      env = map
-        (name: { name = name; value = config.env.${name}; })
-        (lib.attrNames config.env);
       packages = config.packages;
       startup.bash_extra = noDepEntry config.bash.extra;
       interactive.bash_interactive = noDepEntry config.bash.interactive;

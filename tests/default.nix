@@ -16,6 +16,7 @@ in
 { recurseForDerivations = true; }
 // (import ./commands.nix attrs)
 // (import ./devshell.nix attrs)
+// (import ./env.nix attrs)
 // (import ./git-hooks.nix attrs)
 // (import ./modules-docs.nix attrs)
   // { }
