@@ -6,6 +6,7 @@ let
     ./back-compat.nix
     ./commands.nix
     ./devshell.nix
+    ./env.nix
     ./modules-docs.nix
     {
       # Configure modules-docs
