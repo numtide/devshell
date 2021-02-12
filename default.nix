@@ -6,7 +6,18 @@ rec {
   cli = pkgs.callPackage ./devshell { };
 
   # Get the modules documentation from an empty evaluation
-  modules-docs = (eval { configuration = { }; }).config.modules-docs;
+  modules-docs = (eval
+    {
+      configuration = {
+        # Load all of the extra modules so they appear in the docs
+        imports =
+          let dir = builtins.readDir extraModulesDir; in
+          map
+            (str: import "${extraModulesDir}/${str}")
+            (builtins.attrNames dir);
+      };
+    }
+  ).config.modules-docs;
 
   # Docs
   docs = pkgs.callPackage ./docs { inherit modules-docs; };
@@ -17,15 +28,33 @@ rec {
   # Evaluate the devshell module
   eval = import ./modules pkgs;
 
+  # Folder that contains all the extra modules
+  extraModulesDir = toString ./modules_extra;
+
   # Loads a Nix module from TOML.
-  importTOML = file:
+  importTOML =
     let
-      dir = builtins.dirOf file;
+      extraModules = builtins.readDir extraModulesDir;
+    in
+    file:
+    let
+      dir = toString (builtins.dirOf file);
       data = builtins.fromTOML (builtins.readFile file);
+
+      importModule = str:
+        let
+          repoFile = "${dir}/${str}";
+          extraFile =
+            "${extraModulesDir}/${pkgs.lib.removePrefix "extra." str}.nix";
+        in
+        # Load from the extra modules if it starts with extra.
+        if pkgs.lib.hasPrefix "extra." str then import extraFile
+        # Otherwise look in the repo
+        else import repoFile;
     in
     {
       _file = file;
-      imports = map (str: "${toString dir}/${str}") (data.imports or [ ]);
+      imports = map importModule (data.imports or [ ]);
       config = builtins.removeAttrs data [ "imports" ];
     };
 
