@@ -80,7 +80,7 @@ in
 
   config = {
     # Default env
-    env = [
+    env = lib.mkBefore [
       # Expose the path to nixpkgs
       {
         name = "NIXPKGS_PATH";
