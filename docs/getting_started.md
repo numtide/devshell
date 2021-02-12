@@ -20,6 +20,8 @@ in
 devshell.fromTOML ./devshell.toml
 ```
 
+> NOTE: it's probably a good idea to pin the dependency by replacing `master` with a git commit ID.
+
 Now you can enter the developer shell for the project:
 
 ```console
@@ -45,7 +47,33 @@ warning: you did not specify '--add-root'; the result might be removed by the ga
 [devshell]$
 ```
 
+## Adding environment variables
+
+Environment variables that are specific to the project can be added with the
+`[[env]]` declaration. Each environment variable is an entry in an array, and
+will be set in the order that they are declared.
+
+Eg:
+
+```toml
+[[env]]
+name = "GO111MODULE"
+value = "on"
+```
+
+There are different ways to set the environment variables. Look at the schema
+to find all the ways. But in short:
+* Use the `value` key to set a fixed env var.
+* Use the `eval` key to evaluate the value. This is useful when one env var
+  depends on the value of another.
+* Use the `prefix` key to prepend a path to an environment variable that uses
+  the path separator. Like `PATH`.
+
 ## Adding new commands
+
+Devshell also supports adding new commands to the environment. Those are
+displayed on devshell entry so that the user knows what commands are available
+to them.
 
 In order to bring in new dependencies, you can either add them to
 `devshell.packages` or to the `commands` list. Commands are also added to the
@@ -97,5 +125,7 @@ packages = [
 ]
 ```
 
-devshell is extensible in many different ways. The next chapter will show all
+devshell is extensible in many different ways. In the next chapters we will
+discuss the various ways in which it can be adapted to your project's needs.
+to find 
 of the configuration options available.

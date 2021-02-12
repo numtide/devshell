@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   };
 
   buildPhase = ''
-    cp ${modules-docs.markdown} devshell.toml.md
+    cp ${modules-docs.markdown} modules_schema.md
     mdbook build
   '';
 

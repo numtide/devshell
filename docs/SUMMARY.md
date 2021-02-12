@@ -2,7 +2,8 @@
 
 - [Intro](./intro.md)
 - [Getting started](./getting_started.md)
-- [devshell.toml](./devshell.toml.md)
 - [Continuous Integration setup](./ci.md)
+- [Extending devshell](./extending.md)
+- [devshell.toml schema](./modules_schema.md)
 - [TODO](./99_todo.md)
 
