@@ -4,6 +4,7 @@
   git-hooks-1 =
     let
       shell1 = devshell.mkShell {
+        imports = [ ../../extra/git/hooks.nix ];
         devshell.name = "git-hooks-1a";
         git.hooks.enable = true;
         git.hooks.pre-commit.text = ''
@@ -13,6 +14,7 @@
       };
 
       shell2 = devshell.mkShell {
+        imports = [ ../../extra/git/hooks.nix ];
         devshell.name = "git-hooks-1b";
         git.hooks.enable = true;
       };

@@ -16,7 +16,6 @@ let
         branch = "master";
       }];
     }
-    ./git-hooks.nix
   ];
 
   pkgsModule = { config, ... }: {
