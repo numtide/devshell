@@ -126,6 +126,7 @@ let
         + (lib.optionalString opt.internal "\n**internal**\n")
         + opt.description + "\n"
         + (lib.optionalString (opt ? default && opt.default != null) ''
+
           **Default value**:
           ```nix
           ${
@@ -143,10 +144,11 @@ let
 
         '')
         + ''
-          **Type**: ${opt.type}
 
+          **Type**: ${opt.type}
         ''
         + (lib.optionalString (opt ? example) ''
+
           **Example value**:
           ```nix
           ${builtins.toJSON opt.example}
@@ -154,13 +156,14 @@ let
 
         '')
         + ''
+
           Declared in:
         ''
         + (
           lib.concatStringsSep
             "\n"
             (map
-              (decl: "* [./modules/${decl.path}](${decl.url})")
+              (decl: "* [${decl.path}](${decl.url})")
               opt.declarations
             )
         )

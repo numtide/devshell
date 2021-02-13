@@ -4,7 +4,7 @@
   language-c-1 =
     let
       shell = devshell.mkShell {
-        imports = [ ../../modules_extra/language/c.nix ];
+        imports = [ ../../extra/language/c.nix ];
         devshell.name = "devshell-1";
       };
     in

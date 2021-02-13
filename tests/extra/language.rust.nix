@@ -4,7 +4,7 @@
   simple =
     let
       shell = devshell.mkShell {
-        imports = [ ../../modules_extra/language/rust.nix ];
+        imports = [ ../../extra/language/rust.nix ];
         devshell.name = "language-rust-simple";
       };
     in

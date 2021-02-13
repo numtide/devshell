@@ -12,7 +12,7 @@ let
       # Configure modules-docs
       config.modules-docs.roots = [{
         url = "https://github.com/numtide/devshell";
-        path = ../.;
+        path = toString ../.;
         branch = "master";
       }];
     }

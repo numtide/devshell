@@ -12,7 +12,7 @@ let
           type = data.${name};
         in
         sum ++
-        (if type == "regular" then [ (import path) ]
+        (if type == "regular" then [ path ]
         # assume it's a directory
         else importTree path);
     in
@@ -23,7 +23,7 @@ rec {
   cli = pkgs.callPackage ./devshell { };
 
   # Folder that contains all the extra modules
-  extraModulesDir = toString ./modules_extra;
+  extraModulesDir = toString ./extra;
 
   # Get the modules documentation from an empty evaluation
   modules-docs = (eval {
