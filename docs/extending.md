@@ -5,12 +5,11 @@ possible to extend it.
 
 ## Extra modules
 
-All the `devshell.toml` schema options that are prefixed with `extra.<name>`
-are only loaded on demand. This is done to keep devshell fast for users that
-don't need all the modules.
+All the `devshell.toml` schema options that are `Declared in:` the `extra/`
+folder in the schema documentation are loaded on demand.
 
 In order to load an extra module, use the `<name>` in the import section. For
-example to make the `extra.locale` options available, import `locale`:
+example to make the `locale` options available, import `locale`:
 
 `devshell.toml`:
 ```toml
@@ -19,13 +18,13 @@ imports = ["locale"]
 
 Make sure to add this at the first statement in the file.
 
-Now that the module has been loaded, the `devshell.toml` understands the extra
-options:
+Now that the module has been loaded, the `devshell.toml` understands the
+`locale` prefix:
 
 ```toml
-imports = ["extra.locale"]
+imports = ["locale"]
 
-[extra.locale]
+[locale]
 lang = "en_US.UTF-8"
 ```
 

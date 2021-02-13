@@ -16,6 +16,10 @@
       source ${shell}
 
       # Sets LOCALE_ARCHIVE
-      assert -n "$LOCALE_ARCHIVE"
+      if [[ $OSTYPE == linux-gnu ]]; then
+        assert -n "$LOCALE_ARCHIVE"
+      else
+        assert -z "$LOCALE_ARCHIVE"
+      fi
     '';
 }
