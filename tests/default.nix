@@ -46,4 +46,5 @@ in
 {
   recurseForDerivations = true;
   core = loadDir "tests.core" (toString ./core);
+  extra = loadDir "tests.extra" (toString ./extra);
 }
