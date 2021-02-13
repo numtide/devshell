@@ -1,23 +1,37 @@
 { system ? builtins.currentSystem
 , pkgs ? import (import ./nix/nixpkgs.nix) { inherit system; }
 }:
+let
+  # Build a list of all the files, imported as Nix code, from a directory.
+  importTree = dir:
+    let
+      data = builtins.readDir dir;
+      op = sum: name:
+        let
+          path = "${dir}/${name}";
+          type = data.${name};
+        in
+        sum ++
+        (if type == "regular" then [ (import path) ]
+        # assume it's a directory
+        else importTree path);
+    in
+    builtins.foldl' op [ ] (builtins.attrNames data);
+in
 rec {
   # CLI
   cli = pkgs.callPackage ./devshell { };
 
+  # Folder that contains all the extra modules
+  extraModulesDir = toString ./modules_extra;
+
   # Get the modules documentation from an empty evaluation
-  modules-docs = (eval
-    {
-      configuration = {
-        # Load all of the extra modules so they appear in the docs
-        imports =
-          let dir = builtins.readDir extraModulesDir; in
-          map
-            (str: import "${extraModulesDir}/${str}")
-            (builtins.attrNames dir);
-      };
-    }
-  ).config.modules-docs;
+  modules-docs = (eval {
+    configuration = {
+      # Load all of the extra modules so they appear in the docs
+      imports = importTree extraModulesDir;
+    };
+  }).config.modules-docs;
 
   # Docs
   docs = pkgs.callPackage ./docs { inherit modules-docs; };
@@ -27,9 +41,6 @@ rec {
 
   # Evaluate the devshell module
   eval = import ./modules pkgs;
-
-  # Folder that contains all the extra modules
-  extraModulesDir = toString ./modules_extra;
 
   # Loads a Nix module from TOML.
   importTOML =
@@ -45,12 +56,13 @@ rec {
         let
           repoFile = "${dir}/${str}";
           extraFile =
-            "${extraModulesDir}/${pkgs.lib.removePrefix "extra." str}.nix";
+            "${extraModulesDir}/${builtins.replaceStrings [ "." ] [ "/" ] str}.nix";
         in
-        # Load from the extra modules if it starts with extra.
-        if pkgs.lib.hasPrefix "extra." str then import extraFile
-        # Otherwise look in the repo
-        else import repoFile;
+        # First try to import from the user's repository
+        if pkgs.lib.hasPrefix "./" str || pkgs.lib.hasSuffix ".nix" str
+        then import repoFile
+        # Then fallback on the extra modules
+        else import extraFile;
     in
     {
       _file = file;

@@ -1,3 +1,7 @@
+imports = [
+  "language.go"
+]
+
 [devshell]
 # This is the name of your environment. It should usually map to the project
 # name.
@@ -14,18 +18,10 @@ name = "devshell"
 # NOTE: don't forget to put commas between items! :)
 packages = [
   "diffutils", # used by golangci-lint
-  "go",
   "goreleaser",
   "mdbook",
   "webfs",
 ]
-
-# Use this section to set environment variables to have in the environment.
-#
-# NOTE: all the values are escaped
-[[env]]
-name = "GO111MODULE"
-value = "on"
 
 # Declare commands that are available in the environment.
 [[commands]]
