@@ -20,7 +20,9 @@ packages = [
   "diffutils", # used by golangci-lint
   "goreleaser",
   "mdbook",
+  "mdsh",
   "webfs",
+  "hyperfine",
 ]
 
 # Declare commands that are available in the environment.
