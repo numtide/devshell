@@ -245,8 +245,7 @@ in
     };
 
     interactive = {
-      PS1 = noDepEntry ''
-        # Set a cool PS1
+      PS1_util = noDepEntry ''
         if [[ -n "''${DEVSHELL_ROOT:-}" ]]; then
           # Print the path relative to $DEVSHELL_ROOT
           rel_root() {
@@ -262,8 +261,12 @@ in
             echo " \W "
           }
         fi
-        PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
       '';
+
+      # Set a cool PS1
+      PS1 = stringAfter [ "PS1_util" ] (lib.mkDefault ''
+        PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
+      '');
     };
 
     # Use a naked derivation to limit the amount of noise passed to nix-shell.
