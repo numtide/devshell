@@ -11,10 +11,20 @@ let
         default = "";
         type = types.str;
       };
+
+      src = mkOption {
+        description = "File containing the script to install";
+        default = "";
+        type = types.str;
+      };
     };
 
   # Only keep all the hooks that have a value set.
-  hooksWithData = filterAttrs (k: v: k != "enable" && v.text != "") cfg;
+  hooksWithData = filterAttrs
+    (k: v: k != "enable"
+      && (v.text != "" || v.src != "")
+    )
+    cfg;
 
   # A collection of all the git hooks in the /bin folder
   hooksDir =
@@ -22,7 +32,14 @@ let
       mkHookScript = k: hook:
         pkgs.runCommand k
           {
-            text = hook.text;
+            text =
+              assert lib.assertMsg (!(hook.text != "" && hook.src != ""))
+                "options ${k}.text and ${k}.src are mutually exclusive";
+              if hook.text != ""
+              then hook.text
+              else
+                builtins.readFile readFile.src;
+
             passAsFile = [ "text" ];
           }
           ''
