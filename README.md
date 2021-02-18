@@ -2,7 +2,7 @@
 
 **STATUS: unstable**
 
-[![Devshell Dev Environment](https://img.shields.io/badge/nix-devshell-blue?logo=NixOS&labelColor=ccc)](https://github.com/numtide/devshell)
+[![Devshell Dev Environment](https://img.shields.io/badge/nix-devshell-blue?logo=NixOS&labelColor=ccc)](https://github.com/numtide/devshell) [![Support room on Matrix](https://img.shields.io/matrix/devshell:numtide.com.svg?label=%23devshell%3Anumtide.com&logo=matrix&server_fqdn=matrix.numtide.com)](https://matrix.to/#/#devshell:numtide.com)
 
 The goal of this project is to simplify per-project developer environments.
 
