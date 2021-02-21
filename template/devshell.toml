@@ -1,3 +1,7 @@
 # https://numtide.github.io/devshell
 [[commands]]
 package = "nixFlakes"
+
+[[commands]]
+package = "devshell.cli"
+help = "Per project developer environments"

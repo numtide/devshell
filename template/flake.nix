@@ -4,16 +4,19 @@
   inputs.devshell.url = "github:numtide/devshell";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
-  outputs = { self, flake-utils, devshell }:
+  outputs = { self, flake-utils, devshell, nixpkgs }:
     flake-utils.lib.eachDefaultSystem (system: {
-      devShell = let shell = import devshell { inherit system; }; in
-        shell.mkShell {
-          imports = [ (shell.importTOML ./devshell.toml) ];
+      devShell =
+        let inherit (pkgs.devshell) mkShell importTOML;
 
-          commands = [{
-            package = devshell.defaultPackage.${system};
-            help = "Per project developer environments";
-          }];
+          pkgs = import nixpkgs {
+            inherit system;
+
+            overlays = [ devshell.overlay ];
+          };
+        in
+        mkShell {
+          imports = [ (importTOML ./devshell.toml) ];
         };
     });
 }
