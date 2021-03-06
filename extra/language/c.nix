@@ -13,7 +13,12 @@ with lib;
       type = types.listOf strOrPackage;
       default = [ ];
       description = "Use this when another language dependens on a dynamic library";
+      example = lib.literalExample ''
+        [ pkgs.glibc ]
+      '';
     };
+
+    pkg-config = mkEnableOption "use pkg-config";
 
     includes = mkOption {
       type = types.listOf strOrPackage;
@@ -25,7 +30,11 @@ with lib;
       type = strOrPackage;
       default = pkgs.clang;
       defaultText = "pkgs.clang";
-      description = "Which C compiler to use";
+      description = ''
+        Which C compiler to use.
+
+        For gcc, use pkgs.gcc-unwrapped.
+      '';
     };
   };
 
@@ -35,26 +44,24 @@ with lib;
       ++
       (lib.optionals hasLibraries (map lib.getLib cfg.libraries))
       ++
-      # Assume we want pkg-config, because it's good
-      (lib.optionals hasIncludes ([ pkgs.pkg-config ] ++ (map lib.getDev cfg.includes)))
+      (lib.optional cfg.pkg-config pkgs.pkg-config)
     ;
 
     env =
       (lib.optionals hasLibraries [
         {
-          name = "LD_LIBRARY_PATH";
-          prefix = "$DEVSHELL_DIR/lib";
+          name = "LIBRARY_PATH";
+          value = lib.concatStringsSep ":" (map (x: "${lib.getLib x}/lib") cfg.libraries);
         }
       ])
-      ++ lib.optionals hasIncludes [
-        {
-          name = "LD_INCLUDE_PATH";
-          prefix = "$DEVSHELL_DIR/include";
-        }
-        {
-          name = "PKG_CONFIG_PATH";
-          prefix = "$DEVSHELL_DIR/lib/pkgconfig";
-        }
-      ];
+      ++ (lib.optional hasIncludes {
+        name = "LD_INCLUDE_PATH";
+        prefix = "$DEVSHELL_DIR/include";
+      })
+      ++ (lib.optional cfg.pkg-config {
+        name = "PKG_CONFIG_PATH";
+        value = lib.concatStringsSep ":" (map (x: "${lib.getLib x}/lib/pkgconfig") cfg.libraries);
+      })
+    ;
   };
 }
