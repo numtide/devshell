@@ -9,6 +9,24 @@ in
 with lib;
 {
   options.language.c = {
+    compiler = mkOption {
+      type = strOrPackage;
+      default = pkgs.clang;
+      defaultText = "pkgs.clang";
+      description = ''
+        Which C compiler to use.
+
+        For gcc, use pkgs.gcc-unwrapped.
+      '';
+    };
+
+    linker = mkOption {
+      type = strOrPackage;
+      default = pkgs.binutils;
+      defaultText = "pkgs.binutils";
+      description = "Which linker package to use";
+    };
+
     libraries = mkOption {
       type = types.listOf strOrPackage;
       default = [ ];
@@ -26,21 +44,11 @@ with lib;
       description = "C dependencies from nixpkgs";
     };
 
-    compiler = mkOption {
-      type = strOrPackage;
-      default = pkgs.clang;
-      defaultText = "pkgs.clang";
-      description = ''
-        Which C compiler to use.
-
-        For gcc, use pkgs.gcc-unwrapped.
-      '';
-    };
   };
 
   config = {
     devshell.packages =
-      [ cfg.compiler ]
+      [ cfg.compiler cfg.linker ]
       ++
       (lib.optionals hasLibraries (map lib.getLib cfg.libraries))
       ++
