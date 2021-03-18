@@ -13,12 +13,13 @@
 }:
 let
   script =
-    if lib.hasPrefix "#!" then text
+    if lib.hasPrefix "#!" text then text
     else "${defaultShebang}\n${text}";
 in
 writeTextFile (
   {
-    inherit name text;
+    inherit name;
+    text = script;
     executable = true;
   }
   // (lib.optionalAttrs (checkPhase != null) { inherit checkPhase; })
