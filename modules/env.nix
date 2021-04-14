@@ -90,8 +90,7 @@ in
       # This is used by bash-completions to find new completions on demand
       {
         name = "XDG_DATA_DIRS";
-        eval =
-          ''$DEVSHELL_DIR/share''${XDG_DATA_DIRS:-:/usr/local/share:/usr/share}''${XDG_DATA_DIRS+:$XDG_DATA_DIRS}'';
+        eval = ''$DEVSHELL_DIR/share:''${XDG_DATA_DIRS:-/usr/local/share:/usr/share}'';
       }
     ];
 
