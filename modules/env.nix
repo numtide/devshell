@@ -51,7 +51,7 @@ let
     else if valType == "prefix" then
       ''export ${name}=$(${pkgs.coreutils}/bin/realpath "${prefix}")''${${name}+:''${${name}}}''
     else
-      throw "BUG in the environ.nix module. This should never be reached.";
+      throw "BUG in the env.nix module. This should never be reached.";
 in
 {
   options.env = mkOption {
