@@ -33,6 +33,65 @@ All the CI has to do, is this: `$(nix-build shell.nix) make`.
 3. Finally make is executed in the context of the project environment, with
    all the same dependencies as the developer's.
 
+## Hercules CI
+
+[Hercules CI](https://hercules-ci.com) is a Nix-based continuous integration and deployment service.
+
+### Build
+
+If you haven't packaged your project with Nix or if a check can't run in the Nix sandbox, you can run it as an [effect](https://docs.hercules-ci.com/hercules-ci/effects/):
+
+`ci.nix`
+```
+rec {
+  shell = import ./shell.nix {};
+  build = shell.mkEffect {
+    src = ./.;
+    effectScript = ''
+      go build
+    '';
+  };
+}
+```
+
+### Run locally
+
+The [`hci` command](https://docs.hercules-ci.com/hercules-ci-agent/hci/) is available in `nixos-21.05` and `nixos-unstable`.
+
+`devshell.toml`
+```
+[[commands]]
+package = "hci"
+```
+
+Use [`hci effect run`](https://docs.hercules-ci.com/hercules-ci-agent/hci/). Following the previous example:
+
+```console
+hci effect run build --no-token
+```
+
+### Shell only
+
+To build the shell itself on `x86_64-linux`:
+
+`ci.nix`
+```
+{
+  shell = import ./shell.nix {};
+
+  # ... any extra Nix packages you want to build; perhaps
+  # pkgs = import ./default.nix {} // { recurseForDerivations = true; };
+}
+```
+
+### `system`
+
+If you build for [multiple systems](https://docs.hercules-ci.com/hercules-ci/guides/multi-platform/), pass `system`:
+
+```
+import ./shell.nix { inherit system; };
+```
+
 ## GitHub Actions
 
 Add the following file to your project. Replace the `<your build command>`

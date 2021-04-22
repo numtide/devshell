@@ -1,5 +1,6 @@
 { system ? builtins.currentSystem
 , pkgs ? import (import ./nix/nixpkgs.nix) { inherit system; }
+, hercules-ci-effects ? import ./nix/hercules-ci-effects.nix
 }:
 let
   # Build a list of all the files, imported as Nix code, from a directory.
@@ -17,6 +18,11 @@ let
         else importTree path);
     in
     builtins.foldl' op [ ] (builtins.attrNames data);
+
+  sources = {
+    inherit hercules-ci-effects;
+  };
+
 in
 rec {
   # CLI
@@ -40,7 +46,7 @@ rec {
   tests = import ./tests { inherit pkgs system; };
 
   # Evaluate the devshell module
-  eval = import ./modules pkgs;
+  eval = import ./modules { inherit pkgs sources; };
 
   # Loads a Nix module from TOML.
   importTOML =
@@ -83,6 +89,7 @@ rec {
   # * nix-shell
   # * flake app
   # * direnv integration
+  # * hercules ci effect
   mkShell = configuration:
     (eval { inherit configuration; }).shell;
 }

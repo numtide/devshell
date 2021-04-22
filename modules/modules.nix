@@ -1,5 +1,6 @@
 { pkgs
 , lib
+, sources
 }:
 let
   modules = [
@@ -23,6 +24,7 @@ let
       _module.args.baseModules = modules;
       _module.args.pkgsPath = lib.mkDefault pkgs.path;
       _module.args.pkgs = lib.mkDefault pkgs;
+      _module.args.sources = lib.mkDefault sources;
     };
   };
 in
