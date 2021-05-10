@@ -43,8 +43,14 @@ If you haven't packaged your project with Nix or if a check can't run in the Nix
 
 `ci.nix`
 ```
-rec {
+let
   shell = import ./shell.nix {};
+  effectsSrc = 
+    builtins.fetchTarball "https://github.com/hercules-ci/hercules-ci-effects/archive/COMMIT_HASH.tar.gz";
+  effects = import (effectsSrc + "/effects") effects shell.config._module.args.pkgs;
+in
+{
+  inherit shell;
   build = effects.mkEffect {
     src = ./.;
     effectScript = ''
@@ -57,7 +63,8 @@ rec {
 }
 ```
 
-You can bring `effects` into scope [using any pinning method](https://docs.hercules-ci.com/hercules-ci-effects/guide/import-or-pin/).
+Replace COMMIT_HASH by the latest git sha from [`hercules-ci-effects`](https://github.com/hercules-ci/hercules-ci-effects/commit/master),
+or, if you prefer, you can bring `effects` into scope [using another pinning method](https://docs.hercules-ci.com/hercules-ci-effects/guide/import-or-pin/).
 
 ### Run locally
 
