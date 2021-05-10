@@ -39,20 +39,25 @@ All the CI has to do, is this: `$(nix-build shell.nix) make`.
 
 ### Build
 
-If you haven't packaged your project with Nix or if a check can't run in the Nix sandbox, you can run it as an [effect](https://docs.hercules-ci.com/hercules-ci/effects/):
+If you haven't packaged your project with Nix or if a check can't run in the Nix sandbox, you can run it as an [effect](https://docs.hercules-ci.com/hercules-ci/effects/).
 
 `ci.nix`
 ```
 rec {
   shell = import ./shell.nix {};
-  build = shell.mkEffect {
+  build = effects.mkEffect {
     src = ./.;
     effectScript = ''
       go build
     '';
+    inputs = [
+      shell.hook
+    ];
   };
 }
 ```
+
+You can bring `effects` into scope [using any pinning method](https://docs.hercules-ci.com/hercules-ci-effects/guide/import-or-pin/).
 
 ### Run locally
 

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, sources, ... }:
+{ config, lib, pkgs, ... }:
 with lib;
 let
   cfg = config.devshell;
@@ -17,19 +17,6 @@ let
     type = "app";
     program = "${bin}";
   };
-
-  effects = pkgs.effects or (import (sources.hercules-ci-effects + "/effects") effects pkgs);
-
-  mkEffect = entrypoint: config: effectArgs: effects.mkEffect ({
-    name = "devshell-effect";
-    prebuilt = entrypoint;
-  } // effectArgs // {
-    inherit entrypoint;
-    inputs = (effectArgs.inputs or []) ++ [ (mkSetupHook entrypoint) ];
-    passthru = (effectArgs.passthru or {}) // {
-      config = effectArgs.passthru.config or config;
-    };
-  });
 
   mkSetupHook = entrypoint:
     pkgs.stdenvNoCC.mkDerivation {
@@ -300,7 +287,6 @@ in
       passthru = {
         inherit config;
         flakeApp = mkFlakeApp entrypoint;
-        mkEffect = mkEffect entrypoint config;
         hook = mkSetupHook entrypoint;
       };
     };

@@ -1,12 +1,12 @@
 # Evaluate the devshell environment
-{ pkgs, sources }:
+pkgs:
 { configuration
 , lib ? pkgs.lib
 , extraSpecialArgs ? { }
 }:
 let
   devenvModules = import ./modules.nix {
-    inherit pkgs lib sources;
+    inherit pkgs lib;
   };
 
   module = lib.evalModules {
