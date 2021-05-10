@@ -176,7 +176,9 @@ in
       help = "prints this menu";
       name = "menu";
       command = ''
-        echo -e "${commandsToMenu config.commands}"
+        cat <<'DEVSHELL_MENU'
+        ${commandsToMenu config.commands}
+        DEVSHELL_MENU
       '';
     }
   ];
