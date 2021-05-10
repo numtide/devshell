@@ -47,6 +47,19 @@ warning: you did not specify '--add-root'; the result might be removed by the ga
 [devshell]$
 ```
 
+## Flakes
+For users of nix flakes, a default template is provided to get you up and
+running.
+
+```sh
+nix flake new -t "github:numtide/devshell" devshell
+
+cd devshell
+
+# enter the shell
+nix develop # or `direnv allow`
+```
+
 ## Adding environment variables
 
 Environment variables that are specific to the project can be added with the

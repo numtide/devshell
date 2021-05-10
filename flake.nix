@@ -33,6 +33,8 @@
         };
     in
     {
+      defaultTemplate.path = ./template;
+      defaultTemplate.description = "nix flake new 'github:numtide/devshell'";
       # Import this overlay into your instance of nixpkgs
       overlay = import ./overlay.nix;
     }
