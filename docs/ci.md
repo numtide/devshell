@@ -45,9 +45,9 @@ If you haven't packaged your project with Nix or if a check can't run in the Nix
 ```
 let
   shell = import ./shell.nix {};
-  effectsSrc = 
+  effectsSrc =
     builtins.fetchTarball "https://github.com/hercules-ci/hercules-ci-effects/archive/COMMIT_HASH.tar.gz";
-  effects = import (effectsSrc + "/effects") effects shell.config._module.args.pkgs;
+  inherit (import effectsSrc { inherit (shell.config._module.args) pkgs; }) effects;
 in
 {
   inherit shell;
