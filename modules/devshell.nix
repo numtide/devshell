@@ -288,6 +288,7 @@ in
         inherit config;
         flakeApp = mkFlakeApp entrypoint;
         hook = mkSetupHook entrypoint;
+        inherit (config._module.args) pkgs;
       };
     };
   };
