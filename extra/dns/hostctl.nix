@@ -41,12 +41,11 @@ in
       type = types.attrs;
       default = {};
       description = "configure static dns entries";
-      example = literalExample ''
+      example =
         {
           dns."some.host" = "1.2.3.4";
           dns."another.host" = "4.3.2.1";
-        }
-      '';
+        };
     };
   };
 
