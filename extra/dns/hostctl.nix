@@ -35,7 +35,7 @@ let
 in
 {
   options.hostctl = {
-    enable = mkEnableOption "manage temoprary /etc/host entries for development from within the shell";
+    enable = mkEnableOption "manage temporary /etc/host entries for development from within the shell";
 
     dns = mkOption {
       type = types.attrs;
