@@ -42,33 +42,7 @@ rec {
   # Evaluate the devshell module
   eval = import ./modules pkgs;
 
-  # Loads a Nix module from TOML.
-  importTOML =
-    let
-      extraModules = builtins.readDir extraModulesDir;
-    in
-    file:
-    let
-      dir = toString (builtins.dirOf file);
-      data = builtins.fromTOML (builtins.readFile file);
-
-      importModule = str:
-        let
-          repoFile = "${dir}/${str}";
-          extraFile =
-            "${extraModulesDir}/${builtins.replaceStrings [ "." ] [ "/" ] str}.nix";
-        in
-        # First try to import from the user's repository
-        if pkgs.lib.hasPrefix "./" str || pkgs.lib.hasSuffix ".nix" str
-        then import repoFile
-        # Then fallback on the extra modules
-        else import extraFile;
-    in
-    {
-      _file = file;
-      imports = map importModule (data.imports or [ ]);
-      config = builtins.removeAttrs data [ "imports" ];
-    };
+  importTOML = import ./nix/importTOML.nix;
 
   # Build the devshell from a TOML declaration.
   fromTOML = path: mkShell (importTOML path);
