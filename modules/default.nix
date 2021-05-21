@@ -13,6 +13,7 @@ let
     modules = [ configuration ] ++ devenvModules;
     specialArgs = {
       modulesPath = builtins.toString ./.;
+      inherit (pkgs.devshell) importTOML;
     } // extraSpecialArgs;
   };
 in
