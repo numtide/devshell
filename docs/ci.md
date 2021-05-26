@@ -33,6 +33,78 @@ All the CI has to do, is this: `$(nix-build shell.nix) make`.
 3. Finally make is executed in the context of the project environment, with
    all the same dependencies as the developer's.
 
+## Hercules CI
+
+[Hercules CI](https://hercules-ci.com) is a Nix-based continuous integration and deployment service.
+
+### Build
+
+If you haven't packaged your project with Nix or if a check can't run in the Nix sandbox, you can run it as an [effect](https://docs.hercules-ci.com/hercules-ci/effects/).
+
+`ci.nix`
+```
+let
+  shell = import ./shell.nix {};
+  pkgs = shell.pkgs;
+  effectsSrc =
+    builtins.fetchTarball "https://github.com/hercules-ci/hercules-ci-effects/archive/COMMIT_HASH.tar.gz";
+  inherit (import effectsSrc { inherit pkgs; }) effects;
+in
+{
+  inherit shell;
+  build = effects.mkEffect {
+    src = ./.;
+    effectScript = ''
+      go build
+    '';
+    inputs = [
+      shell.hook
+    ];
+  };
+}
+```
+
+Replace COMMIT_HASH by the latest git sha from [`hercules-ci-effects`](https://github.com/hercules-ci/hercules-ci-effects/commit/master),
+or, if you prefer, you can bring `effects` into scope [using another pinning method](https://docs.hercules-ci.com/hercules-ci-effects/guide/import-or-pin/).
+
+### Run locally
+
+The [`hci` command](https://docs.hercules-ci.com/hercules-ci-agent/hci/) is available in `nixos-21.05` and `nixos-unstable`.
+
+`devshell.toml`
+```
+[[commands]]
+package = "hci"
+```
+
+Use [`hci effect run`](https://docs.hercules-ci.com/hercules-ci-agent/hci/). Following the previous example:
+
+```console
+hci effect run build --no-token
+```
+
+### Shell only
+
+To build the shell itself on `x86_64-linux`:
+
+`ci.nix`
+```
+{
+  shell = import ./shell.nix {};
+
+  # ... any extra Nix packages you want to build; perhaps
+  # pkgs = import ./default.nix {} // { recurseForDerivations = true; };
+}
+```
+
+### `system`
+
+If you build for [multiple systems](https://docs.hercules-ci.com/hercules-ci/guides/multi-platform/), pass `system`:
+
+```
+import ./shell.nix { inherit system; };
+```
+
 ## GitHub Actions
 
 Add the following file to your project. Replace the `<your build command>`

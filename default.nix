@@ -57,6 +57,7 @@ rec {
   # * nix-shell
   # * flake app
   # * direnv integration
+  # * setup hook for derivation or hercules ci effect
   mkShell = configuration:
     (eval { inherit configuration; }).shell;
 }

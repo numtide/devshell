@@ -18,6 +18,17 @@ let
     program = "${bin}";
   };
 
+  mkSetupHook = entrypoint:
+    pkgs.stdenvNoCC.mkDerivation {
+      name = "devshell-setup-hook";
+      setupHook = pkgs.writeText "devshell-setup-hook.sh" ''
+        source ${entrypoint}
+      '';
+      dontUnpack = true;
+      dontBuild = true;
+      dontInstall = true;
+    };
+
   mkNakedShell = pkgs.callPackage ../nix/mkNakedShell.nix { };
 
   addAttributeName = prefix:
@@ -276,6 +287,8 @@ in
       passthru = {
         inherit config;
         flakeApp = mkFlakeApp entrypoint;
+        hook = mkSetupHook entrypoint;
+        inherit (config._module.args) pkgs;
       };
     };
   };
