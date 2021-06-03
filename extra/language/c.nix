@@ -48,7 +48,7 @@ with lib;
       ])
       ++ lib.optionals hasIncludes [
         {
-          name = "LD_INCLUDE_PATH";
+          name = "C_INCLUDE_PATH";
           prefix = "$DEVSHELL_DIR/include";
         }
         {
