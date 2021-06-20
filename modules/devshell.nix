@@ -231,6 +231,11 @@ in
         done
       '';
 
+      complement_manpath = noDepEntry ''
+        # Load installed manpaths
+        export MANPATH="$DEVSHELL_DIR/share/man:$MANPATH"
+      '';
+
       motd = noDepEntry ''
         __devshell-motd() {
           cat <<DEVSHELL_PROMPT
