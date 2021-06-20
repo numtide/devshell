@@ -224,11 +224,19 @@ in
 
     startup = {
       load_profiles = noDepEntry ''
+        # PATH is devshell's exorbitant privilige:
+        # fence against its pollution
+        _PATH=''${PATH}
+
         # Load installed profiles
         for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
           # If that folder doesn't exist, bash loves to return the whole glob
           [[ -f "$file" ]] && source "$file"
         done
+
+        # Exert exorbitant privilige and leave no trace
+        export PATH=''${_PATH}
+        unset _PATH
       '';
 
       motd = noDepEntry ''
