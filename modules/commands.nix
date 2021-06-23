@@ -55,8 +55,14 @@ let
 
       commands = map cleanName cmds;
 
+      pushDownExtras = { package, extra, ... }@cmd:
+        assert lib.assertMsg (package != null || extra == [ ]) "[[commands]]: ${cmd.name} cannot specify `extra` commands without a `package` attribute.";
+        [ cmd ] ++ cmd.extra;
+
+      allCommands = concatMap pushDownExtras commands;
+
       commandLengths =
-        map ({ name, ... }: builtins.stringLength name) commands;
+        map ({ name, ... }: builtins.stringLength name) allCommands;
 
       maxCommandLength =
         builtins.foldl'
@@ -66,7 +72,7 @@ let
       ;
 
       commandCategories = lib.unique (
-        (zipAttrsWithNames [ "category" ] (name: vs: vs) commands).category
+        (zipAttrsWithNames [ "category" ] (name: vs: vs) allCommands).category
       );
 
       commandByCategoriesSorted =
@@ -74,7 +80,7 @@ let
           commandCategories
           (category: lib.nameValuePair category (builtins.sort
             (a: b: a.name < b.name)
-            (builtins.filter (x: x.category == category) commands)
+            (builtins.filter (x: x.category == category) allCommands)
           ))
         );
 
@@ -95,16 +101,8 @@ let
     in
     builtins.concatStringsSep "\n" (map opCat commandByCategoriesSorted) + "\n";
 
-  # These are all the options available for the commands.
-  commandOptions = {
-    name = mkOption {
-      type = types.nullOr types.str;
-      default = null;
-      description = ''
-        Name of this command. Defaults to attribute name in commands.
-      '';
-    };
-
+  # Options available to all commands
+  commonCommandOptions = {
     category = mkOption {
       type = types.str;
       default = "general commands";
@@ -119,6 +117,27 @@ let
       default = null;
       description = ''
         Describes what the command does in one line of text.
+      '';
+    };
+  };
+
+  # Options only available to extra commands
+  extraCommandOptions = commonCommandOptions // {
+    name = mkOption {
+      type = types.str;
+      description = ''
+        Name of this command.
+      '';
+    };
+  };
+
+  # Options only available to basic commands
+  commandOptions = commonCommandOptions // {
+    name = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        Name of this command. Defaults to attribute name in commands.
       '';
     };
 
@@ -144,6 +163,17 @@ let
       description = ''
         Used to bring in a specific package. This package will be added to the
         environment.
+      '';
+    };
+
+    extra = mkOption {
+      type = types.listOf (types.submodule { options = extraCommandOptions; });
+      default = [ ];
+      description = ''
+        Extra commands for extra programs brought in by the command's package.
+        Note this only allows to add a menu entry, it won't bring a specific
+        package or command in the environment.
+        It can't be used if the base command doesn't specify a package.
       '';
     };
   };
