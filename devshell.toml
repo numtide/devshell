@@ -45,3 +45,13 @@ category = "utilites"
 help = "golang linter"
 package = "golangci-lint"
 category = "linters"
+
+[[commands]]
+package = "go"
+
+# Declares an extra command for the go command since gofmt is included in the
+# go package.
+[[commands.extra]]
+name = "gofmt"
+help = "Formats Go programs"
+category = "formatters"
