@@ -19,7 +19,5 @@ in
 {
   inherit (module) config options;
 
-  activationPackage = module.config.devshell.activationPackage;
-
   shell = module.config.devshell.shell;
 }
