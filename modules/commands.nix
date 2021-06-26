@@ -17,10 +17,17 @@ let
     else
       str;
 
+  # Fallback to the package pname if the name is unset
+  resolveName = cmd:
+    if cmd.name == null then
+      cmd.package.pname or (builtins.parseDrvName cmd.package.name).name
+    else
+      cmd.name;
+
   # Fill in default options for a command.
   commandToPackage = cmd:
     assert lib.assertMsg (cmd.command == null || cmd.name != cmd.command) "[[commands]]: ${toString cmd.name} cannot be set to both the `name` and the `command` attributes. Did you mean to use the `package` attribute?";
-    assert lib.assertMsg (cmd.package != null || (cmd.command != null && cmd.command != "")) "[[commands]]: ${name} expected either a command or package attribute.";
+    assert lib.assertMsg (cmd.package != null || (cmd.command != null && cmd.command != "")) "[[commands]]: ${resolveName cmd} expected either a command or package attribute.";
     if cmd.package == null then
       writeDefaultShellScript
         {
@@ -35,13 +42,8 @@ let
     let
       cleanName = { name, package, ... }@cmd:
         assert lib.assertMsg (cmd.name != null || cmd.package != null) "[[commands]]: some command is missing both a `name` or `package` attribute.";
-        # Fallback to the package pname if the name is unset
         let
-          name =
-            if cmd.name == null then
-              cmd.package.pname or (builtins.parseDrvName cmd.package.name).name
-            else
-              cmd.name;
+          name = resolveName cmd;
 
           help =
             if cmd.help == null then
