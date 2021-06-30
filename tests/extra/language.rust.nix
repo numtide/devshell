@@ -10,7 +10,7 @@
     in
     runTest "simple" { } ''
       # Load the devshell
-      source ${shell}
+      source ${shell}/env.bash
 
       # Has a rust compiler
       type -p rustc

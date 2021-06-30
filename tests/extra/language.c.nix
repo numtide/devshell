@@ -10,7 +10,7 @@
     in
     runTest "language-c-1" { } ''
       # Load the devshell
-      source ${shell}
+      source ${shell}/env.bash
 
 
       # Has a C compiler

@@ -22,8 +22,9 @@ let
   };
 in
 { name
-, # A path to a script that will be loaded by the shell
-  script
+, # A path to a buildEnv that will be loaded by the shell.
+  # We assume that the buildEnv contains an ./env.bash script.
+  profile
 , meta ? { }
 , passthru ? { }
 }:
@@ -34,7 +35,7 @@ in
   builder = bashPath;
 
   # Bring in the dependencies on `nix-build`
-  args = [ "-ec" "${coreutils}/bin/ln -s ${script} $out; exit 0" ];
+  args = [ "-ec" "${coreutils}/bin/ln -s ${profile} $out; exit 0" ];
 
   # $stdenv/setup is loaded by nix-shell during startup.
   # https://github.com/nixos/nix/blob/377345e26f1ac4bbc87bb21debcc52a1d03230aa/src/nix-build/nix-build.cc#L429-L432
@@ -55,7 +56,7 @@ in
       export SHELL=${bashPath}
     fi
 
-    # Load the script environment
-    source "${script}"
+    # Load the environment
+    source "${profile}/env.bash"
   '';
 }) // { inherit meta passthru; } // passthru

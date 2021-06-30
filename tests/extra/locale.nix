@@ -13,7 +13,7 @@
       assert -z "$LOCALE_ARCHIVE"
 
       # Load the devshell
-      source ${shell}
+      source ${shell}/env.bash
 
       # Sets LOCALE_ARCHIVE
       if [[ $OSTYPE == linux-gnu ]]; then

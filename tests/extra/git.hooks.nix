@@ -26,7 +26,7 @@
       assert_fail -L .git/hooks/pre-commit
 
       # Load the devshell
-      source ${shell1}
+      source ${shell1}/env.bash
 
       # The hook has been install
       assert -L .git/hooks/pre-commit
@@ -35,7 +35,7 @@
       assert "$(.git/hooks/pre-commit)" == "PRE-COMMIT"
 
       # Load the new config
-      source ${shell2}
+      source ${shell2}/env.bash
 
       # The hook should have been uninstalled
       assert_fail -L .git/hooks/pre-commit

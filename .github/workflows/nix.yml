@@ -18,7 +18,8 @@ jobs:
         with:
           name: numtide
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: $(nix-build shell.nix) --pure /usr/bin/env HOME=$HOME bash -c "cd devshell && golangci-lint run"
+      - run: |
+          $(./shell.nix)/entrypoint --pure /usr/bin/env HOME=$HOME bash -c "cd devshell && golangci-lint run"
       - run: nix-shell --run "echo OK"
       - run: nix-build
   flakes:

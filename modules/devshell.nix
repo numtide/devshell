@@ -22,7 +22,7 @@ let
     pkgs.stdenvNoCC.mkDerivation {
       name = "devshell-setup-hook";
       setupHook = pkgs.writeText "devshell-setup-hook.sh" ''
-        source ${entrypoint}
+        source ${devshell_dir}/env.bash
       '';
       dontUnpack = true;
       dontBuild = true;
@@ -58,8 +58,11 @@ let
 
   # Write a bash profile to load
   envBash = pkgs.writeText "devshell-env.bash" ''
+    # It assums that the shell is always loaded from the root of the project.
+    export DEVSHELL_ROOT=''${DEVSHELL_ROOT:-$PWD}
+
     # Expose the folder that contains the assembled environment.
-    export DEVSHELL_DIR=@devshellDir@
+    export DEVSHELL_DIR=@DEVSHELL_DIR@
 
     # Prepend the PATH with the devshell dir and bash
     PATH=''${PATH%:/path-not-set}
@@ -78,29 +81,18 @@ let
     fi # Interactive session
   '';
 
-  # Builds the DEVSHELL_DIR with all the dependencies
-  devshellDir = pkgs.buildEnv {
-    name = "devshell-dir";
-    paths = cfg.packages;
-    postBuild = ''
-      cp ${envBash} $out/env.bash
-      substituteInPlace $out/env.bash --subst-var-by devshellDir $out
-    '';
-  };
 
-  # This is our entry-point for everything!
+  # This is our entrypoint script.
   entrypoint = pkgs.writeShellScript "${cfg.name}-entrypoint" ''
     #!${bashPath}
     # Script that sets-up the environment. Can be both sourced or invoked.
 
-    # It assums that the shell is always loaded from the root of the project.
-    # Store that for later usage.
-    export DEVSHELL_ROOT=$PWD
+    export DEVSHELL_DIR=@DEVSHELL_DIR@
 
     # If the file is sourced, skip all of the rest and just source the env
     # script.
     if [[ $0 != "''${BASH_SOURCE[0]}" ]]; then
-      source "${devshellDir}/env.bash"
+      source "$DEVSHELL_DIR/env.bash"
       return
     fi
 
@@ -109,11 +101,10 @@ let
 
     if [[ $# = 0 ]]; then
       # Start an interactive shell
-      exec "${bashPath}" --rcfile "${devshellDir}/env.bash" --noprofile
+      exec "${bashPath}" --rcfile "$DEVSHELL_DIR/env.bash" --noprofile
     elif [[ $1 == "-h" || $1 == "--help" ]]; then
       cat <<USAGE
     Usage: ${cfg.name}
-      source $0               # load the environment in the current bash
       $0 -h | --help          # show this help
       $0 [--pure]             # start a bash sub-shell
       $0 [--pure] <cmd> [...] # run a command in the environment
@@ -128,10 +119,22 @@ let
       exec -c "$0" "$@"
     else
       # Start a script
-      source "${devshellDir}/env.bash"
+      source "$DEVSHELL_DIR/env.bash"
       exec -- "$@"
     fi
   '';
+
+  # Builds the DEVSHELL_DIR with all the dependencies
+  devshell_dir = pkgs.buildEnv {
+    name = "devshell-dir";
+    paths = cfg.packages;
+    postBuild = ''
+      substitute ${envBash} $out/env.bash --subst-var-by DEVSHELL_DIR $out
+      substitute ${entrypoint} $out/entrypoint --subst-var-by DEVSHELL_DIR $out
+      chmod +x $out/entrypoint
+    '';
+  };
+
 in
 {
   options.devshell = {
@@ -143,11 +146,11 @@ in
       description = "Version of bash to use in the project";
     };
 
-    entrypoint = mkOption {
+    package = mkOption {
       internal = true;
       type = types.package;
       description = ''
-        This package contains a script that loads the current environment.
+        This package contains the DEVSHELL_DIR
       '';
     };
 
@@ -220,7 +223,7 @@ in
   };
 
   config.devshell = {
-    entrypoint = entrypoint;
+    package = devshell_dir;
 
     startup = {
       load_profiles = noDepEntry ''
@@ -283,7 +286,7 @@ in
     # Use a naked derivation to limit the amount of noise passed to nix-shell.
     shell = mkNakedShell {
       name = cfg.name;
-      script = cfg.entrypoint;
+      profile = cfg.package;
       passthru = {
         inherit config;
         flakeApp = mkFlakeApp entrypoint;
