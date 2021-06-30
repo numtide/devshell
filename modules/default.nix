@@ -13,6 +13,7 @@ let
     modules = [ configuration ] ++ devenvModules;
     specialArgs = {
       modulesPath = builtins.toString ./.;
+      extraModulesPath = builtins.toString ../extra;
     } // extraSpecialArgs;
   };
 in
