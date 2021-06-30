@@ -24,5 +24,5 @@ in
 {
   _file = file;
   imports = map importModule (data.imports or [ ]);
-  config = builtins.removeAttrs data [ "imports" ];
+  config = (builtins.removeAttrs data [ "imports" ]) // { lib._tomlfile = file; };
 }
