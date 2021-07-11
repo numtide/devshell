@@ -10,7 +10,7 @@ let
       '';
       example = "hello";
     };
-    priority = mkOption = {
+    priority = mkOption {
       type = types.nullOr (types.either (types.enum [ "low" "high" ]) types.int);
       description = ''
         The priority of this package in the shell environment.
