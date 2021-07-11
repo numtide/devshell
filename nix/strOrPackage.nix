@@ -1,13 +1,14 @@
 { lib, pkgs }:
 with lib;
 let
+
   pkgOpt = {
     pkg = mkOption {
-      type = types.package;
+      type = types.either types.str types.package;
       description = ''
         The derivation of this package.
       '';
-      exampleText = "pkgs.hello";
+      example = "hello";
     };
     prio = mkOption = {
       type = types.nullOr (types.either (types.enum [ "low" "high" ]) types.int);
@@ -21,26 +22,27 @@ let
     };
   };
 
+  strOrAttrs =
+    types.coercedTo
+      types.str
+      (pkg: { inherit pkg; })
+      (types.submodule { options = pkgOpt; });
+
   # Because we want to be able to push pure JSON-like data into the environment.
-  coerceStr = str:
+  resolveKey = key:
     let
       attrs = builtins.filter builtins.isString (builtins.split "\\." key);
       op = sum: attr: sum.${attr} or (throw "package \"${key}\" not found");
     in
-    {
-      pkg = builtins.foldl' op pkgs attrs;
-    };
-
-  strOrAttrs =
-    types.coercedTo
-      types.str
-      coerceStr
-      (types.submodule { options = pkgOpt; });
+    builtins.foldl' op pkgs attrs;
 
   coercePkgOpt = opt:
-    if isNull opt.prio then opt.pkg
-    else if opt.prio == "low" then lowPrio opt.pkg
-    else if opt.prio == "high" then hiPrio opt.pkg
-    else setPrio opt.prio opt.pkg;
+    let
+      pkg = if isString opt.pkg then resolveKey opt.pkg else opt.pkg;
+    in
+      if isNull opt.prio then pkg
+      else if opt.prio == "low" then lowPrio pkg
+      else if opt.prio == "high" then hiPrio pkg
+      else setPrio opt.prio pkg;
 in
 types.coercedTo strOrAttrs coercePkgOpt types.package
