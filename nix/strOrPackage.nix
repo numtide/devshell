@@ -3,14 +3,14 @@ with lib;
 let
 
   pkgOpt = {
-    pkg = mkOption {
+    package = mkOption {
       type = types.either types.str types.package;
       description = ''
         The derivation of this package.
       '';
       example = "hello";
     };
-    prio = mkOption = {
+    priority = mkOption = {
       type = types.nullOr (types.either (types.enum [ "low" "high" ]) types.int);
       description = ''
         The priority of this package in the shell environment.
@@ -25,7 +25,7 @@ let
   strOrAttrs =
     types.coercedTo
       types.str
-      (pkg: { inherit pkg; })
+      (package: { inherit package; })
       (types.submodule { options = pkgOpt; });
 
   # Because we want to be able to push pure JSON-like data into the environment.
@@ -38,11 +38,13 @@ let
 
   coercePkgOpt = opt:
     let
-      pkg = if isString opt.pkg then resolveKey opt.pkg else opt.pkg;
+      pkg =
+        if isString opt.package then resolveKey opt.package
+        else opt.package;
     in
-      if isNull opt.prio then pkg
-      else if opt.prio == "low" then lowPrio pkg
-      else if opt.prio == "high" then hiPrio pkg
-      else setPrio opt.prio pkg;
+      if isNull opt.priority then pkg
+      else if opt.priority == "low" then lowPrio pkg
+      else if opt.priority == "high" then hiPrio pkg
+      else setPrio opt.priority pkg;
 in
 types.coercedTo strOrAttrs coercePkgOpt types.package
