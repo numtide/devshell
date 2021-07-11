@@ -81,7 +81,15 @@ let
   # Builds the DEVSHELL_DIR with all the dependencies
   devshellDir = pkgs.buildEnv {
     name = "devshell-dir";
-    paths = cfg.packages;
+    paths =
+      flip map cfg.packages ({ package, priority }:
+        if isNull priority then package
+        else if isInt priority then setPrio priority package
+        else {
+          low = lowPrio package;
+          high = hiPrio package;
+        }.${priority}
+      );
     postBuild = ''
       cp ${envBash} $out/env.bash
       substituteInPlace $out/env.bash --subst-var-by devshellDir $out
