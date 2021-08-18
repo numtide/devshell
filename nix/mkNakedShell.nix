@@ -44,7 +44,7 @@ in
   # requires that other trampoline.
   shellHook = ''
     # Remove all the unnecessary noise that is set by the build env
-    unset NIX_BUILD_TOP NIX_BUILD_CORES NIX_BUILD_TOP NIX_STORE
+    unset NIX_BUILD_TOP NIX_BUILD_CORES NIX_STORE
     unset TEMP TEMPDIR TMP TMPDIR
     unset builder name out shellHook stdenv system
     # Flakes stuff
