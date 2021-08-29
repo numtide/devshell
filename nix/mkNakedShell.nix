@@ -5,8 +5,6 @@
 }:
 let
   bashPath = "${bashInteractive}/bin/bash";
-  _system = system;
-
   stdenv = writeTextFile {
     name = "naked-stdenv";
     destination = "/setup";
