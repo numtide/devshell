@@ -59,7 +59,7 @@ let
   # Write a bash profile to load
   envBash = pkgs.writeText "devshell-env.bash" ''
     # It assums that the shell is always loaded from the root of the project.
-    export DEVSHELL_ROOT=''${DEVSHELL_ROOT:-$PWD}
+    export PRJ_ROOT=''${PRJ_ROOT:-$PWD}
 
     # Expose the folder that contains the assembled environment.
     export DEVSHELL_DIR=@DEVSHELL_DIR@
@@ -260,17 +260,17 @@ in
 
     interactive = {
       PS1_util = noDepEntry ''
-        if [[ -n "''${DEVSHELL_ROOT:-}" ]]; then
-          # Print the path relative to $DEVSHELL_ROOT
+        if [[ -n "''${PRJ_ROOT:-}" ]]; then
+          # Print the path relative to $PRJ_ROOT
           rel_root() {
             local path
-            path=$(${pkgs.coreutils}/bin/realpath --relative-to "$DEVSHELL_ROOT" "$PWD")
+            path=$(${pkgs.coreutils}/bin/realpath --relative-to "$PRJ_ROOT" "$PWD")
             if [[ $path != . ]]; then
               echo " $path "
             fi
           }
         else
-          # If DEVSHELL_ROOT is unset, print only the current directory name
+          # If PRJ_ROOT is unset, print only the current directory name
           rel_root() {
             echo " \W "
           }

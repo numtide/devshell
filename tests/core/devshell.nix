@@ -15,8 +15,8 @@
       # Sets an environment variable that points to the buildEnv
       assert -n "$DEVSHELL_DIR"
 
-      # Points DEVSHELL_ROOT to the project root
-      assert "$PWD" == "$DEVSHELL_ROOT"
+      # Points PRJ_ROOT to the project root
+      assert "$PWD" == "$PRJ_ROOT"
 
       # Adds packages to the PATH
       type -p git
