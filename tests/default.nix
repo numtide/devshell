@@ -7,6 +7,9 @@ let
     pkgs.runCommand name attrs ''
       source ${./assert.sh}
 
+      # Needed by devshell
+      export PRJ_ROOT=$PWD
+
       ${script}
 
       touch $out
