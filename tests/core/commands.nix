@@ -31,7 +31,7 @@
     in
     runTest "devshell-1" { } ''
       # Load the devshell
-      source ${shell}
+      source ${shell}/env.bash
 
       menu
 

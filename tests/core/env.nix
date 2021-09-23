@@ -25,7 +25,7 @@
       unset XDG_DATA_DIRS
 
       # Load the devshell
-      source ${shell}
+      source ${shell}/env.bash
 
       # NIXPKGS_PATH is being set
       assert "$NIXPKGS_PATH" == "${toString pkgs.path}"
