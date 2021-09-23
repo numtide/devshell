@@ -121,7 +121,7 @@ let
     elif [[ $1 == "--pure" ]]; then
       # re-execute the script in a clean environment
       shift
-      exec -c "$0" "$@"
+      exec /usr/bin/env -i -- "HOME=$HOME" "PRJ_ROOT=$PRJ_ROOT" "$0" "$@"
     else
       # Start a script
       source "$DEVSHELL_DIR/env.bash"
