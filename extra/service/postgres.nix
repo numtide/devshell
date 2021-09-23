@@ -6,12 +6,16 @@
 { lib, pkgs, config, ... }:
 with lib;
 let
+  # Because we want to be able to push pure JSON-like data into the
+  # environment.
+  strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
+
   cfg = config.service.postgres;
 in
 {
   options.service.postgres = {
     package = mkOption {
-      type = types.package;
+      type = strOrPackage;
       description = "Which version of postgres to use";
       default = pkgs.postgresql;
       defaultText = "pkgs.postgresl";
