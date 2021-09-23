@@ -92,6 +92,12 @@ in
         name = "XDG_DATA_DIRS";
         eval = ''$DEVSHELL_DIR/share:''${XDG_DATA_DIRS:-/usr/local/share:/usr/share}'';
       }
+
+      # A per-project data directory for runtime information.
+      {
+        name = "PRJ_DATA_DIR";
+        eval = "\${PRJ_DATA_DIR:-$PRJ_ROOT/.data}";
+      }
     ];
 
     devshell.startup_env = concatStringsSep "\n" (map envToBash config.env);
