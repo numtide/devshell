@@ -42,13 +42,13 @@ direnv: export +AR +AS +CC +CONFIG_SHELL +CXX +HOST_PATH +IN_NIX_SHELL +LD +NIX_
 ```
 to:
 ```
-direnv: export +DEVSHELL_DIR +DEVSHELL_ROOT +IN_NIX_SHELL +NIXPKGS_PATH ~PATH
+direnv: export +DEVSHELL_DIR +PRJ_ROOT +IN_NIX_SHELL +NIXPKGS_PATH ~PATH
 ```
 
 There are new environment variables useful to support the day-to-day
 activities:
 * `DEVSHELL_DIR`: contains all the programs.
-* `DEVSHELL_ROOT`: points to the project root.
+* `PRJ_ROOT`: points to the project root.
 * `NIXPKGS_PATH`: path to `nixpkgs` source.
 
 ### Common utilities

@@ -16,7 +16,7 @@
           }
           {
             name = "XDG_CACHE_DIR";
-            eval = "$DEVSHELL_ROOT/$(echo .cache)";
+            eval = "$PRJ_ROOT/$(echo .cache)";
           }
         ];
       };

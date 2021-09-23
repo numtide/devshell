@@ -72,7 +72,7 @@ in
         }
         {
           name = "XDG_CACHE_DIR";
-          eval = "$DEVSHELL_ROOT/.cache";
+          eval = "$PRJ_ROOT/.cache";
         }
       ]
     '';
