@@ -34,15 +34,22 @@ let
       '';
       example = "bin";
     };
+
+    unset = mkEnableOption "unsets the variable";
   };
 
-  envToBash = { name, value, eval, prefix }@args:
+  envToBash = { name, value, eval, prefix, unset }@args:
     let
-      vals = filter (key: args.${key} != null) [ "value" "eval" "prefix" ];
+      vals = filter (key: args.${key} != null && args.${key} != false) [
+        "eval"
+        "prefix"
+        "unset"
+        "value"
+      ];
       valType = head vals;
     in
-    assert assertMsg ((length vals) > 0) "[[environ]]: ${name} expected one of value, eval or prefix to be set.";
-    assert assertMsg ((length vals) < 2) "[[environ]]: ${name} expected only one of value, eval or prefix to be set. Not ${toString vals}";
+    assert assertMsg ((length vals) > 0) "[[environ]]: ${name} expected one of (value|eval|prefix|unset) to be set.";
+    assert assertMsg ((length vals) < 2) "[[environ]]: ${name} expected only one of (value|eval|prefix|unset) to be set. Not ${toString vals}";
     assert assertMsg (!(name == "PATH" && valType == "value")) "[[environ]]: ${name} should not override the value. Use 'prefix' instead.";
     if valType == "value" then
       "export ${name}=${escapeShellArg (toString value)}"
@@ -50,6 +57,8 @@ let
       "export ${name}=${eval}"
     else if valType == "prefix" then
       ''export ${name}=$(${pkgs.coreutils}/bin/realpath "${prefix}")''${${name}+:''${${name}}}''
+    else if valType == "unset" then
+      ''unset ${name}''
     else
       throw "BUG in the env.nix module. This should never be reached.";
 in
@@ -73,6 +82,10 @@ in
         {
           name = "XDG_CACHE_DIR";
           eval = "$PRJ_ROOT/.cache";
+        }
+        {
+          name = "CARGO_HOME";
+          unset = true;
         }
       ]
     '';
