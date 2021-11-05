@@ -88,7 +88,7 @@ let
 
 
   # This is our entrypoint script.
-  entrypoint = pkgs.writeShellScript "${cfg.name}-entrypoint" ''
+  entrypoint = pkgs.writeScript "${cfg.name}-entrypoint" ''
     #!${bashPath}
     # Script that sets-up the environment. Can be both sourced or invoked.
 
