@@ -190,9 +190,12 @@ in
     motd = mkOption {
       type = types.str;
       default = ''
-        ${ansi.orange}🔨 Welcome to ${cfg.name}${ansi.reset}
+        {202}🔨 Welcome to ${cfg.name}{reset}
         $(type -p menu &>/dev/null && menu)
       '';
+      apply = builtins.replaceStrings
+        (map (key: "{${key}}") (attrNames ansi))
+        (map (esc: "${esc}") (attrValues ansi));
       description = ''
         Message Of The Day.
 
