@@ -1,7 +1,7 @@
 {
   description = "devshell";
 
-  outputs = { self }:
+  outputs = { self, nixpkgs }:
     let
       eachSystem = f:
         let
@@ -32,6 +32,15 @@
           legacyPackages = devshell;
           devShell = devshell.fromTOML ./devshell.toml;
         };
+      fromTOML = path:  eachSystem (system:
+        let pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ (import ./overlay.nix) ];
+        };
+        in {
+          devShell = pkgs.devshell.fromTOML path;
+        }
+      );
     in
     {
       defaultTemplate.path = ./template;
@@ -39,6 +48,7 @@
       # Import this overlay into your instance of nixpkgs
       overlay = import ./overlay.nix;
       lib = {
+        inherit fromTOML;
         importTOML = import ./nix/importTOML.nix;
       };
     }
