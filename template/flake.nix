@@ -3,5 +3,7 @@
 
   inputs.devshell.url = "github:numtide/devshell";
 
-  outputs = { devshell, ... }: devshell.lib.fromTOML ./devshell.toml;
+  outputs = { devshell, nixpkgs, ... }@inputs: {
+    devShell = devshell.lib.flakeTOML inputs ./devshell.toml;
+  };
 }
