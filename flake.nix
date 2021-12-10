@@ -1,7 +1,7 @@
 {
   description = "devshell";
 
-  outputs = { self, nixpkgs }:
+  outputs = { self }:
     let
       eachSystem = f:
         let
@@ -32,10 +32,13 @@
           legacyPackages = devshell;
           devShell = devshell.fromTOML ./devshell.toml;
         };
-      flakeTOML = inputs: path: eachSystem (system:
-        let pkgs = nixpkgs.legacyPackages.${system}.extend self.overlay;
-        in { 
-          devShell = pkgs.devshell.fromTOML path;
+      flakeTOML = nixpkgs: path: eachSystem (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          devshell = import ./. { inherit system pkgs; };
+        in
+        {
+          devShell = devshell.fromTOML path;
         }
       );
     in

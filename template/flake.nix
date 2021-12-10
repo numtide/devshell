@@ -3,6 +3,6 @@
 
   inputs.devshell.url = "github:numtide/devshell";
 
-  outputs = { devshell, nixpkgs, ... }@inputs: 
-    devshell.lib.flakeTOML inputs ./devshell.toml;
+  outputs = { devshell, nixpkgs }:
+    devshell.lib.flakeTOML nixpkgs ./devshell.toml;
 }
