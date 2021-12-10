@@ -33,11 +33,8 @@
           devShell = devshell.fromTOML ./devshell.toml;
         };
       flakeTOML = inputs: path: eachSystem (system:
-        let pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ (import ./overlay.nix) ];
-        };
-        in {
+        let pkgs = nixpkgs.legacyPackages.${system}.extend self.overlay;
+        in { 
           devShell = pkgs.devshell.fromTOML path;
         }
       );
