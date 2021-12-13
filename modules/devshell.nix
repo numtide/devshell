@@ -193,9 +193,9 @@ in
         {202}🔨 Welcome to ${cfg.name}{reset}
         $(type -p menu &>/dev/null && menu)
       '';
-      apply = builtins.replaceStrings
+      apply = replaceStrings
         (map (key: "{${key}}") (attrNames ansi))
-        (map (esc: "${esc}") (attrValues ansi));
+        (attrValues ansi);
       description = ''
         Message Of The Day.
 
