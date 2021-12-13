@@ -21,4 +21,29 @@
       # Adds packages to the PATH
       type -p git
     '';
+
+  # Only load profiles
+  devshell-load-profiles-1 =
+    let
+      fakeProfile = pkgs.writeTextFile {
+        name = "fake_profile.sh";
+        destination = "/etc/profile.d/fake_profile.sh";
+        text = ''
+          export FAKE_PROFILE=1
+        '';
+      };
+
+      shell = devshell.mkShell {
+        devshell.name = "devshell-1";
+        devshell.load_profiles = true;
+        devshell.packages = [ fakeProfile ];
+      };
+    in
+    runTest "devshell-load-profiles-1" { } ''
+      # Load the devshell
+      source ${shell}/env.bash
+
+      # Check that the profile got loaded
+      assert "$FAKE_PROFILE" == "1"
+    '';
 }
