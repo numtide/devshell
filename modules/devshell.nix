@@ -201,6 +201,8 @@ in
 
         This is the welcome message that is being printed when the user opens
         the shell.
+
+        You may use any valid ansi color from the 8-bit ansi color table. For example, to use a green color you would use something like {106}. You may also use {bold}, {italic}, {underline}. Use {reset} to turn off all attributes.
       '';
     };
 
