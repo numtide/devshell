@@ -201,6 +201,8 @@ in
       '';
     };
 
+    load_profiles = mkEnableOption "load etc/profiles.d/*.sh in the shell";
+
     name = mkOption {
       type = types.str;
       default = "devshell";
@@ -231,14 +233,6 @@ in
     package = devshell_dir;
 
     startup = {
-      load_profiles = noDepEntry ''
-        # Load installed profiles
-        for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
-          # If that folder doesn't exist, bash loves to return the whole glob
-          [[ -f "$file" ]] && source "$file"
-        done
-      '';
-
       motd = noDepEntry ''
         __devshell-motd() {
           cat <<DEVSHELL_PROMPT
@@ -261,7 +255,15 @@ in
           PROMPT_COMMAND=__devshell-prompt''${PROMPT_COMMAND+;$PROMPT_COMMAND}
         fi
       '';
-    };
+    } // (optionalAttrs cfg.load_profiles {
+      load_profiles = lib.noDepEntry ''
+        # Load installed profiles
+        for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
+          # If that folder doesn't exist, bash loves to return the whole glob
+          [[ -f "$file" ]] && source "$file"
+        done
+      '';
+    });
 
     interactive = {
       PS1_util = noDepEntry ''
