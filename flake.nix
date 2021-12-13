@@ -34,7 +34,7 @@
         };
       flakeTOML = nixpkgs: path: eachSystem (system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = nixpkgs.legacyPackages.${system}.extend self.overlay;
           devshell = import ./. { inherit system pkgs; };
         in
         {
