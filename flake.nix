@@ -16,6 +16,7 @@
             builtins.foldl' op2 attrs (builtins.attrNames ret);
         in
         builtins.foldl' op { } [
+          "aarch64-darwin"
           "aarch64-linux"
           "i686-linux"
           "x86_64-darwin"
