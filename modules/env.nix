@@ -69,7 +69,7 @@ in
     description = ''
       Add environment variables to the shell.
     '';
-    example = literalExample ''
+    example = literalExpression ''
       [
         {
           name = "HTTP_PORT";

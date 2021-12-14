@@ -15,7 +15,7 @@ with lib;
     package = mkOption {
       type = strOrPackage;
       default = pkgs.go;
-      example = literalExample "pkgs.go";
+      example = literalExpression "pkgs.go";
       description = "Which go package to use";
     };
   };
