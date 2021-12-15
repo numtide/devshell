@@ -157,7 +157,7 @@ in
     description = ''
       Add commands to the environment.
     '';
-    example = literalExample ''
+    example = literalExpression ''
       [
         {
           help = "print hello";
