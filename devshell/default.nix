@@ -4,7 +4,8 @@ let
   source = import ../nix/source.nix;
 in
 buildGoModule {
-  name = "devshell";
+  pname = "devshell";
+  version = "0+git";
   src = source.filter {
     path = ./.;
     allow = [

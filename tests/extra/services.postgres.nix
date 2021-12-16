@@ -4,8 +4,8 @@
   simple =
     let
       shell = devshell.mkShell {
-        imports = [ ../../extra/service/postgres.nix ];
-        devshell.name = "service-postgres-example";
+        imports = [ ../../extra/services/postgres.nix ];
+        devshell.name = "services-postgres-example";
       };
     in
     runTest "simple" { } ''

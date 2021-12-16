@@ -10,10 +10,10 @@ let
   # environment.
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
 
-  cfg = config.service.postgres;
+  cfg = config.services.postgres;
 in
 {
-  options.service.postgres = {
+  options.services.postgres = {
     package = mkOption {
       type = strOrPackage;
       description = "Which version of postgres to use";
