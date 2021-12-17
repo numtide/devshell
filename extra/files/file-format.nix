@@ -16,7 +16,6 @@ let
     '';
   toFile = name: value: {
     source = generate (builtins.baseNameOf name) value;
-    git-add = lib.mkIf config.files.git.auto-add true;
   };
 in {
   options.files.${format} = lib.mkOption {
