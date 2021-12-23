@@ -17,11 +17,11 @@ type Bash struct {
 
 // Command ...
 type Command struct {
-	Alias   string `toml:"alias,omitempty"`
-	Command string `toml:"command,omitempty"`
-	Help    string `toml:"help,omitempty"`
-	Name    string `toml:"name"`
-	Package string `toml:"package,omitempty"`
+	Category string `toml:"category,omitempty"`
+	Command  string `toml:"command,omitempty"`
+	Help     string `toml:"help,omitempty"`
+	Name     string `toml:"name"`
+	Package  string `toml:"package,omitempty"`
 }
 
 // Devshell ...

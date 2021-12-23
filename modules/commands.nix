@@ -162,12 +162,12 @@ in
         {
           help = "print hello";
           name = "hello";
-          alias = "echo hello";
+          command = "echo hello";
         }
 
         {
-          help = "used to format nix code";
-          package = pkgs.nixpkgs-fmt;
+          package = "nixpkgs-fmt";
+          category = "formatter";
         }
       ]
     '';
