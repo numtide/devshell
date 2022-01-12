@@ -74,8 +74,8 @@ let
     export PATH=${pkgs.coreutils}/bin:$PATH
 
     # Find the git dir
-    git_work_tree=$(git rev-parse --show-toplevel)
-    git_dir=$(git rev-parse --absolute-git-dir)
+    git_work_tree=$(${pkgs.gitMinimal}/bin/git rev-parse --show-toplevel)
+    git_dir=$(${pkgs.gitMinimal}/bin/git rev-parse --absolute-git-dir)
     source_hook_dir=${hooksDir}/bin
     target_hook_dir=$git_dir/hooks
 
