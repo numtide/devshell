@@ -74,7 +74,11 @@ let
     export PATH=${pkgs.coreutils}/bin:$PATH
 
     # Find the git dir
-    git_work_tree=$(${pkgs.gitMinimal}/bin/git rev-parse --show-toplevel)
+    git_work_tree=$(${pkgs.gitMinimal}/bin/git rev-parse --show-toplevel || true)
+    if [[ $git_work_tree == "" ]]; then
+      log "skipping as we can't find any .git folder, we are probably not in a git repository" >&2
+      exit
+    fi
     git_dir=$(${pkgs.gitMinimal}/bin/git rev-parse --absolute-git-dir)
     source_hook_dir=${hooksDir}/bin
     target_hook_dir=$git_dir/hooks
