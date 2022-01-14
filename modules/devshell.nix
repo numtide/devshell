@@ -190,14 +190,19 @@ in
     motd = mkOption {
       type = types.str;
       default = ''
-        ${ansi.orange}🔨 Welcome to ${cfg.name}${ansi.reset}
+        {202}🔨 Welcome to ${cfg.name}{reset}
         $(type -p menu &>/dev/null && menu)
       '';
+      apply = replaceStrings
+        (map (key: "{${key}}") (attrNames ansi))
+        (attrValues ansi);
       description = ''
         Message Of The Day.
 
         This is the welcome message that is being printed when the user opens
         the shell.
+
+        You may use any valid ansi color from the 8-bit ansi color table. For example, to use a green color you would use something like {106}. You may also use {bold}, {italic}, {underline}. Use {reset} to turn off all attributes.
       '';
     };
 
