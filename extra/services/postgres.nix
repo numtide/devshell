@@ -37,7 +37,7 @@ in
 
     devshell.startup.setup-postgres.text = ''
       if [[ ! -d "$PGDATA" ]]; then
-      initdb
+      initdb --no-locale
       cat >> "$PGDATA/postgresql.conf" <<EOF
         listen_addresses = '''
         unix_socket_directories = '$PGHOST'
