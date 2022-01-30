@@ -32,6 +32,15 @@
           legacyPackages = devshell;
           devShell = devshell.fromTOML ./devshell.toml;
         };
+      flakeTOML = nixpkgs: path: eachSystem (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system}.extend self.overlay;
+          devshell = import ./. { inherit system pkgs; };
+        in
+        {
+          devShell = devshell.fromTOML path;
+        }
+      );
     in
     {
       defaultTemplate.path = ./template;
@@ -39,6 +48,7 @@
       # Import this overlay into your instance of nixpkgs
       overlay = import ./overlay.nix;
       lib = {
+        inherit flakeTOML;
         importTOML = import ./nix/importTOML.nix;
       };
     }
