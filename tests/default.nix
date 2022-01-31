@@ -1,8 +1,14 @@
 { system ? builtins.currentSystem
-, pkgs ? import (import ../nix/nixpkgs.nix) { inherit system; }
+, inputs ? import ../flake.lock.nix { }
+, pkgs ? import inputs.nixpkgs {
+    inherit system;
+    # Makes the config pure as well. See <nixpkgs>/top-level/impure.nix:
+    config = { };
+    overlays = [ ];
+  }
 }:
 let
-  devshell = import ../. { inherit pkgs; };
+  devshell = import ../. { inputs = null; nixpkgs = pkgs; };
   runTest = name: attrs: script:
     pkgs.runCommand name attrs ''
       source ${./assert.sh}

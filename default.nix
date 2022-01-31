@@ -1,5 +1,11 @@
 { system ? builtins.currentSystem
-, pkgs ? import (import ./nix/nixpkgs.nix) { inherit system; }
+, inputs ? import ./flake.lock.nix { }
+, nixpkgs ? import inputs.nixpkgs {
+    inherit system;
+    # Makes the config pure as well. See <nixpkgs>/top-level/impure.nix:
+    config = { };
+    overlays = [ ];
+  }
 }:
 let
   # Build a list of all the files, imported as Nix code, from a directory.
@@ -20,7 +26,7 @@ let
 in
 rec {
   # CLI
-  cli = pkgs.callPackage ./devshell { };
+  cli = nixpkgs.callPackage ./devshell { };
 
   # Folder that contains all the extra modules
   extraModulesDir = toString ./extra;
@@ -34,13 +40,17 @@ rec {
   }).config.modules-docs;
 
   # Docs
-  docs = pkgs.callPackage ./docs { inherit modules-docs; };
+  docs = nixpkgs.callPackage ./docs { inherit modules-docs; };
 
   # Tests
-  tests = import ./tests { inherit pkgs system; };
+  tests = import ./tests {
+    inherit system;
+    inputs = null;
+    pkgs = nixpkgs;
+  };
 
   # Evaluate the devshell module
-  eval = import ./modules pkgs;
+  eval = import ./modules nixpkgs;
 
   importTOML = import ./nix/importTOML.nix;
 
@@ -49,7 +59,7 @@ rec {
 
   # A utility to build a "naked" nix-shell environment that doesn't contain
   # all of the default environment variables. This is mostly for internal use.
-  mkNakedShell = pkgs.callPackage ./nix/mkNakedShell.nix { };
+  mkNakedShell = nixpkgs.callPackage ./nix/mkNakedShell.nix { };
 
   # A developer shell that works in all scenarios
   #
