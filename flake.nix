@@ -1,7 +1,9 @@
 {
   description = "devshell";
 
-  outputs = { self }:
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+
+  outputs = inputs:
     let
       eachSystem = f:
         let
@@ -25,7 +27,8 @@
 
       forSystem = system:
         let
-          devshell = import ./. { inherit system; };
+          pkgs = import inputs.nixpkgs {inherit system; };
+          devshell = import ./. { inherit system pkgs; };
         in
         {
           defaultPackage = devshell.cli;
