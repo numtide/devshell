@@ -1,5 +1,5 @@
 # Import this overlay in your project to add devshell and mkDevShell
 final: prev:
 {
-  devshell = import ./. { pkgs = final; };
+  devshell = import ./. { nixpkgs = final; };
 }
