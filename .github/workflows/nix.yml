@@ -45,11 +45,7 @@ jobs:
       - run: nix flake check
       - run: nix develop -c echo OK
       - name: Run nix flake archive
-        run: |
-          set -euo pipefail
-          nix flake archive --json | \
-            jq -r '.path,(.inputs|to_entries[].value.path)' | \
-            cachix push numtide
+        run: nix flake archive
   docs:
     strategy:
       matrix:
