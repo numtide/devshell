@@ -20,6 +20,17 @@ in
       default = pkgs.postgresql;
       defaultText = "pkgs.postgresl";
     };
+
+    initdbArgs = mkOption {
+      type = with types; listOf str;
+      default = [ "--no-locale" ];
+      example = [ "--data-checksums" "--allow-group-access" ];
+      description = ''
+        Additional arguments passed to <literal>initdb</literal> during data dir
+        initialisation.
+      '';
+    };
+
   };
   config = {
     packages = [ cfg.package ];
@@ -37,7 +48,7 @@ in
 
     devshell.startup.setup-postgres.text = ''
       if [[ ! -d "$PGDATA" ]]; then
-      initdb --no-locale
+      initdb ${concatStringsSep " " cfg.initdbArgs}
       cat >> "$PGDATA/postgresql.conf" <<EOF
         listen_addresses = '''
         unix_socket_directories = '$PGHOST'
