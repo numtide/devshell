@@ -297,7 +297,7 @@ in
 
     # Use a naked derivation to limit the amount of noise passed to nix-shell.
     shell = mkNakedShell {
-      name = cfg.name;
+      name = strings.sanitizeDerivationName cfg.name;
       profile = cfg.package;
       passthru = {
         inherit config;
