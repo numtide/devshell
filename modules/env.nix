@@ -8,7 +8,7 @@ let
     };
 
     value = mkOption {
-      type = with types; nullOr (oneOf [ str int bool ]);
+      type = with types; nullOr (oneOf [ str int bool package ]);
       default = null;
       description = "Shell-escaped value to set";
     };
