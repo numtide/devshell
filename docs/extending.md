@@ -30,7 +30,7 @@ lang = "en_US.UTF-8"
 
 ## Building your own modules
 
-Building your own modules requires to understand the Nix language. If Nix
+Building your own modules requires to understand the Nix language. If
 this is too complicated, please reach out to the issue tracker and describe
 your use-case. We want to be able to support a wide variety of development
 scenario.
