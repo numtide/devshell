@@ -245,8 +245,11 @@ in
         DEVSHELL_PROMPT
         }
 
-        # Print the motd in direnv
-        if [[ ''${DIRENV_IN_ENVRC:-} = 1 ]]; then
+        if [[ ''${DEVSHELL_NO_MOTD:-} = 1 ]]; then
+          # Skip if that env var is set
+          :
+        elif [[ ''${DIRENV_IN_ENVRC:-} = 1 ]]; then
+          # Print the motd in direnv
           __devshell-motd
         else
           # Print information if the prompt is displayed. We have to make
