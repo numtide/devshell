@@ -28,6 +28,12 @@ imports = ["locale"]
 lang = "en_US.UTF-8"
 ```
 
+From a nix flake you would import it like
+
+```nix
+imports = ["${devshell}/extra/locale.nix"];
+```
+
 ## Building your own modules
 
 Building your own modules requires to understand the Nix language. If
