@@ -22,10 +22,16 @@ with lib;
       ];
       description = "Which rust tools to pull from the platform package set";
     };
+    enableDefaultToolchain = mkOption {
+      type = types.bool;
+      default = true;      
+      defaultText = "true";
+      description = "Enable the default rust toolchain coming from nixpkgs";
+    };
   };
 
   config = {
-    devshell.packages = map (tool: cfg.packageSet.${tool}) cfg.tools;
+    devshell.packages = if cfg.enableDefaultToochain then (map (tool: cfg.packageSet.${tool}) cfg.tools) else [];
     env = [
       {
         # On darwin for example enables finding of libiconv
