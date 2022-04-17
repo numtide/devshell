@@ -24,7 +24,7 @@ with lib;
     };
     enableDefaultToolchain = mkOption {
       type = types.bool;
-      default = true;      
+      default = true;
       defaultText = "true";
       description = "Enable the default rust toolchain coming from nixpkgs";
     };
