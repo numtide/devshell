@@ -31,7 +31,7 @@ with lib;
   };
 
   config = {
-    devshell.packages = if cfg.enableDefaultToochain then (map (tool: cfg.packageSet.${tool}) cfg.tools) else [];
+    devshell.packages = if cfg.enableDefaultToolchain then (map (tool: cfg.packageSet.${tool}) cfg.tools) else [ ];
     env = [
       {
         # On darwin for example enables finding of libiconv
