@@ -25,9 +25,10 @@ The `devshell.toml` would have it as part of its commands:
 package = "gnumake"
 ```
 
-All the CI has to do, is this: `$(nix-build shell.nix) make`.
+All the CI has to do, is this: `nix-shell --run "$(nix-build shell.nix)/entrypoint make"`.
 
-1. `nix-build shell.nix` outputs a path to the entrypoint script
+1. `$(nix-build shell.nix)/entrypoint` outputs a path to the entrypoint script
+1. `nix-shell --run` sets the required environment variables for the entrypoint script to work.
 2. The entrypoint script is executed with `make` as an argument. It loads the
    environment.
 3. Finally make is executed in the context of the project environment, with
