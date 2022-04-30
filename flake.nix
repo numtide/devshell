@@ -20,7 +20,16 @@
           nixpkgs = inputs.nixpkgs.legacyPackages.${system};
         };
       in
-      {
+      { inherit (pkgs)
+          cli
+          eval
+          extraModulesDir
+          mkShell
+          mkNakedShell
+          fromTOML
+          importTOML
+          ;
+      } // {
         defaultPackage = pkgs.cli;
         legacyPackages = pkgs;
         devShell = pkgs.fromTOML ./devshell.toml;
