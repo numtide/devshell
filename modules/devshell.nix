@@ -216,6 +216,14 @@ in
       '';
     };
 
+    meta = mkOption {
+      type = types.attrsOf types.anything;
+      default = {};
+      description = ''
+        Metadata, such as 'meta.description'. Can be useful as metadata for downstream tooling.
+      '';
+    };
+
     packages = mkOption {
       type = types.listOf strOrPackage;
       default = [ ];
@@ -301,6 +309,7 @@ in
     # Use a naked derivation to limit the amount of noise passed to nix-shell.
     shell = mkNakedShell {
       name = strings.sanitizeDerivationName cfg.name;
+      inherit (cfg) meta;
       profile = cfg.package;
       passthru = {
         inherit config;
