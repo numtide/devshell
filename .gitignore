@@ -2,7 +2,11 @@
 /devshell/devshell
 
 # mdbook
+/result
 /book
 
 # goreleaser
 /dist
+
+# direnv
+/.direnv
