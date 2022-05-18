@@ -4,3 +4,8 @@ language = "en"
 multilingual = false
 src = "."
 title = "devshell"
+
+[output.html]
+# Show github links in top bar
+git-repository-url = "https://github.com/numtide/devshell"
+edit-url-template = "https://github.com/numtide/devshell/edit/master/docs/{path}"

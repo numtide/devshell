@@ -1,4 +1,4 @@
-# virtualenv, for every language
+# Introducing Devshell: like virtualenv, for every language
 
 **STATUS: unstable**
 

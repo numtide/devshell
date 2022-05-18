@@ -8,6 +8,8 @@ Now that's done, got to your project root and create an empty `devshell.toml`.
 
 There are different ways to load that config depending on your preferences:
 
+### Nix (non-flake)
+
 Add another file called `shell.nix` with the following content. This file will
 contain some nix code. Don't worry about the details.
 
@@ -47,17 +49,17 @@ warning: you did not specify '--add-root'; the result might be removed by the ga
 [devshell]$
 ```
 
-## Flakes
+### Nix Flakes
 For users of nix flakes, a default template is provided to get you up and
 running.
 
 ```sh
-nix flake new -t "github:numtide/devshell" devshell
+nix flake new -t "github:numtide/devshell" project/
 
-cd devshell
+cd project/
 
 # enter the shell
-nix develop # or `direnv allow`
+nix develop # or `direnv allow` if you want to use direnv
 ```
 
 ## Adding environment variables
@@ -89,8 +91,8 @@ displayed on devshell entry so that the user knows what commands are available
 to them.
 
 In order to bring in new dependencies, you can either add them to
-`devshell.packages` or to the `commands` list. Commands are also added to the
-menu so they might be preferable for discovery.
+`devshell.packages` or as an entry in the `[[commands]]` list (see [TOML docs](https://toml.io/en/v1.0.0#array-of-tables)). Commands are also added to the
+menu so they might be preferable for discoverability.
 
 As an exercise, add the following snippet to your `devshell.toml`:
 
@@ -99,7 +101,7 @@ As an exercise, add the following snippet to your `devshell.toml`:
 package = "go"
 ```
 
-Then re-enter the shell with `nix-shell`. You should see something like this:
+Then re-enter the shell with `nix-shell`/`nix develop`/`direnv reload`. You should see something like this:
 
 ```console
 $ nix-shell

@@ -130,3 +130,12 @@ script that checks that everything is in good shape?
 What? Not everyone is using bash? Right now, support is already available in 
 direnv mode.
 
+# Contributing
+
+## Dev Setup
+
+### Docs
+
+1. Change files in `docs/`
+2. Run `docs/serve.sh` (or the task in VSCode)
+3. Visit [`localhost:8000`](http://localhost:8000)
