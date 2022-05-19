@@ -140,7 +140,30 @@ packages = [
 ]
 ```
 
-devshell is extensible in many different ways. In the next chapters we will
+### Finding packages
+
+Check out the [Nix package repository](https://search.nixos.org/packages).
+
+Note that it is also possible to **use specific versions** for some packages - e.g. for NodeJS, [search the repo](https://search.nixos.org/packages?type=packages&query=nodejs) & use like this:
+```toml
+[[commands]]
+package = "nodejs-17_x" # https://search.nixos.org/packages?type=packages&query=nodejs
+name = "node"
+help = "NodeJS"
+```
+
+Or another example:
+```toml
+[devshell]
+packages = [
+  "python27", # 2.7
+  "python311", # 3.11
+]
+```
+
+### Wrapping up
+
+**devshell** is extensible in many different ways. In the next chapters we will
 discuss the various ways in which it can be adapted to your project's needs.
 to find 
 of the configuration options available.
