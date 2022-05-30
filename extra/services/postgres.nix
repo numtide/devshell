@@ -11,6 +11,29 @@ let
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
 
   cfg = config.services.postgres;
+
+  setup-postgres = pkgs.writeShellScriptBin "setup-postgres" ''
+    set -euo pipefail
+    export PATH=${cfg.package}/bin:${pkgs.coreutils}/bin
+
+    # Abort if the data dir already exists
+    [[ ! -d "$PGDATA" ]] || exit 0
+
+    initdb ${concatStringsSep " " cfg.initdbArgs}
+
+    cat >> "$PGDATA/postgresql.conf" <<EOF
+      listen_addresses = '''
+      unix_socket_directories = '$PGHOST'
+    EOF
+
+    echo "CREATE DATABASE ''${USER:-$(id -nu)};" | postgres --single -E postgres
+  '';
+
+  start-postgres = pkgs.writeShellScriptBin "start-postgres" ''
+    set -euo pipefail
+    ${setup-postgres}/bin/setup-postgres
+    exec ${cfg.package}/bin/postgres
+  '';
 in
 {
   options.services.postgres = {
@@ -20,6 +43,8 @@ in
       default = pkgs.postgresql;
       defaultText = "pkgs.postgresl";
     };
+
+    setupPostgresOnStartup = mkEnableOption "call setup-postgres on startup";
 
     initdbArgs = mkOption {
       type = with types; listOf str;
@@ -33,7 +58,11 @@ in
 
   };
   config = {
-    packages = [ cfg.package ];
+    packages = [
+      cfg.package
+      setup-postgres
+      start-postgres
+    ];
 
     env = [
       {
@@ -46,15 +75,8 @@ in
       }
     ];
 
-    devshell.startup.setup-postgres.text = ''
-      if [[ ! -d "$PGDATA" ]]; then
-      initdb ${concatStringsSep " " cfg.initdbArgs}
-      cat >> "$PGDATA/postgresql.conf" <<EOF
-        listen_addresses = '''
-        unix_socket_directories = '$PGHOST'
-      EOF
-      echo "CREATE DATABASE ''${USER:-$(id -nu)};" | postgres --single -E postgres
-      fi
+    devshell.startup.setup-postgres.text = lib.optionalString cfg.setupPostgresOnStartup ''
+      ${setup-postgres}/bin/setup-postgres
     '';
   };
 }

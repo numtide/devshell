@@ -15,6 +15,12 @@
       # Has postgres
       type -p postgres
 
+      # Has a setup script
+      setup-postgres
+
+      # Second call is idempotent and should succeed as well
+      setup-postgres
+
       # Start postgres in the background
       pg_ctl start
       trap "pg_ctl stop" EXIT
