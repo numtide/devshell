@@ -63,7 +63,7 @@ jobs:
           cp -r "$(readlink ./result)" book
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/master'
-        uses: crazy-max/ghaction-github-pages@v2
+        uses: crazy-max/ghaction-github-pages@v3
         with:
           target_branch: gh-pages
           build_dir: book
