@@ -294,7 +294,13 @@ in
 
       # Set a cool PS1
       PS1 = stringAfter [ "PS1_util" ] (lib.mkDefault ''
-        PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
+        __set_prompt() {
+          PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
+        }
+        # Only set the prompt when entering a nix shell, since nix shells
+        # always reset to plain bash, otherwise respect the user's preferences
+        [[ -n "''${IN_NIX_SHELL:-}" ]] && __set_prompt
+        unset -f __set_prompt
       '');
     };
 
