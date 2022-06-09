@@ -11,6 +11,9 @@ let
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
 
   cfg = config.services.postgres;
+  createDB = optionalString cfg.createUserDB ''
+    echo "CREATE DATABASE ''${USER:-$(id -nu)};" | postgres --single -E postgres
+  '';
 
   setup-postgres = pkgs.writeShellScriptBin "setup-postgres" ''
     set -euo pipefail
@@ -26,7 +29,7 @@ let
       unix_socket_directories = '$PGHOST'
     EOF
 
-    echo "CREATE DATABASE ''${USER:-$(id -nu)};" | postgres --single -E postgres
+    ${createDB}
   '';
 
   start-postgres = pkgs.writeShellScriptBin "start-postgres" ''
@@ -45,6 +48,7 @@ in
     };
 
     setupPostgresOnStartup = mkEnableOption "call setup-postgres on startup";
+    createUserDB = mkEnableOption "create database named like current user on startup";
 
     initdbArgs = mkOption {
       type = with types; listOf str;
