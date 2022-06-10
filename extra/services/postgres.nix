@@ -48,7 +48,15 @@ in
     };
 
     setupPostgresOnStartup = mkEnableOption "call setup-postgres on startup";
-    createUserDB = mkEnableOption "create database named like current user on startup";
+
+    createUserDB = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Create a database named like current user on startup.
+        This option only makes sense when `setupPostgresOnStartup` is true.
+      '';
+    };
 
     initdbArgs = mkOption {
       type = with types; listOf str;
