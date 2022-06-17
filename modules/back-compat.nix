@@ -1,9 +1,9 @@
-{ lib, pkgs, config, ... }:
+{ lib, pkgsets, config, ... }:
 # Avoid breaking back-compat for now.
 let
   # Because we want to be able to push pure JSON-like data into the
   # environment.
-  strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
+  strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgsets; };
 in
 with lib;
 {

@@ -6,8 +6,13 @@
     config = { };
     overlays = [ ];
   }
+, pkgsets ? {
+    inherit nixpkgs;
+  }
 }:
 let
+  inherit (pkgsets) nixpkgs;
+
   # Build a list of all the files, imported as Nix code, from a directory.
   importTree = dir:
     let
@@ -44,13 +49,11 @@ rec {
 
   # Tests
   tests = import ./tests {
-    inherit system;
-    inputs = null;
-    pkgs = nixpkgs;
+    inherit pkgsets;
   };
 
   # Evaluate the devshell module
-  eval = import ./modules nixpkgs;
+  eval = import ./modules pkgsets;
 
   importTOML = import ./nix/importTOML.nix;
 

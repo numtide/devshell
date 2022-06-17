@@ -17,12 +17,12 @@ name = "devshell"
 #
 # NOTE: don't forget to put commas between items! :)
 packages = [
-  "diffutils", # used by golangci-lint
-  "goreleaser",
-  "mdbook",
-  "mdsh",
-  "webfs",
-  "hyperfine",
+  "nixpkgs.diffutils", # used by golangci-lint
+  "nixpkgs.goreleaser",
+  "nixpkgs.hyperfine",
+  "nixpkgs.mdbook",
+  "nixpkgs.mdsh",
+  "nixpkgs.webfs",
 ]
 
 # Declare commands that are available in the environment.
@@ -32,16 +32,16 @@ name = "hello"
 command = "echo hello"
 
 [[commands]]
-package = "nixpkgs-fmt"
+package = "nixpkgs.nixpkgs-fmt"
 category = "formatters"
 
 [[commands]]
 help = "github utility"
 name = "hub"
-package = "gitAndTools.hub"
+package = "nixpkgs.gitAndTools.hub"
 category = "utilites"
 
 [[commands]]
 help = "golang linter"
-package = "golangci-lint"
+package = "nixpkgs.golangci-lint"
 category = "linters"

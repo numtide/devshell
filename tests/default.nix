@@ -1,16 +1,23 @@
 { system ? builtins.currentSystem
-, inputs ? import ../flake.lock.nix { }
-, pkgs ? import inputs.nixpkgs {
-    inherit system;
-    # Makes the config pure as well. See <nixpkgs>/top-level/impure.nix:
-    config = { };
-    overlays = [ ];
+, flakeLock ? import ../flake.lock.nix { }
+, pkgsets ? {
+    nixpkgs = import flakeLock.nixpkgs {
+      inherit system;
+      # Makes the config pure as well. See <nixpkgs>/top-level/impure.nix:
+      config = { };
+      overlays = [ ];
+    };
   }
 }:
 let
-  devshell = import ../. { inputs = null; nixpkgs = pkgs; };
+  inherit (pkgsets) nixpkgs;
+
+  devshell = import ../. {
+    inherit pkgsets;
+  };
+
   runTest = name: attrs: script:
-    pkgs.runCommand name attrs ''
+    nixpkgs.runCommand name attrs ''
       source ${./assert.sh}
 
       # Needed by devshell
@@ -22,7 +29,7 @@ let
     '';
 
   # Arguments to pass to each test file
-  attrs = { inherit pkgs devshell runTest; };
+  attrs = { inherit pkgsets devshell runTest; };
 
   # Attrs marked with this attribute are recursed into by nix-build
   recursive = { recurseForDerivations = true; };
@@ -36,7 +43,7 @@ let
           type = data.${name};
           # Nix doesn't recurse into attrs that have dots in them...
           attr = builtins.replaceStrings [ "." ] [ "-" ]
-            (pkgs.lib.removeSuffix ".nix" name);
+            (nixpkgs.lib.removeSuffix ".nix" name);
 
           args = attrs // {
             # Customize runTest

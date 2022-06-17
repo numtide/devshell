@@ -1,7 +1,7 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgsets, ... }:
 let
   cfg = config.language.go;
-  strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
+  strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgsets; };
 in
 with lib;
 {
@@ -14,8 +14,8 @@ with lib;
 
     package = mkOption {
       type = strOrPackage;
-      default = pkgs.go;
-      example = literalExpression "pkgs.go";
+      default = pkgsets.nixpkgs.go;
+      example = literalExpression "nixpkgs.go";
       description = "Which go package to use";
     };
   };

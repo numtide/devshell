@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgsets, ... }:
 with lib;
 let
   cfg = config.devshell;
@@ -10,7 +10,7 @@ let
 
   # Because we want to be able to push pure JSON-like data into the
   # environment.
-  strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
+  strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgsets; };
 
   # Use this to define a flake app for the environment.
   mkFlakeApp = bin: {
@@ -19,9 +19,9 @@ let
   };
 
   mkSetupHook = entrypoint:
-    pkgs.stdenvNoCC.mkDerivation {
+    pkgsets.nixpkgs.stdenvNoCC.mkDerivation {
       name = "devshell-setup-hook";
-      setupHook = pkgs.writeText "devshell-setup-hook.sh" ''
+      setupHook = pkgsets.nixpkgs.writeText "devshell-setup-hook.sh" ''
         source ${devshell_dir}/env.bash
       '';
       dontUnpack = true;
@@ -29,7 +29,7 @@ let
       dontInstall = true;
     };
 
-  mkNakedShell = pkgs.callPackage ../nix/mkNakedShell.nix { };
+  mkNakedShell = pkgsets.nixpkgs.callPackage ../nix/mkNakedShell.nix { };
 
   addAttributeName = prefix:
     mapAttrs (k: v: v // {
@@ -57,7 +57,7 @@ let
   };
 
   # Write a bash profile to load
-  envBash = pkgs.writeText "devshell-env.bash" ''
+  envBash = pkgsets.nixpkgs.writeText "devshell-env.bash" ''
     if [[ -n ''${IN_NIX_SHELL:-} || ''${DIRENV_IN_ENVRC:-} = 1 ]]; then
       # We know that PWD is always the current directory in these contexts
       export PRJ_ROOT=$PWD
@@ -88,7 +88,7 @@ let
 
 
   # This is our entrypoint script.
-  entrypoint = pkgs.writeScript "${cfg.name}-entrypoint" ''
+  entrypoint = pkgsets.nixpkgs.writeScript "${cfg.name}-entrypoint" ''
     #!${bashPath}
     # Script that sets-up the environment. Can be both sourced or invoked.
 
@@ -130,7 +130,7 @@ let
   '';
 
   # Builds the DEVSHELL_DIR with all the dependencies
-  devshell_dir = pkgs.buildEnv {
+  devshell_dir = pkgsets.nixpkgs.buildEnv {
     name = "devshell-dir";
     paths = cfg.packages;
     postBuild = ''
@@ -146,8 +146,8 @@ in
     bashPackage = mkOption {
       internal = true;
       type = strOrPackage;
-      default = pkgs.bashInteractive;
-      defaultText = "pkgs.bashInteractive";
+      default = pkgsets.nixpkgs.bashInteractive;
+      defaultText = "nixpkgs.bashInteractive";
       description = "Version of bash to use in the project";
     };
 
@@ -287,7 +287,7 @@ in
           # Print the path relative to $PRJ_ROOT
           rel_root() {
             local path
-            path=$(${pkgs.coreutils}/bin/realpath --relative-to "$PRJ_ROOT" "$PWD")
+            path=$(${pkgsets.nixpkgs.coreutils}/bin/realpath --relative-to "$PRJ_ROOT" "$PWD")
             if [[ $path != . ]]; then
               echo " $path "
             fi
@@ -315,7 +315,7 @@ in
         inherit config;
         flakeApp = mkFlakeApp entrypoint;
         hook = mkSetupHook entrypoint;
-        inherit (config._module.args) pkgs;
+        inherit (config._module.args) pkgsets;
       };
     };
   };

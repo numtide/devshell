@@ -3,21 +3,21 @@
 #
 # To start the server, invoke `postgres` in one devshell. Then start a second
 # devshell to run the clients.
-{ lib, pkgs, config, ... }:
+{ lib, pkgsets, config, ... }:
 with lib;
 let
   # Because we want to be able to push pure JSON-like data into the
   # environment.
-  strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
+  strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgsets; };
 
   cfg = config.services.postgres;
   createDB = optionalString cfg.createUserDB ''
     echo "CREATE DATABASE ''${USER:-$(id -nu)};" | postgres --single -E postgres
   '';
 
-  setup-postgres = pkgs.writeShellScriptBin "setup-postgres" ''
+  setup-postgres = pkgsets.nixpkgs.writeShellScriptBin "setup-postgres" ''
     set -euo pipefail
-    export PATH=${cfg.package}/bin:${pkgs.coreutils}/bin
+    export PATH=${cfg.package}/bin:${pkgsets.nixpkgs.coreutils}/bin
 
     # Abort if the data dir already exists
     [[ ! -d "$PGDATA" ]] || exit 0
@@ -32,7 +32,7 @@ let
     ${createDB}
   '';
 
-  start-postgres = pkgs.writeShellScriptBin "start-postgres" ''
+  start-postgres = pkgsets.nixpkgs.writeShellScriptBin "start-postgres" ''
     set -euo pipefail
     ${setup-postgres}/bin/setup-postgres
     exec ${cfg.package}/bin/postgres
@@ -43,8 +43,8 @@ in
     package = mkOption {
       type = strOrPackage;
       description = "Which version of postgres to use";
-      default = pkgs.postgresql;
-      defaultText = "pkgs.postgresl";
+      default = pkgsets.nixpkgs.postgresql;
+      defaultText = "nixpkgs.postgresl";
     };
 
     setupPostgresOnStartup = mkEnableOption "call setup-postgres on startup";

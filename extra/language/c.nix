@@ -1,7 +1,7 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgsets, ... }:
 let
   cfg = config.language.c;
-  strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
+  strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgsets; };
 
   hasLibraries = lib.length cfg.libraries > 0;
   hasIncludes = lib.length cfg.includes > 0;
@@ -23,8 +23,8 @@ with lib;
 
     compiler = mkOption {
       type = strOrPackage;
-      default = pkgs.clang;
-      defaultText = "pkgs.clang";
+      default = pkgsets.nixpkgs.clang;
+      defaultText = "nixpkgs.clang";
       description = "Which C compiler to use";
     };
   };
@@ -36,7 +36,7 @@ with lib;
       (lib.optionals hasLibraries (map lib.getLib cfg.libraries))
       ++
       # Assume we want pkg-config, because it's good
-      (lib.optionals hasIncludes ([ pkgs.pkg-config ] ++ (map lib.getDev cfg.includes)))
+      (lib.optionals hasIncludes ([ pkgsets.nixpkgs.pkg-config ] ++ (map lib.getDev cfg.includes)))
     ;
 
     env =

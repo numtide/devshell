@@ -1,14 +1,14 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgsets, ... }:
 with lib;
 let
   ansi = import ../nix/ansi.nix;
 
   # Because we want to be able to push pure JSON-like data into the
   # environment.
-  strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
+  strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgsets; };
 
   writeDefaultShellScript = import ../nix/writeDefaultShellScript.nix {
-    inherit (pkgs) lib writeTextFile bash;
+    inherit (pkgsets.nixpkgs) lib writeTextFile bash;
   };
 
   pad = str: num:
@@ -166,7 +166,7 @@ in
         }
 
         {
-          package = "nixpkgs-fmt";
+          package = "nixpkgs.nixpkgs-fmt";
           category = "formatter";
         }
       ]

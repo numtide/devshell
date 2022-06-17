@@ -1,4 +1,4 @@
-{ pkgs, devshell, runTest }:
+{ pkgsets, devshell, runTest }:
 {
   # Basic test
   simple =

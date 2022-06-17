@@ -1,13 +1,12 @@
 # Evaluate the devshell environment
-nixpkgs:
+pkgsets:
 { configuration
-, lib ? nixpkgs.lib
+, lib ? pkgsets.nixpkgs.lib
 , extraSpecialArgs ? { }
 }:
 let
   devenvModules = import ./modules.nix {
-    pkgs = nixpkgs;
-    inherit lib;
+    inherit lib pkgsets;
   };
 
   module = lib.evalModules {

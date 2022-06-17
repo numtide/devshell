@@ -1,11 +1,11 @@
-{ pkgs, devshell, runTest }:
+{ pkgsets, devshell, runTest }:
 {
   # Basic devshell package usage
   devshell-packages-1 =
     let
       shell = devshell.mkShell {
         devshell.name = "devshell-1";
-        devshell.packages = [ pkgs.git ];
+        devshell.packages = [ pkgsets.nixpkgs.git ];
       };
     in
     runTest "devshell-1" { } ''
@@ -25,7 +25,7 @@
   # Only load profiles
   devshell-load-profiles-1 =
     let
-      fakeProfile = pkgs.writeTextFile {
+      fakeProfile = pkgsets.nixpkgs.writeTextFile {
         name = "fake_profile.sh";
         destination = "/etc/profile.d/fake_profile.sh";
         text = ''

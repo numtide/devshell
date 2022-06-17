@@ -1,4 +1,4 @@
-{ pkgs, devshell, runTest }:
+{ pkgsets, devshell, runTest }:
 {
   # Basic git.hooks module tests
   git-hooks-1 =
@@ -8,7 +8,7 @@
         devshell.name = "git-hooks-1a";
         git.hooks.enable = true;
         git.hooks.pre-commit.text = ''
-          #!${pkgs.bash}/bin/bash
+          #!${pkgsets.nixpkgs.bash}/bin/bash
           echo "PRE-COMMIT"
         '';
       };
@@ -28,17 +28,17 @@
         devshell.name = "git-hooks-1d";
         git.hooks.enable = true;
         git.hooks.pre-commit.text = ''
-          #!${pkgs.bash}/bin/bash
+          #!${pkgsets.nixpkgs.bash}/bin/bash
           echo "PRE-COMMIT-OF-ANOTHER-COLOR"
         '';
         git.hooks.pre-rebase.text = ''
-          #!${pkgs.bash}/bin/bash
+          #!${pkgsets.nixpkgs.bash}/bin/bash
           echo "NOPE"
           exit 1
         '';
       };
     in
-    runTest "git-hooks-1" { nativeBuildInputs = [ pkgs.git ]; } ''
+    runTest "git-hooks-1" { nativeBuildInputs = [ pkgsets.nixpkgs.git ]; } ''
       mkdir worktree-1
 
       cd worktree-1
@@ -52,7 +52,7 @@
       # Make a commit in order to add worktrees
       git commit --allow-empty -m init
 
-      git_dir=$(${pkgs.gitMinimal}/bin/git rev-parse --absolute-git-dir)
+      git_dir=$(${pkgsets.nixpkgs.gitMinimal}/bin/git rev-parse --absolute-git-dir)
       git_hooks_path=$(git rev-parse --path-format=absolute --git-path hooks/ 2>/dev/null) \
         || git_hooks_path="''${git_dir}/hooks"
 

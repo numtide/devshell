@@ -1,4 +1,4 @@
-{ pkgs, devshell, runTest }:
+{ pkgsets, devshell, runTest }:
 {
   # Test the environment variables
   env-1 =
@@ -33,7 +33,7 @@
       source ${shell}/env.bash
 
       # NIXPKGS_PATH is being set
-      assert "$NIXPKGS_PATH" == "${toString pkgs.path}"
+      assert "$NIXPKGS_PATH" == "${toString pkgsets.nixpkgs.path}"
 
       assert "$XDG_DATA_DIRS" == "$DEVSHELL_DIR/share:/usr/local/share:/usr/share"
 
