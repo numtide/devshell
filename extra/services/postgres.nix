@@ -44,7 +44,7 @@ in
       type = strOrPackage;
       description = "Which version of postgres to use";
       default = pkgs.postgresql;
-      defaultText = "pkgs.postgresl";
+      defaultText = "pkgs.postgresql";
     };
 
     setupPostgresOnStartup = mkEnableOption "call setup-postgres on startup";
