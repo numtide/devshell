@@ -49,8 +49,8 @@ in
     # Flakes stuff
     unset dontAddDisableDepTrack outputs
 
-    # For `nix develop`
-    if [[ "$SHELL" == "/noshell" ]]; then
+    # For `nix develop`. We get /noshell on Linux and /sbin/nologin on macOS.
+    if [[ "$SHELL" == "/noshell" || "$SHELL" == "/sbin/nologin" ]]; then
       export SHELL=${bashPath}
     fi
 
