@@ -18,10 +18,25 @@ in
     package = mkOption {
       type = types.package;
       default = pkgs.userhosts;
+      description = ''
+        The package containing the LD_PRELOAD library libuserhosts.so.
+      '';
     };
     hosts = mkOption {
       type = types.attrsOf (types.listOf types.string);
       default = {};
+      description = ''
+        The host entries to use for userhosts.
+        The top-level entries are the addresses where hostnames are resolved to.
+        For each address you can supply a list of hostnames.
+        This structure represents the structure you'd see in /etc/hosts.
+
+        Note that, unlike /etc/hosts, you can also use names to resolve to as well.
+      '';
+      example = {
+        "127.0.0.1" = [ "example.org" ];
+        "myhost.local" = [ "mydomain.test" ];
+      };
     };
   };
 
