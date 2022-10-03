@@ -40,16 +40,19 @@ in
     };
   };
 
-  config = mkIf (cfg.hosts != {}) {
-    env = [
-      {
-        name = "HOSTS_FILE";
-        value = "${hostsFile}";
-      }
-      {
-        name = "LD_PRELOAD";
-        prefix = "${cfg.package}/lib/libuserhosts.so";
-      }
-    ];
-  };
+  config = mkIf (cfg.hosts != {}) (
+    assert assertMsg pkgs.stdenv.isLinux "services.usershosts is only supported on Linux";
+    {
+      env = [
+        {
+          name = "HOSTS_FILE";
+          value = "${hostsFile}";
+        }
+        {
+          name = "LD_PRELOAD";
+          prefix = "${cfg.package}/lib/libuserhosts.so";
+        }
+      ];
+    }
+  );
 }
