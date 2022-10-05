@@ -41,7 +41,9 @@ in
   };
 
   config = mkIf (cfg.hosts != {}) (
-    assert assertMsg pkgs.stdenv.isLinux "services.usershosts is only supported on Linux";
+    if !pkgs.stdenv.isLinux then
+      builtins.trace "warning: services.usershosts is only supported on Linux" {}
+    else
     {
       env = [
         {
