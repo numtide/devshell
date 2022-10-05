@@ -1,4 +1,7 @@
 { pkgs, devshell, runTest }:
+if !pkgs.stdenv.isLinux then
+  {}
+else
 {
   # Basic test
   simple =
