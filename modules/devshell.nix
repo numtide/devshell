@@ -313,7 +313,7 @@ in
       profile = cfg.package;
       passthru = {
         inherit config;
-        flakeApp = mkFlakeApp entrypoint;
+        flakeApp = mkFlakeApp "${devshell_dir}/entrypoint";
         hook = mkSetupHook entrypoint;
         inherit (config._module.args) pkgs;
       };
