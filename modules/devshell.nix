@@ -18,11 +18,11 @@ let
     program = "${bin}";
   };
 
-  mkSetupHook = entrypoint:
+  mkSetupHook = rc:
     pkgs.stdenvNoCC.mkDerivation {
       name = "devshell-setup-hook";
       setupHook = pkgs.writeText "devshell-setup-hook.sh" ''
-        source ${devshell_dir}/env.bash
+        source ${rc}
       '';
       dontUnpack = true;
       dontBuild = true;
@@ -314,7 +314,7 @@ in
       passthru = {
         inherit config;
         flakeApp = mkFlakeApp "${devshell_dir}/entrypoint";
-        hook = mkSetupHook entrypoint;
+        hook = mkSetupHook "${devshell_dir}/env.bash";
         inherit (config._module.args) pkgs;
       };
     };
