@@ -108,7 +108,7 @@ let
 
     if [[ $# = 0 ]]; then
       # Start an interactive shell
-      exec "${bashPath}" --rcfile "$DEVSHELL_DIR/env.bash" --noprofile
+      set -- "${bashPath}" --rcfile "$DEVSHELL_DIR/env.bash" --noprofile
     elif [[ $1 == "-h" || $1 == "--help" ]]; then
       cat <<USAGE
     Usage: ${cfg.name}
@@ -123,12 +123,13 @@ let
     elif [[ $1 == "--pure" ]]; then
       # re-execute the script in a clean environment
       shift
-      exec /usr/bin/env -i -- ''${HOME:+"HOME=''${HOME:-}"} ''${PRJ_ROOT:+"PRJ_ROOT=''${PRJ_ROOT:-}"} "$0" "$@"
+      set -- /usr/bin/env -i -- ''${HOME:+"HOME=''${HOME:-}"} ''${PRJ_ROOT:+"PRJ_ROOT=''${PRJ_ROOT:-}"} "$0" "$@"
     else
       # Start a script
       source "$DEVSHELL_DIR/env.bash"
-      exec -- "$@"
     fi
+
+    exec -- "$@"
   '';
 
   # Builds the DEVSHELL_DIR with all the dependencies
