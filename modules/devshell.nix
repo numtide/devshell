@@ -106,10 +106,27 @@ let
     # Be strict!
     set -euo pipefail
 
-    if [[ $# = 0 ]]; then
-      # Start an interactive shell
-      set -- "${bashPath}" --rcfile "$DEVSHELL_DIR/env.bash" --noprofile
-    elif [[ $1 == "-h" || $1 == "--help" ]]; then
+    while (( "$#" > 0 )); do
+      case "$1" in
+        -h|--help)
+          help=1
+          ;;
+        --pure)
+          pure=1
+          ;;
+        --)
+          shift
+          break
+          ;;
+        *)
+          break
+          ;;
+      esac
+
+      shift
+    done
+
+    if [[ -n "''${help:-}" ]]; then
       cat <<USAGE
     Usage: ${cfg.name}
       $0 -h | --help          # show this help
@@ -120,10 +137,20 @@ let
       * --pure : execute the script in a clean environment
     USAGE
       exit
-    elif [[ $1 == "--pure" ]]; then
-      # re-execute the script in a clean environment
-      shift
-      set -- /usr/bin/env -i -- ''${HOME:+"HOME=''${HOME:-}"} ''${PRJ_ROOT:+"PRJ_ROOT=''${PRJ_ROOT:-}"} "$0" "$@"
+    fi
+
+    if (( "$#" == 0 )); then
+      # Start an interactive shell
+      set -- ${lib.escapeShellArg bashPath} --rcfile "$DEVSHELL_DIR/env.bash" --noprofile
+    fi
+
+    if [[ -n "''${pure:-}" ]]; then
+      # re-execute the script in a clean environment.
+      # note that the `--` in between `"$0"` and `"$@"` will immediately
+      # short-circuit options processing on the second pass through this
+      # script, in case we get something like:
+      #   <entrypoint> --pure -- --pure <cmd>
+      set -- /usr/bin/env -i -- ''${HOME:+"HOME=''${HOME:-}"} ''${PRJ_ROOT:+"PRJ_ROOT=''${PRJ_ROOT:-}"} "$0" -- "$@"
     else
       # Start a script
       source "$DEVSHELL_DIR/env.bash"
