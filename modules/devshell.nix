@@ -98,7 +98,7 @@ let
 
     # If the file is sourced, skip all of the rest and just source the env
     # script.
-    if [[ $0 != "''${BASH_SOURCE[0]}" ]]; then
+    if (return 0) &>/dev/null; then
       source "$DEVSHELL_DIR/env.bash"
       return
     fi
