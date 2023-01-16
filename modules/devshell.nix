@@ -124,6 +124,16 @@ let
 
           shift
           ;;
+        --env-bin)
+          if (( "$#" < 2 )); then
+            echo 1>&2 '${cfg.name}: missing required argument to --env-bin'
+            exit 1
+          fi
+
+          env_bin="$2"
+
+          shift
+          ;;
         --)
           shift
           break
@@ -146,6 +156,7 @@ let
     Options:
       * --pure            : execute the script in a clean environment
       * --prj-root <path> : set the project root (\$PRJ_ROOT)
+      * --env-bin <path>  : path to the env executable (default: /usr/bin/env)
     USAGE
       exit
     fi
@@ -161,7 +172,7 @@ let
       # short-circuit options processing on the second pass through this
       # script, in case we get something like:
       #   <entrypoint> --pure -- --pure <cmd>
-      set -- /usr/bin/env -i -- ''${HOME:+"HOME=''${HOME:-}"} ''${PRJ_ROOT:+"PRJ_ROOT=''${PRJ_ROOT:-}"} "$0" -- "$@"
+      set -- "''${env_bin:-/usr/bin/env}" -i -- ''${HOME:+"HOME=''${HOME:-}"} ''${PRJ_ROOT:+"PRJ_ROOT=''${PRJ_ROOT:-}"} "$0" -- "$@"
     else
       # Start a script
       source "$DEVSHELL_DIR/env.bash"
