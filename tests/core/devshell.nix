@@ -46,4 +46,35 @@
       # Check that the profile got loaded
       assert "$FAKE_PROFILE" == "1"
     '';
+
+  # Devshell entrypoint script features
+  devshell-entrypoint-1 =
+    let
+      shell = devshell.mkShell {
+        devshell.name = "devshell-entrypoint-1";
+        devshell.packages = [ pkgs.git ];
+      };
+    in
+    runTest "devshell-entrypoint-1" { } ''
+      entrypoint_clean() {
+        env -u IN_NIX_SHELL -u PRJ_ROOT ${shell}/entrypoint "$@"
+      }
+
+      # No packages in PATH
+      ! type -p git
+
+      # Exits badly if PRJ_ROOT isn't set, or if we cannot assume PRJ_ROOT
+      # should be PWD.
+      ! msg="$(entrypoint_clean /bin/sh -c 'exit 0' 2>&1)"
+      assert "$msg" == 'ERROR: please set the PRJ_ROOT env var to point to the project root'
+
+      # Succeeds with --prj-root set
+      entrypoint_clean --prj-root . /bin/sh -c 'exit 0'
+
+      # Packages available through entrypoint
+      entrypoint_clean --prj-root . /bin/sh -c 'type -p git'
+
+      # Packages available through entrypoint in pure mode
+      entrypoint_clean --pure --env-bin env --prj-root . /bin/sh -c 'type -p git'
+    '';
 }
