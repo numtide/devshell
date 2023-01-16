@@ -60,11 +60,13 @@ let
   envBash = pkgs.writeText "devshell-env.bash" ''
     if [[ -n ''${IN_NIX_SHELL:-} || ''${DIRENV_IN_ENVRC:-} = 1 ]]; then
       # We know that PWD is always the current directory in these contexts
-      export PRJ_ROOT=$PWD
+      PRJ_ROOT=$PWD
     elif [[ -z ''${PRJ_ROOT:-} ]]; then
       echo "ERROR: please set the PRJ_ROOT env var to point to the project root" >&2
       return 1
     fi
+
+    export PRJ_ROOT
 
     # Expose the folder that contains the assembled environment.
     export DEVSHELL_DIR=@DEVSHELL_DIR@
