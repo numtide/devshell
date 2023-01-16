@@ -114,6 +114,16 @@ let
         --pure)
           pure=1
           ;;
+        --prj-root)
+          if (( "$#" < 2 )); then
+            echo 1>&2 '${cfg.name}: missing required argument to --prj-root'
+            exit 1
+          fi
+
+          PRJ_ROOT="$2"
+
+          shift
+          ;;
         --)
           shift
           break
@@ -134,7 +144,8 @@ let
       $0 [--pure] <cmd> [...] # run a command in the environment
 
     Options:
-      * --pure : execute the script in a clean environment
+      * --pure            : execute the script in a clean environment
+      * --prj-root <path> : set the project root (\$PRJ_ROOT)
     USAGE
       exit
     fi
