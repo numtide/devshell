@@ -13,7 +13,7 @@ let
       config.modules-docs.roots = [{
         url = "https://github.com/numtide/devshell";
         path = toString ../.;
-        branch = "master";
+        branch = "main";
       }];
     }
   ];
