@@ -48,7 +48,7 @@ var Enter = &cli.Command{
 		&cli.StringSliceFlag{
 			Name:  "I",
 			Usage: "Add a path to the NIX_PATH",
-			Value: cli.NewStringSlice("devshell=https://github.com/numtide/devshell/archive/master.tar.gz"),
+			Value: cli.NewStringSlice("devshell=https://github.com/numtide/devshell/archive/main.tar.gz"),
 		},
 	},
 	Action: func(c *cli.Context) error {

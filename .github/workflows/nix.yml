@@ -2,7 +2,7 @@ name: Nix
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
   workflow_dispatch:
 jobs:
@@ -62,7 +62,7 @@ jobs:
           nix-build -A docs
           cp -r "$(readlink ./result)" book
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         uses: crazy-max/ghaction-github-pages@v3
         with:
           target_branch: gh-pages

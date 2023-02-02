@@ -16,13 +16,13 @@ contain some nix code. Don't worry about the details.
 ```nix
 { system ? builtins.currentSystem }:
 let
-  src = fetchTarball "https://github.com/numtide/devshell/archive/master.tar.gz";
+  src = fetchTarball "https://github.com/numtide/devshell/archive/main.tar.gz";
   devshell = import src { inherit system; };
 in
 devshell.fromTOML ./devshell.toml
 ```
 
-> NOTE: it's probably a good idea to pin the dependency by replacing `master` with a git commit ID.
+> NOTE: it's probably a good idea to pin the dependency by replacing `main` with a git commit ID.
 
 Now you can enter the developer shell for the project:
 
