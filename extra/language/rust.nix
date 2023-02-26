@@ -58,6 +58,14 @@ with lib;
         # append in case it needs to be modified
         eval = "\"-L framework=$DEVSHELL_DIR/Library/Frameworks\"";
       }
+    ]
+    # fenix provides '.rust-src' in the 'complete' toolchain configuration
+    ++ lib.optionals (cfg.enableDefaultToolchain && cfg.packageSet ? rust-src) [
+      {
+        # rust-analyzer may use this to quicker find the rust source
+        name = "RUST_SRC_PATH";
+        value = "${cfg.packageSet.rust-src}/lib/rustlib/src/rust/library";
+      }
     ];
   };
 }
