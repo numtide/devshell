@@ -12,20 +12,21 @@
       "i686-linux"
       "x86_64-darwin"
       "x86_64-linux"
-    ] (system:
-      let
-        pkgs = import inputs.self {
-          inherit system;
-          inputs = null;
-          nixpkgs = inputs.nixpkgs.legacyPackages.${system};
-        };
-      in
-      {
-        packages.default = pkgs.cli;
-        legacyPackages = pkgs;
-        devShells.default = pkgs.fromTOML ./devshell.toml;
-      }
-    ) // {
+    ]
+      (system:
+        let
+          pkgs = import inputs.self {
+            inherit system;
+            inputs = null;
+            nixpkgs = inputs.nixpkgs.legacyPackages.${system};
+          };
+        in
+        {
+          packages.default = pkgs.cli;
+          legacyPackages = pkgs;
+          devShells.default = pkgs.fromTOML ./devshell.toml;
+        }
+      ) // {
       templates.default.path = ./template;
       templates.default.description = "nix flake new 'github:numtide/devshell'";
       # Import this overlay into your instance of nixpkgs
