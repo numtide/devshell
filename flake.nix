@@ -21,15 +21,15 @@
         };
       in
       {
-        defaultPackage = pkgs.cli;
+        packages.default = pkgs.cli;
         legacyPackages = pkgs;
-        devShell = pkgs.fromTOML ./devshell.toml;
+        devShells.default = pkgs.fromTOML ./devshell.toml;
       }
     ) // {
-      defaultTemplate.path = ./template;
-      defaultTemplate.description = "nix flake new 'github:numtide/devshell'";
+      templates.default.path = ./template;
+      templates.default.description = "nix flake new 'github:numtide/devshell'";
       # Import this overlay into your instance of nixpkgs
-      overlay = import ./overlay.nix;
+      overlays.default = import ./overlay.nix;
       lib = {
         importTOML = import ./nix/importTOML.nix;
       };
