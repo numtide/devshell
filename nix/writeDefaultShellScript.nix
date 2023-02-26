@@ -23,5 +23,5 @@ writeTextFile (
     executable = true;
   }
   // (lib.optionalAttrs (checkPhase != null) { inherit checkPhase; })
-  // (lib.optionalAttrs binPrefix { destination = "/bin/${name}"; })
+    // (lib.optionalAttrs binPrefix { destination = "/bin/${name}"; })
 )

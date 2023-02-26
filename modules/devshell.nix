@@ -218,7 +218,7 @@ in
 
     meta = mkOption {
       type = types.attrsOf types.anything;
-      default = {};
+      default = { };
       description = ''
         Metadata, such as 'meta.description'. Can be useful as metadata for downstream tooling.
       '';

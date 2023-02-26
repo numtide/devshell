@@ -32,7 +32,7 @@ let
   # shims read the correct "real" shim (directory) from DEVSHELL_GIT_HOOKS_DIR,
   # which points to the directory containing git hooks for the current
   # devshell.
-  hookShimsDir = pkgs.runCommand "git.hook.shims" {} ''
+  hookShimsDir = pkgs.runCommand "git.hook.shims" { } ''
     mkdir -p $out/bin
 
     ${lib.concatMapStringsSep "\n" (k: ''
