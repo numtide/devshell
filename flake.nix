@@ -26,12 +26,23 @@
           devShells.default = pkgs.fromTOML ./devshell.toml;
         }
       ) // {
-      templates.default.path = ./template;
-      templates.default.description = "nix flake new 'github:numtide/devshell'";
+
+      templates = rec {
+        toml = {
+          path = ./templates/toml;
+          description = "nix flake new my-project -t github:numtide/devshell";
+        };
+        flake-parts = {
+          path = ./templates/flake-parts;
+          description = "nix flake new my-project -t github:numtide/devshell#flake-parts";
+        };
+        default = toml;
+      };
       # Import this overlay into your instance of nixpkgs
       overlays.default = import ./overlay.nix;
       lib = {
         importTOML = import ./nix/importTOML.nix;
       };
+      flakeModule = ./flake-module.nix;
     };
 }
