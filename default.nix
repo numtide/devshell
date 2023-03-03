@@ -25,9 +25,6 @@ let
     builtins.foldl' op [ ] (builtins.attrNames data);
 in
 rec {
-  # CLI
-  cli = nixpkgs.callPackage ./devshell { };
-
   # Folder that contains all the extra modules
   extraModulesDir = toString ./extra;
 

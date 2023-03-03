@@ -22,7 +22,6 @@
           };
         in
         {
-          packages.default = pkgs.cli;
           legacyPackages = pkgs;
           devShells.default = pkgs.fromTOML ./devshell.toml;
         }
