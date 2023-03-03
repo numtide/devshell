@@ -1,4 +1,3 @@
 # https://numtide.github.io/devshell
 [[commands]]
-package = "devshell.cli"
-help = "Per project developer environments"
+package = "devshell.hello"
