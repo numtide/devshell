@@ -16,6 +16,7 @@ let
         branch = "main";
       }];
     }
+    ./services.nix
   ];
 
   pkgsModule = { config, ... }: {
