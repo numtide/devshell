@@ -3,6 +3,7 @@ file:
 # Return a module that gets lib as an argument
 { lib, ... }:
 let
+  importTOML = import ./importTOML.nix;
   dir = toString (builtins.dirOf file);
   data = builtins.fromTOML (builtins.readFile file);
 
@@ -16,8 +17,13 @@ let
         "${extraModulesDir}/${builtins.replaceStrings [ "." ] [ "/" ] str}.nix";
     in
     # First try to import from the user's repository
-    if lib.hasPrefix "./" str || lib.hasSuffix ".nix" str
-    then import repoFile
+    if lib.hasPrefix "./" str || lib.hasSuffix ".nix" str || lib.hasSuffix ".toml" str
+    then
+      (
+        if lib.hasSuffix ".toml" str
+        then importTOML repoFile
+        else import repoFile
+      )
     # Then fallback on the extra modules
     else import extraFile;
 in
