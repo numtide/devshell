@@ -36,9 +36,17 @@ let
     };
 
     unset = mkEnableOption "unsets the variable";
+
+    __toString = mkOption {
+      type = types.functionTo types.str;
+      internal = true;
+      readOnly = true;
+      default = envToBash;
+      description = "Function used to translate this submodule to Bash code";
+    };
   };
 
-  envToBash = { name, value, eval, prefix, unset }@args:
+  envToBash = { name, value, eval, prefix, unset, ... }@args:
     let
       vals = filter (key: args.${key} != null && args.${key} != false) [
         "eval"
@@ -113,6 +121,6 @@ in
       }
     ];
 
-    devshell.startup_env = concatStringsSep "\n" (map envToBash config.env);
+    devshell.startup_env = concatStringsSep "\n" config.env;
   };
 }
