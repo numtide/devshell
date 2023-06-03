@@ -53,6 +53,9 @@
       shell = devshell.mkShell {
         devshell.name = "devshell-entrypoint-1";
         devshell.packages = [ pkgs.git ];
+
+        # Force PRJ_ROOT to be defined by caller (possibly via `--prj-root`).
+        devshell.prj_root_fallback = null;
       };
     in
     runTest "devshell-entrypoint-1" { } ''

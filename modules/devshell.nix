@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, options, ... }:
 with lib;
 let
   cfg = config.devshell;
@@ -62,8 +62,12 @@ let
       # We know that PWD is always the current directory in these contexts
       PRJ_ROOT=$PWD
     elif [[ -z ''${PRJ_ROOT:-} ]]; then
-      echo "ERROR: please set the PRJ_ROOT env var to point to the project root" >&2
-      return 1
+      ${lib.optionalString (cfg.prj_root_fallback != null) cfg.prj_root_fallback}
+
+      if [[ -z "''${PRJ_ROOT:-}" ]]; then
+        echo "ERROR: please set the PRJ_ROOT env var to point to the project root" >&2
+        return 1
+      fi
     fi
 
     export PRJ_ROOT
@@ -291,6 +295,36 @@ in
       internal = true;
       type = types.package;
       description = "TODO";
+    };
+
+    prj_root_fallback = mkOption {
+      type = let
+        envType = options.env.type.nestedTypes.elemType;
+        coerceFunc = value: { inherit value; };
+      in types.nullOr (types.coercedTo types.nonEmptyStr coerceFunc envType);
+      apply = x: if x == null then x else x // { name = "PRJ_ROOT"; };
+      default = { eval = "$PWD"; };
+      example = lib.literalExpression ''
+        {
+          # Use the top-level directory of the working tree
+          eval = "$(git rev-parse --show-toplevel)";
+        };
+      '';
+      description = ''
+        If IN_NIX_SHELL is nonempty, or DIRENV_IN_ENVRC is set to '1', then
+        PRJ_ROOT is set to the value of PWD.
+
+        This option specifies the path to use as the value of PRJ_ROOT in case
+        IN_NIX_SHELL is empty or unset and DIRENV_IN_ENVRC is any value other
+        than '1'.
+
+        Set this to null to force PRJ_ROOT to be defined at runtime (except if
+        IN_NIX_SHELL or DIRENV_IN_ENVRC are defined as described above).
+
+        Otherwise, you can set this to a string representing the desired
+        default path, or to a submodule of the same type valid in the 'env'
+        options list (except that the 'name' field is ignored).
+      '';
     };
   };
 
