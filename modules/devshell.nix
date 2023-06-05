@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, options, ... }:
 with lib;
 let
   cfg = config.devshell;
@@ -18,11 +18,11 @@ let
     program = "${bin}";
   };
 
-  mkSetupHook = entrypoint:
+  mkSetupHook = rc:
     pkgs.stdenvNoCC.mkDerivation {
       name = "devshell-setup-hook";
       setupHook = pkgs.writeText "devshell-setup-hook.sh" ''
-        source ${devshell_dir}/env.bash
+        source ${rc}
       '';
       dontUnpack = true;
       dontBuild = true;
@@ -60,11 +60,17 @@ let
   envBash = pkgs.writeText "devshell-env.bash" ''
     if [[ -n ''${IN_NIX_SHELL:-} || ''${DIRENV_IN_ENVRC:-} = 1 ]]; then
       # We know that PWD is always the current directory in these contexts
-      export PRJ_ROOT=$PWD
+      PRJ_ROOT=$PWD
     elif [[ -z ''${PRJ_ROOT:-} ]]; then
-      echo "ERROR: please set the PRJ_ROOT env var to point to the project root" >&2
-      return 1
+      ${lib.optionalString (cfg.prj_root_fallback != null) cfg.prj_root_fallback}
+
+      if [[ -z "''${PRJ_ROOT:-}" ]]; then
+        echo "ERROR: please set the PRJ_ROOT env var to point to the project root" >&2
+        return 1
+      fi
     fi
+
+    export PRJ_ROOT
 
     # Expose the folder that contains the assembled environment.
     export DEVSHELL_DIR=@DEVSHELL_DIR@
@@ -96,7 +102,7 @@ let
 
     # If the file is sourced, skip all of the rest and just source the env
     # script.
-    if [[ $0 != "''${BASH_SOURCE[0]}" ]]; then
+    if (return 0) &>/dev/null; then
       source "$DEVSHELL_DIR/env.bash"
       return
     fi
@@ -104,10 +110,47 @@ let
     # Be strict!
     set -euo pipefail
 
-    if [[ $# = 0 ]]; then
-      # Start an interactive shell
-      exec "${bashPath}" --rcfile "$DEVSHELL_DIR/env.bash" --noprofile
-    elif [[ $1 == "-h" || $1 == "--help" ]]; then
+    while (( "$#" > 0 )); do
+      case "$1" in
+        -h|--help)
+          help=1
+          ;;
+        --pure)
+          pure=1
+          ;;
+        --prj-root)
+          if (( "$#" < 2 )); then
+            echo 1>&2 '${cfg.name}: missing required argument to --prj-root'
+            exit 1
+          fi
+
+          PRJ_ROOT="$2"
+
+          shift
+          ;;
+        --env-bin)
+          if (( "$#" < 2 )); then
+            echo 1>&2 '${cfg.name}: missing required argument to --env-bin'
+            exit 1
+          fi
+
+          env_bin="$2"
+
+          shift
+          ;;
+        --)
+          shift
+          break
+          ;;
+        *)
+          break
+          ;;
+      esac
+
+      shift
+    done
+
+    if [[ -n "''${help:-}" ]]; then
       cat <<USAGE
     Usage: ${cfg.name}
       $0 -h | --help          # show this help
@@ -115,18 +158,31 @@ let
       $0 [--pure] <cmd> [...] # run a command in the environment
 
     Options:
-      * --pure : execute the script in a clean environment
+      * --pure            : execute the script in a clean environment
+      * --prj-root <path> : set the project root (\$PRJ_ROOT)
+      * --env-bin <path>  : path to the env executable (default: /usr/bin/env)
     USAGE
       exit
-    elif [[ $1 == "--pure" ]]; then
-      # re-execute the script in a clean environment
-      shift
-      exec /usr/bin/env -i -- "HOME=$HOME" "PRJ_ROOT=$PRJ_ROOT" "$0" "$@"
+    fi
+
+    if (( "$#" == 0 )); then
+      # Start an interactive shell
+      set -- ${lib.escapeShellArg bashPath} --rcfile "$DEVSHELL_DIR/env.bash" --noprofile
+    fi
+
+    if [[ -n "''${pure:-}" ]]; then
+      # re-execute the script in a clean environment.
+      # note that the `--` in between `"$0"` and `"$@"` will immediately
+      # short-circuit options processing on the second pass through this
+      # script, in case we get something like:
+      #   <entrypoint> --pure -- --pure <cmd>
+      set -- "''${env_bin:-/usr/bin/env}" -i -- ''${HOME:+"HOME=''${HOME:-}"} ''${PRJ_ROOT:+"PRJ_ROOT=''${PRJ_ROOT:-}"} "$0" -- "$@"
     else
       # Start a script
       source "$DEVSHELL_DIR/env.bash"
-      exec -- "$@"
     fi
+
+    exec -- "$@"
   '';
 
   # Builds the DEVSHELL_DIR with all the dependencies
@@ -240,6 +296,36 @@ in
       type = types.package;
       description = "TODO";
     };
+
+    prj_root_fallback = mkOption {
+      type = let
+        envType = options.env.type.nestedTypes.elemType;
+        coerceFunc = value: { inherit value; };
+      in types.nullOr (types.coercedTo types.nonEmptyStr coerceFunc envType);
+      apply = x: if x == null then x else x // { name = "PRJ_ROOT"; };
+      default = { eval = "$PWD"; };
+      example = lib.literalExpression ''
+        {
+          # Use the top-level directory of the working tree
+          eval = "$(git rev-parse --show-toplevel)";
+        };
+      '';
+      description = ''
+        If IN_NIX_SHELL is nonempty, or DIRENV_IN_ENVRC is set to '1', then
+        PRJ_ROOT is set to the value of PWD.
+
+        This option specifies the path to use as the value of PRJ_ROOT in case
+        IN_NIX_SHELL is empty or unset and DIRENV_IN_ENVRC is any value other
+        than '1'.
+
+        Set this to null to force PRJ_ROOT to be defined at runtime (except if
+        IN_NIX_SHELL or DIRENV_IN_ENVRC are defined as described above).
+
+        Otherwise, you can set this to a string representing the desired
+        default path, or to a submodule of the same type valid in the 'env'
+        options list (except that the 'name' field is ignored).
+      '';
+    };
   };
 
   config.devshell = {
@@ -313,8 +399,8 @@ in
       profile = cfg.package;
       passthru = {
         inherit config;
-        flakeApp = mkFlakeApp entrypoint;
-        hook = mkSetupHook entrypoint;
+        flakeApp = mkFlakeApp "${devshell_dir}/entrypoint";
+        hook = mkSetupHook "${devshell_dir}/env.bash";
         inherit (config._module.args) pkgs;
       };
     };

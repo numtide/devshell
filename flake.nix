@@ -18,10 +18,6 @@
           }
       );
 
-      devShells = eachSystem (system: {
-        default = self.legacyPackages.${system}.fromTOML ./devshell.toml;
-      });
-
       templates = rec {
         toml = {
           path = ./templates/toml;
@@ -33,6 +29,15 @@
         };
         default = toml;
       };
+
+      devShells = eachSystem (system: {
+        default = self.legacyPackages.${system}.fromTOML ./devshell.toml;
+      });
+
+      apps = eachSystem (system: {
+        default = self.devShells.${system}.default.flakeApp;
+      });
+
       # Import this overlay into your instance of nixpkgs
       overlays.default = import ./overlay.nix;
       lib = {
