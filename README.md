@@ -34,7 +34,7 @@ new environment variables, which then need to be unset. The `stdenv` itself
 contains either GCC or Clang which makes it hard to select a specific C
 compiler.
 
-This is why `mkDevShell` builds its environment from a `builtins.derivation`.
+This is why `mkShell` builds its environment from a `builtins.derivation`.
 
 direnv loads will change from:
 ```
@@ -65,11 +65,10 @@ those are useful yet:
 When entering a random project, it's useful to get a quick view of what
 commands are available.
 
-When running `nix-shell` or `nix develop`, `mkDevShell` prints a welcome
-message:
+When running `nix-shell` or `nix develop`, `mkShell` prints a welcome message:
 
 ```
-### 🔨 Welcome to mkDevShell ####
+🔨 Welcome to devshell
 
 # Commands
 
@@ -90,13 +89,12 @@ handle 80% of the use-cases and falling back on Nix is always possible.
 Life is not complete otherwise. Huhu.
 
 Packages that contain bash completions will automatically be loaded by
-`mkDevShell` in `nix-shell` or `nix develop` modes.
+`mkShell` in `nix-shell` or `nix develop` modes.
 
 ### Capture development dependencies in CI
 
 With a CI + Binary cache setup, one often wants to be able to capture all the
-build inputs of a `shell.nix`. Before, `pkgs.mkShell` would even refuse to
-build! (my fault really). With `pkgs.mkDevShell`, capturing all of the
+build inputs of a `shell.nix`. With `mkShell` capturing all of the
 development dependencies is as easy as:
 
 ```sh
