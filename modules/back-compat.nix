@@ -37,12 +37,19 @@ with lib;
       type = types.listOf strOrPackage;
       default = [ ];
     };
+
+    packagesFrom = mkOption {
+      internal = true;
+      type = types.listOf strOrPackage;
+      default = [ ];
+    };
   };
 
   # Copy the values over to the devshell module
   config.devshell =
     {
       packages = config.packages;
+      packagesFrom = config.packagesFrom;
       startup.bash_extra = noDepEntry config.bash.extra;
       interactive.bash_interactive = noDepEntry config.bash.interactive;
     }

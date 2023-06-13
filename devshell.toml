@@ -25,6 +25,11 @@ packages = [
   "hyperfine",
 ]
 
+# Expose all the dependencies from a package to the environment.
+packagesFrom = [
+  "direnv"
+]
+
 # Declare commands that are available in the environment.
 [[commands]]
 help = "prints hello"
