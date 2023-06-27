@@ -65,7 +65,7 @@ let
     if root == null then
     # We need to strip references to /nix/store/* from the options or
     # else the build will fail.
-      { path = removePrefix "${builtins.storePath}/" decl; url = ""; }
+      { path = removePrefix "${builtins.storeDir}/" decl; url = ""; }
     else
       rec {
         path = removePrefix root.prefix decl;
