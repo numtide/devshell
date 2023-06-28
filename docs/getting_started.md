@@ -161,9 +161,32 @@ packages = [
 ]
 ```
 
-### Wrapping up
+
+## Adding background services
+
+Many projects need background services to be running during development or to
+run tests (e.g. a database, caching server, webserver, ...). This is supported
+in devshell through the concept of service groups.
+
+A service group defines a collection of long-running processes that can be
+started and stopped.
+
+An example service group could be configured like this:
+```toml
+[serviceGroups.database]
+description = "Runs a database in the backgroup"
+[serviceGroups.database.services.postgres]
+command = "postgres"
+[serviceGroups.database.services.memcached]
+command = "memcached"
+```
+
+This will add two commands to the devshell: `database:start` and
+`database:stop`. `database:start` starts the defined services in the `database`
+group in the foreground and shows their output. `database:stop` can be executed
+in a different shell to stop the processes (or press Ctrl-C in the main shell).
+
+## Wrapping up
 
 **devshell** is extensible in many different ways. In the next chapters we will
 discuss the various ways in which it can be adapted to your project's needs.
-to find 
-of the configuration options available.
