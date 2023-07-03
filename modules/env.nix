@@ -64,7 +64,7 @@ let
     else if valType == "eval" then
       "export ${name}=${eval}"
     else if valType == "prefix" then
-      ''export ${name}=$(${pkgs.coreutils}/bin/realpath --canonicalize-missing ${escapeShellArg prefix})''${${name}+:''${${name}}}''
+      ''export ${name}=$(${pkgs.coreutils}/bin/realpath --canonicalize-missing "${prefix}")''${${name}+:''${${name}}}''
     else if valType == "unset" then
       ''unset ${name}''
     else
