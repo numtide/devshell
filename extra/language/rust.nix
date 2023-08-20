@@ -58,6 +58,15 @@ with lib;
         # append in case it needs to be modified
         eval = "\"-L framework=$DEVSHELL_DIR/Library/Frameworks\"";
       }
+      {
+        name="PATH"; 
+        prefix = let 
+          inherit (pkgs) xcbuild; 
+        in lib.makeBinPath [
+          xcbuild 
+          "${xcbuild}/Toolchains/XcodeDefault.xctoolchain"
+        ];
+      }
     ]
     # fenix provides '.rust-src' in the 'complete' toolchain configuration
     ++ lib.optionals (cfg.enableDefaultToolchain && cfg.packageSet ? rust-src) [
