@@ -157,3 +157,10 @@ direnv mode.
 1. Change files in `docs/`
 2. Run `docs/serve.sh` (or the task in VSCode)
 3. Visit [`localhost:8000`](http://localhost:8000)
+
+# Commercial support
+
+Looking for help or customization?
+
+Get in touch with Numtide to get a quote. We make it easy for companies to
+work with Open Source projects: <https://numtide.com/contact>
