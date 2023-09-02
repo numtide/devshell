@@ -1,0 +1,39 @@
+# https://numtide.github.io/devshell
+# https://numtide.github.io/devshell/getting_started.html
+[[commands]]
+package = "hello"
+
+[[commands]]
+package = "go"
+
+[[commands]]
+package = "nodejs_20"
+
+[[commands]]
+package = "python311"
+
+[[env]]
+name = "GO111MODULE"
+value = "on"
+
+[devshell]
+packages = [
+  "postgresql_15",
+  "memcached",
+]
+
+[[commands]]
+name = "initPostgres"
+help = "Initialize the Postgres database"
+command = """\
+  initdb pgdata; \
+  chmod -R 700 pgdata; \
+  echo -e "Use the devshell command 'database:start'"
+  """
+
+[serviceGroups.database]
+description = "Runs a database in the background"
+[serviceGroups.database.services.postgres]
+command = "postgres -D ./pgdata"
+[serviceGroups.database.services.memcached]
+command = "memcached"
