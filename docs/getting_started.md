@@ -62,6 +62,8 @@ cd project/
 nix develop # or `direnv allow` if you want to use direnv
 ```
 
+Find `templates/gettingStartedExample` in this repository for a working example of the additional configuration below: `env`, `packages`, and `serviceGroups`.
+
 ## Adding environment variables
 
 Environment variables that are specific to the project can be added with the
