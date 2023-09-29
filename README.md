@@ -13,7 +13,7 @@ dependencies.
 
 ## Documentation
 
-See [docs](docs)
+See [docs](https://numtide.github.io/devshell/) ([docs source](docs))
 
 ## Features
 
