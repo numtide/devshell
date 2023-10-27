@@ -8,8 +8,9 @@ then
       else "path";
   in
     (builtins.getFlake "${scheme}://${toString ./.}")
-    .devShell
+    .devShells
     .${builtins.currentSystem}
+    .default
 
 # Otherwise we'll use the flake-compat shim
 else

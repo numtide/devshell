@@ -11,7 +11,7 @@
 
   outputs = { self, flake-utils, devshell, nixpkgs, ... }:
     flake-utils.lib.eachDefaultSystem (system: {
-      devShell =
+      devShells.default =
         let
           pkgs = import nixpkgs {
             inherit system;
