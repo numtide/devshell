@@ -32,7 +32,7 @@ with lib;
     env = [
       (mkIf (cfg.extraPackages != []) {
         name = "PERL5LIB";
-        prefix = pkgs.perlPackages.makePerlPath cfg.extraPackages;
+        prefix = pkgs.perlPackages.makeFullPerlPath cfg.extraPackages;
       })
       (mkIf (cfg.libraryPaths != []) {
         name = "PERL5LIB";
