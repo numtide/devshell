@@ -10,13 +10,13 @@ with lib;
   options.language.perl = {
     extraPackages = mkOption {
       type = types.listOf strOrPackage;
-      default = [];
+      default = [ ];
       example = literalExpression "[ perl538Packages.FileNext ]";
       description = "List of extra packages (coming from perl5XXPackages) to add";
     };
     libraryPaths = mkOption {
       type = types.listOf types.str;
-      default = [];
+      default = [ ];
       example = literalExpression "[ ./lib ]";
       description = "List of paths to add to PERL5LIB";
     };
@@ -30,11 +30,11 @@ with lib;
 
   config = {
     env = [
-      (mkIf (cfg.extraPackages != []) {
+      (mkIf (cfg.extraPackages != [ ]) {
         name = "PERL5LIB";
         prefix = pkgs.perlPackages.makeFullPerlPath cfg.extraPackages;
       })
-      (mkIf (cfg.libraryPaths != []) {
+      (mkIf (cfg.libraryPaths != [ ]) {
         name = "PERL5LIB";
         prefix = concatStringsSep ":" cfg.libraryPaths;
       })

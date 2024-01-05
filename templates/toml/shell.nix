@@ -7,10 +7,7 @@ then
       then "git+file"
       else "path";
   in
-    (builtins.getFlake "${scheme}://${toString ./.}")
-    .devShells
-    .${builtins.currentSystem}
-    .default
+  (builtins.getFlake "${scheme}://${toString ./.}").devShells.${builtins.currentSystem}.default
 
 # Otherwise we'll use the flake-compat shim
 else
