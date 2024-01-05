@@ -2,10 +2,12 @@
 authors = ["zimbatm"]
 language = "en"
 multilingual = false
-src = "."
+src = "src"
 title = "devshell"
 
 [output.html]
 # Show github links in top bar
 git-repository-url = "https://github.com/numtide/devshell"
 edit-url-template = "https://github.com/numtide/devshell/edit/main/docs/{path}"
+additional-css = ["theme/pagetoc.css"]
+additional-js = ["theme/pagetoc.js"]

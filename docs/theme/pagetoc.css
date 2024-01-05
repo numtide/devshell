@@ -1,0 +1,80 @@
+:root {    
+    /* change this value to adjust TOC width */
+    --toc-width: 310px;
+    
+    /* use this value to center both text and the TOC */
+    --content-shift: calc(-1 * var(--toc-width) / 2)
+    
+    /* --content-shift: 0 */
+}
+
+.nav-chapters {
+    min-width: 50px;
+}
+
+.previous {
+    margin-left: var(--page-padding);
+}
+
+@media only screen and (max-width: 1439px) {
+    .sidetoc {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 1440px) {
+    main {
+        position: relative;
+        left: var(--content-shift);
+        display: flex;
+    }
+    .content-wrap {
+        overflow-y: auto;
+        width: 100%;
+    }
+    .sidetoc {
+        margin-top: 20px;
+        margin-left: 10px;
+        margin-right: auto;
+    }
+    .pagetoc {
+        position: fixed;
+        width: var(--toc-width);
+        height: calc(100vh - var(--menu-bar-height) - 0.67em * 4);
+        overflow: auto;
+    }
+    .pagetoc a {
+        border-left: 1px solid var(--sidebar-bg);
+        color: var(--fg) !important;
+        display: block;
+        padding-bottom: 5px;
+        padding-top: 5px;
+        padding-left: 10px;
+        text-align: left;
+        text-decoration: none;
+    }
+    .pagetoc a:hover,
+    .pagetoc a.active {
+        background: var(--sidebar-bg);
+        color: var(--sidebar-fg) !important;
+    }
+    .pagetoc .active {
+        background: var(--sidebar-bg);
+        color: var(--sidebar-fg);
+    }
+    .pagetoc .pagetoc-H2 {
+        padding-left: 20px;
+    }
+    .pagetoc .pagetoc-H3 {
+        padding-left: 40px;
+    }
+    .pagetoc .pagetoc-H4 {
+        padding-left: 60px;
+    }
+}
+
+@media print {
+    .sidetoc {
+        display: none;
+    }
+}
