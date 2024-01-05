@@ -97,7 +97,7 @@ and shown in the help menu.
 
 **Default value**:
 ```nix
-{"_type":"literalExpression","text":"\"general commands\""}
+{"_type":"literalExpression","text":"\"[general commands]\""}
 ```
 
 

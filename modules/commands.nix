@@ -109,7 +109,7 @@ let
 
     category = mkOption {
       type = types.str;
-      default = "general commands";
+      default = "[general commands]";
       description = ''
         Set a free text category under which this command is grouped
         and shown in the help menu.
