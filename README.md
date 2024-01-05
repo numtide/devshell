@@ -1,6 +1,6 @@
-# devshell - like virtualenv, but for all the languages.
+# devshell - like virtualenv, but for all the languages
 
-**STATUS: unstable**
+<h3>STATUS: unstable</h3>
 
 [![Devshell Dev Environment](https://img.shields.io/badge/nix-devshell-blue?logo=NixOS&labelColor=ccc)](https://github.com/numtide/devshell) [![Support room on Matrix](https://img.shields.io/matrix/devshell:numtide.com.svg?label=%23devshell%3Anumtide.com&logo=matrix&server_fqdn=matrix.numtide.com)](https://matrix.to/#/#devshell:numtide.com)
 
@@ -37,16 +37,20 @@ compiler.
 This is why `mkShell` builds its environment from a `builtins.derivation`.
 
 direnv loads will change from:
-```
+
+```sh
 direnv: export +AR +AS +CC +CONFIG_SHELL +CXX +HOST_PATH +IN_NIX_SHELL +LD +NIX_BINTOOLS +NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_BUILD_CORES +NIX_BUILD_TOP +NIX_CC +NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu +NIX_CFLAGS_COMPILE +NIX_ENFORCE_NO_NATIVE +NIX_HARDENING_ENABLE +NIX_INDENT_MAKE +NIX_LDFLAGS +NIX_STORE +NM +OBJCOPY +OBJDUMP +RANLIB +READELF +RUSTC +SIZE +SOURCE_DATE_EPOCH +STRINGS +STRIP +TEMP +TEMPDIR +TMP +TMPDIR +buildInputs +buildPhase +builder +builtDependencies +cargo_bins_jq_filter +cargo_build_options +cargo_options +cargo_release +cargo_test_options +cargoconfig +checkPhase +configureFlags +configurePhase +cratePaths +crate_sources +depsBuildBuild +depsBuildBuildPropagated +depsBuildTarget +depsBuildTargetPropagated +depsHostHost +depsHostHostPropagated +depsTargetTarget +depsTargetTargetPropagated +doCheck +doInstallCheck +docPhase +dontAddDisableDepTrack +dontUseCmakeConfigure +installPhase +name +nativeBuildInputs +out +outputs +patches +preInstallPhases +propagatedBuildInputs +propagatedNativeBuildInputs +remapPathPrefix +shell +src +stdenv +strictDeps +system +version ~PATH
 ```
+
 to:
-```
+
+```sh
 direnv: export +DEVSHELL_DIR +PRJ_DATA_DIR +PRJ_ROOT +IN_NIX_SHELL +NIXPKGS_PATH ~PATH
 ```
 
 There are new environment variables useful to support the day-to-day
 activities:
+
 * `DEVSHELL_DIR`: contains all the programs.
 * `PRJ_ROOT`: points to the project root.
 * `PRJ_DATA_DIR`: points to `$PRJ_ROOT/.data` by default. Is used to store runtime data.
@@ -57,8 +61,7 @@ activities:
 The shell comes pre-loaded with some utility functions. I'm not 100% sure if
 those are useful yet:
 
-* `devshell-menu` - list all the programs available
-* `devshell-root` - `cd` back to the project root.
+* `menu` - list all the programs available
 
 ### MOTD
 
@@ -67,15 +70,27 @@ commands are available.
 
 When running `nix-shell` or `nix develop`, `mkShell` prints a welcome message:
 
-```
+```sh
 🔨 Welcome to devshell
 
-# Commands
+[[general commands]]
 
-devshell-menu - print this menu
-devshell-root - change directory to root
-hello         - prints hello
-nixpkgs-fmt   - used to format Nix code
+  hello         - prints hello
+  menu          - prints this menu
+
+[formatters]
+
+  nixpkgs-fmt   - Nix code formatter for nixpkgs
+
+[linters]
+
+  golangci-lint - golang linter
+
+[utilites]
+
+  hub           - github utility
+
+[devshell]$ 
 ```
 
 ### Configurable with a TOML file
@@ -113,7 +128,6 @@ nix run '.#<myapp>' -- <devshell-command> <and-args>
 
 This project itself exposes a Nix application; you can try it out with:
 
-
 ```sh
 nix run 'github:numtide/devshell' -- hello
 ```
@@ -124,41 +138,35 @@ See [here](docs/flake-app.md) for how to export your devshell as a flake app.
 
 A lot of things!
 
-### Documentation
+* **Documentation**
+  * Explain how all of this works and all the use-cases.
+* **Testing**
+  * Write integration tests for all of the use-cases.
+* **Lazy dependencies**
+  * This requires some coordination with the repository structure. To keep the
+    dev closure small, it would be nice to be able to load some of the
+    dependencies on demand.
+* **Doctor / nix version check**
+  * Not everything can be nicely sandboxed. Is it possible to get a fast doctor
+    script that checks that everything is in good shape?
+* **Support other shells**
+  * What? Not everyone is using bash? Right now, support is already available in
+    direnv mode.
 
-Explain how all of this works and all the use-cases.
-
-### Testing
-
-Write integration tests for all of the use-cases.
-
-### Lazy dependencies
-
-This requires some coordination with the repository structure. To keep the
-dev closure small, it would be nice to be able to load some of the
-dependencies on demand.
-
-### Doctor / nix version check
-
-Not everything can be nicely sandboxed. Is it possible to get a fast doctor
-script that checks that everything is in good shape?
-
-### Support other shells
-
-What? Not everyone is using bash? Right now, support is already available in 
-direnv mode.
-
-# Contributing
-
-## Dev Setup
+## Contributing
 
 ### Docs
 
 1. Change files in `docs/`
-2. Run `docs/serve.sh` (or the task in VSCode)
-3. Visit [`localhost:8000`](http://localhost:8000)
+1. Run `nix run .#docs`
+1. Open [`docs`](http://localhost:3000/index.html)
 
-# Commercial support
+### Benchmark
+
+1. See [benchmark/README.md](./benchmark/README.md)
+1. Run `nix run .#bench`
+
+## Commercial support
 
 Looking for help or customization?
 
