@@ -5,234 +5,269 @@ quite a while to evaluate.
 
 ## Hyperfine
 
-`$ hyperfine -w 3 'nix-instantiate ../shell.nix' 'nix-instantiate ./devshell-nix.nix' 'nix-instantiate ./devshell-toml.nix' 'nix-instantiate ./nixpkgs-mkshell.nix'`
+Command:
+
+```console
+nix run .#bench
 ```
-Benchmark #1: nix-instantiate ../shell.nix
-  Time (mean ± σ):      1.082 s ±  0.011 s    [User: 732.6 ms, System: 154.7 ms]
-  Range (min … max):    1.065 s …  1.099 s    10 runs
+
+Output:
+
+```console
+Benchmark 1: nix-instantiate ../shell.nix
+  Time (mean ± σ):     568.2 ms ±  18.0 ms    [User: 486.2 ms, System: 81.1 ms]
+  Range (min … max):   544.5 ms … 596.0 ms    10 runs
  
-Benchmark #2: nix-instantiate ./devshell-nix.nix
-  Time (mean ± σ):     412.1 ms ±   3.3 ms    [User: 300.0 ms, System: 63.8 ms]
-  Range (min … max):   406.8 ms … 417.4 ms    10 runs
+Benchmark 2: nix-instantiate ./devshell-nix.nix
+  Time (mean ± σ):     189.6 ms ±  11.8 ms    [User: 150.1 ms, System: 38.6 ms]
+  Range (min … max):   177.8 ms … 221.0 ms    13 runs
  
-Benchmark #3: nix-instantiate ./devshell-toml.nix
-  Time (mean ± σ):     411.6 ms ±   6.6 ms    [User: 299.7 ms, System: 64.7 ms]
-  Range (min … max):   403.6 ms … 420.5 ms    10 runs
+Benchmark 3: nix-instantiate ./devshell-toml.nix
+  Time (mean ± σ):     194.0 ms ±   7.4 ms    [User: 155.1 ms, System: 38.8 ms]
+  Range (min … max):   181.4 ms … 214.5 ms    15 runs
  
-Benchmark #4: nix-instantiate ./nixpkgs-mkshell.nix
-  Time (mean ± σ):     359.7 ms ±   9.1 ms    [User: 269.2 ms, System: 52.6 ms]
-  Range (min … max):   349.8 ms … 379.9 ms    10 runs
+Benchmark 4: nix-instantiate ./nixpkgs-mkshell.nix
+  Time (mean ± σ):     148.9 ms ±   4.7 ms    [User: 118.3 ms, System: 30.3 ms]
+  Range (min … max):   143.7 ms … 164.6 ms    20 runs
  
 Summary
-  'nix-instantiate ./nixpkgs-mkshell.nix' ran
-    1.14 ± 0.03 times faster than 'nix-instantiate ./devshell-toml.nix'
-    1.15 ± 0.03 times faster than 'nix-instantiate ./devshell-nix.nix'
-    3.01 ± 0.08 times faster than 'nix-instantiate ../shell.nix'
+  nix-instantiate ./nixpkgs-mkshell.nix ran
+    1.27 ± 0.09 times faster than nix-instantiate ./devshell-nix.nix
+    1.30 ± 0.06 times faster than nix-instantiate ./devshell-toml.nix
+    3.82 ± 0.17 times faster than nix-instantiate ../shell.nix
 ```
 
 ## Nix stats
 
 ### repo shell
 
-`$ NIX_SHOW_STATS=1 nix-instantiate ./../shell.nix 2>&1`
+Command:
+
+```console
+NIX_SHOW_STATS=1 nix-instantiate ../shell.nix 2>&1
 ```
+
+Output:
+
+```console
 warning: you did not specify '--add-root'; the result might be removed by the garbage collector
-/nix/store/xbadj2p1yva55gcm6n6ml028wdgbap5f-devshell.drv
+/nix/store/6vha60nh201fd5m36nphysmsrvvk0zq0-devshell.drv
 {
-  "cpuTime": 0.742534,
+  "cpuTime": 0.42238301038742065,
   "envs": {
-    "number": 189808,
-    "elements": 321331,
-    "bytes": 5607576
+    "bytes": 17234184,
+    "elements": 879269,
+    "number": 637502
   },
-  "list": {
-    "elements": 119124,
-    "bytes": 952992,
-    "concats": 13943
-  },
-  "values": {
-    "number": 607122,
-    "bytes": 14570928
-  },
-  "symbols": {
-    "number": 37696,
-    "bytes": 917618
-  },
-  "sets": {
-    "number": 60629,
-    "bytes": 42826168,
-    "elements": 1764214
-  },
-  "sizes": {
-    "Env": 16,
-    "Value": 24,
-    "Bindings": 8,
-    "Attr": 24
-  },
-  "nrOpUpdates": 29262,
-  "nrOpUpdateValuesCopied": 1463167,
-  "nrThunks": 446497,
-  "nrAvoided": 320262,
-  "nrLookups": 175553,
-  "nrPrimOpCalls": 139902,
-  "nrFunctionCalls": 167314,
   "gc": {
     "heapSize": 402915328,
-    "totalBytes": 75203696
+    "totalBytes": 116416656
+  },
+  "list": {
+    "bytes": 2528832,
+    "concats": 28933,
+    "elements": 316104
+  },
+  "nrAvoided": 869773,
+  "nrFunctionCalls": 574722,
+  "nrLookups": 387457,
+  "nrOpUpdateValuesCopied": 2237754,
+  "nrOpUpdates": 54186,
+  "nrPrimOpCalls": 405710,
+  "nrThunks": 958406,
+  "sets": {
+    "bytes": 46573200,
+    "elements": 2771910,
+    "number": 138915
+  },
+  "sizes": {
+    "Attr": 16,
+    "Bindings": 16,
+    "Env": 16,
+    "Value": 24
+  },
+  "symbols": {
+    "bytes": 551230,
+    "number": 48261
+  },
+  "values": {
+    "bytes": 28690080,
+    "number": 1195420
   }
 }
 ```
 
-
 ### devshell-nix
 
-`$ NIX_SHOW_STATS=1 nix-instantiate ./devshell-nix.nix 2>&1`
+Command:
+
+```console
+NIX_SHOW_STATS=1 nix-instantiate ./devshell-nix.nix 2>&1
 ```
+
+Output:
+
+```console
 warning: you did not specify '--add-root'; the result might be removed by the garbage collector
-/nix/store/r304514lvygyzh8l75cgjhkhfqs15d1m-devshell.drv
+/nix/store/6zlkfp88d1ic0zyw49kb8srnqbwz5277-devshell.drv
 {
-  "cpuTime": 0.364713,
+  "cpuTime": 0.17254799604415894,
   "envs": {
-    "number": 74392,
-    "elements": 105623,
-    "bytes": 2035256
+    "bytes": 3515536,
+    "elements": 175074,
+    "number": 132184
   },
-  "list": {
-    "elements": 40998,
-    "bytes": 327984,
-    "concats": 2342
-  },
-  "values": {
-    "number": 243435,
-    "bytes": 5842440
-  },
-  "symbols": {
-    "number": 29700,
-    "bytes": 662792
-  },
-  "sets": {
-    "number": 18563,
-    "bytes": 23664496,
-    "elements": 979833
-  },
-  "sizes": {
-    "Env": 16,
-    "Value": 24,
-    "Bindings": 8,
-    "Attr": 24
-  },
-  "nrOpUpdates": 5563,
-  "nrOpUpdateValuesCopied": 837612,
-  "nrThunks": 186590,
-  "nrAvoided": 109995,
-  "nrLookups": 34126,
-  "nrPrimOpCalls": 54602,
-  "nrFunctionCalls": 65308,
   "gc": {
     "heapSize": 402915328,
-    "totalBytes": 35643456
+    "totalBytes": 39903680
+  },
+  "list": {
+    "bytes": 580176,
+    "concats": 3499,
+    "elements": 72522
+  },
+  "nrAvoided": 192068,
+  "nrFunctionCalls": 116933,
+  "nrLookups": 56485,
+  "nrOpUpdateValuesCopied": 1160535,
+  "nrOpUpdates": 7873,
+  "nrPrimOpCalls": 99486,
+  "nrThunks": 274189,
+  "sets": {
+    "bytes": 22358832,
+    "elements": 1364423,
+    "number": 33004
+  },
+  "sizes": {
+    "Attr": 16,
+    "Bindings": 16,
+    "Env": 16,
+    "Value": 24
+  },
+  "symbols": {
+    "bytes": 222375,
+    "number": 23097
+  },
+  "values": {
+    "bytes": 8141064,
+    "number": 339211
   }
 }
 ```
 
 ### devshell-toml
 
-`$ NIX_SHOW_STATS=1 nix-instantiate ./devshell-toml.nix 2>&1`
+Command:
+
+```console
+NIX_SHOW_STATS=1 nix-instantiate ./devshell-toml.nix 2>&1
 ```
+
+Output:
+
+```console
 warning: you did not specify '--add-root'; the result might be removed by the garbage collector
-/nix/store/r304514lvygyzh8l75cgjhkhfqs15d1m-devshell.drv
+/nix/store/6zlkfp88d1ic0zyw49kb8srnqbwz5277-devshell.drv
 {
-  "cpuTime": 0.291564,
+  "cpuTime": 0.14970900118350983,
   "envs": {
-    "number": 74405,
-    "elements": 105638,
-    "bytes": 2035584
+    "bytes": 3515888,
+    "elements": 175092,
+    "number": 132197
   },
-  "list": {
-    "elements": 41008,
-    "bytes": 328064,
-    "concats": 2342
-  },
-  "values": {
-    "number": 243463,
-    "bytes": 5843112
-  },
-  "symbols": {
-    "number": 29700,
-    "bytes": 662793
-  },
-  "sets": {
-    "number": 18572,
-    "bytes": 23665144,
-    "elements": 979857
-  },
-  "sizes": {
-    "Env": 16,
-    "Value": 24,
-    "Bindings": 8,
-    "Attr": 24
-  },
-  "nrOpUpdates": 5564,
-  "nrOpUpdateValuesCopied": 837622,
-  "nrThunks": 186605,
-  "nrAvoided": 110009,
-  "nrLookups": 34136,
-  "nrPrimOpCalls": 54608,
-  "nrFunctionCalls": 65318,
   "gc": {
     "heapSize": 402915328,
-    "totalBytes": 35643456
+    "totalBytes": 39907952
+  },
+  "list": {
+    "bytes": 580248,
+    "concats": 3498,
+    "elements": 72531
+  },
+  "nrAvoided": 192084,
+  "nrFunctionCalls": 116941,
+  "nrLookups": 56497,
+  "nrOpUpdateValuesCopied": 1160541,
+  "nrOpUpdates": 7874,
+  "nrPrimOpCalls": 99494,
+  "nrThunks": 274209,
+  "sets": {
+    "bytes": 22359328,
+    "elements": 1364444,
+    "number": 33014
+  },
+  "sizes": {
+    "Attr": 16,
+    "Bindings": 16,
+    "Env": 16,
+    "Value": 24
+  },
+  "symbols": {
+    "bytes": 222404,
+    "number": 23100
+  },
+  "values": {
+    "bytes": 8141856,
+    "number": 339244
   }
 }
 ```
 
 ### nixpkgs-mkshell
 
-`$ NIX_SHOW_STATS=1 nix-instantiate ./nixpkgs-mkshell.nix 2>&1`
+Command:
+
+```console
+NIX_SHOW_STATS=1 nix-instantiate ./nixpkgs-mkshell.nix 2>&1
 ```
+
+Output:
+
+```console
 warning: you did not specify '--add-root'; the result might be removed by the garbage collector
-/nix/store/d0is0v6f86dsj2sjrdl0bszq0w0fhpn8-nix-shell.drv
+/nix/store/53c78xjnkv3f7c87cwly5hgys1kbdjqv-nix-shell.drv
 {
-  "cpuTime": 0.271529,
+  "cpuTime": 0.11669100075960159,
   "envs": {
-    "number": 57978,
-    "elements": 78401,
-    "bytes": 1554856
+    "bytes": 2552672,
+    "elements": 126138,
+    "number": 96473
   },
-  "list": {
-    "elements": 33856,
-    "bytes": 270848,
-    "concats": 1192
-  },
-  "values": {
-    "number": 205224,
-    "bytes": 4925376
-  },
-  "symbols": {
-    "number": 29169,
-    "bytes": 641516
-  },
-  "sets": {
-    "number": 13313,
-    "bytes": 22291168,
-    "elements": 924361
-  },
-  "sizes": {
-    "Env": 16,
-    "Value": 24,
-    "Bindings": 8,
-    "Attr": 24
-  },
-  "nrOpUpdates": 3373,
-  "nrOpUpdateValuesCopied": 797699,
-  "nrThunks": 159998,
-  "nrAvoided": 86376,
-  "nrLookups": 19189,
-  "nrPrimOpCalls": 46043,
-  "nrFunctionCalls": 50785,
   "gc": {
     "heapSize": 402915328,
-    "totalBytes": 32125552
+    "totalBytes": 34785856te ../shell.nix 2>&1
+```
+  },
+  "list": {
+    "bytes": 457816,
+    "concats": 1927,
+    "elements": 57227
+  },
+  "nrAvoided": 148098,
+  "nrFunctionCalls": 85099,
+  "nrLookups": 35864,
+  "nrOpUpdateValuesCopied": 1078888,
+  "nrOpUpdates": 5237,
+  "nrPrimOpCalls": 79444,
+  "nrThunks": 230270,
+  "sets": {
+    "bytes": 20572560,
+    "elements": 1261476,
+    "number": 24309
+  },
+  "sizes": {
+    "Attr": 16,
+    "Bindings": 16,
+    "Env": 16,
+    "Value": 24
+  },
+  "symbols": {
+    "bytes": 218655,
+    "number": 22549
+  },
+  "values": {
+    "bytes": 6839184,
+    "number": 284966
   }
 }
 ```
