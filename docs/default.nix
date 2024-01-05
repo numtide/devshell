@@ -1,23 +1,25 @@
 { mdbook
 , modules-docs
 , stdenv
+, lib
 }:
-let
-  source = import ../nix/source.nix;
-in
+with lib;
 stdenv.mkDerivation {
   name = "devshell-docs";
   buildInputs = [ mdbook ];
-  src = source.filter {
-    path = ./.;
-    allow = [
-      ./book.toml
-      (source.matchExt "md")
-    ];
-  };
+  src =
+    let fs = lib.fileset; in
+    fs.toSource {
+      root = ./.;
+      fileset = fs.unions [
+        (fs.fileFilter (file: file.hasExt "md") ./src)
+        (fs.fileFilter (file: true) ./theme)
+        ./book.toml
+      ];
+    };
 
   buildPhase = ''
-    cp ${modules-docs.markdown} modules_schema.md
+    cp ${modules-docs.markdown} src/modules_schema.md
     mdbook build
   '';
 
