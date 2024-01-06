@@ -2,8 +2,16 @@ function forEach(elems, fun) {
   Array.prototype.forEach.call(elems, fun);
 }
 
+function getPagetoc(){
+  return document.getElementsByClassName("pagetoc")[0]
+}
+
 function getPagetocElems() {
-  return document.getElementsByClassName("pagetoc")[0].children;
+  return getPagetoc().children;
+}
+
+function getHeaders(){
+  return document.getElementsByClassName("header")
 }
 
 // Un-active everything when you click it
@@ -38,18 +46,21 @@ var updateFunction = function (elem = undefined) {
   }
 
   if (!id) {
-    var elements = document.getElementsByClassName("header");
-    let menuBottom = getRect(document.getElementById("menu-bar")).bottom;
-    let contentCenter = window.innerHeight / 2;
-    let margin = contentCenter / 3;
+    var elements = getHeaders();
+    let margin = window.innerHeight / 3;
 
     forEach(elements, function (el, i, arr) {
-      if (!id && getRect(el).bottom >= menuBottom) {
-        if (getRect(el).top >= contentCenter + margin) {
-          id = arr[Math.max(0, i - 1)];
-        } else {
+      if (!id && getRect(el).top >= 0) {
+        if (getRect(el).top < margin) {
           id = el;
+        } else {
+          id = arr[Math.max(0, i - 1)];
         }
+      }
+      // a very long last section
+      // its heading is over the screen
+      if (!id && i == arr.length - 1) {
+        id = el
       }
     });
   }
@@ -63,7 +74,7 @@ var updateFunction = function (elem = undefined) {
   forPagetocElem(function (el) {
     if (id.href.localeCompare(el.href) == 0) {
       el.classList.add("active");
-      let pagetoc = document.getElementsByClassName("pagetoc")[0];
+      let pagetoc = getPagetoc();
       if (overflowTop(pagetoc, el) > 0) {
         pagetoc.scrollTop = el.offsetTop;
       }
@@ -74,13 +85,13 @@ var updateFunction = function (elem = undefined) {
   });
 };
 
-var elements = document.getElementsByClassName("header");
+let elements = getHeaders();
 
 if (elements.length > 1) {
   // Populate sidebar on load
   window.addEventListener("load", function () {
-    var pagetoc = document.getElementsByClassName("pagetoc")[0];
-    var elements = document.getElementsByClassName("header");
+    var pagetoc = getPagetoc();
+    var elements = getHeaders();
     forEach(elements, function (el) {
       var link = document.createElement("a");
       link.appendChild(document.createTextNode(el.text));

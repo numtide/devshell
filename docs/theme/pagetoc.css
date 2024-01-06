@@ -1,18 +1,19 @@
-:root {    
-    /* change this value to adjust TOC width */
+:root {
     --toc-width: 310px;
-    
-    /* use this value to center both text and the TOC */
-    --content-shift: calc(-1 * var(--toc-width) / 2)
-    
-    /* --content-shift: 0 */
+    --center-content-toc-shift: calc(-1 * var(--toc-width) / 2);
+    --center-content-shift: 0;
 }
 
 .nav-chapters {
+    /* adjust width of buttons that bring to the previous or the next page */
     min-width: 50px;
 }
 
 .previous {
+    /*
+    adjust the space between the left sidebar or the left side of the screen 
+    and the button that leads to the previous page
+    */
     margin-left: var(--page-padding);
 }
 
@@ -25,7 +26,11 @@
 @media only screen and (min-width: 1440px) {
     main {
         position: relative;
-        left: var(--content-shift);
+        /* center the text */
+        /* left: var(--center-content-shift); */
+
+        /* or, center both the text and the TOC */
+        left: var(--center-content-toc-shift);
         display: flex;
     }
     .content-wrap {
@@ -39,6 +44,7 @@
     }
     .pagetoc {
         position: fixed;
+        /* adjust TOC width */
         width: var(--toc-width);
         height: calc(100vh - var(--menu-bar-height) - 0.67em * 4);
         overflow: auto;
