@@ -315,10 +315,12 @@ in
     };
 
     prj_root_fallback = mkOption {
-      type = let
-        envType = options.env.type.nestedTypes.elemType;
-        coerceFunc = value: { inherit value; };
-      in types.nullOr (types.coercedTo types.nonEmptyStr coerceFunc envType);
+      type =
+        let
+          envType = options.env.type.nestedTypes.elemType;
+          coerceFunc = value: { inherit value; };
+        in
+        types.nullOr (types.coercedTo types.nonEmptyStr coerceFunc envType);
       apply = x: if x == null then x else x // { name = "PRJ_ROOT"; };
       default = { eval = "$PWD"; };
       example = lib.literalExpression ''

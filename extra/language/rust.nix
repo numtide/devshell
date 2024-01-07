@@ -59,13 +59,15 @@ with lib;
         eval = "\"-L framework=$DEVSHELL_DIR/Library/Frameworks\"";
       }
       {
-        name="PATH"; 
-        prefix = let 
-          inherit (pkgs) xcbuild; 
-        in lib.makeBinPath [
-          xcbuild 
-          "${xcbuild}/Toolchains/XcodeDefault.xctoolchain"
-        ];
+        name = "PATH";
+        prefix =
+          let
+            inherit (pkgs) xcbuild;
+          in
+          lib.makeBinPath [
+            xcbuild
+            "${xcbuild}/Toolchains/XcodeDefault.xctoolchain"
+          ];
       }
     ]
     # fenix provides '.rust-src' in the 'complete' toolchain configuration
