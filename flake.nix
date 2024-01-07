@@ -2,7 +2,7 @@
   description = "devshell";
   # To update all inputs:
   # nix flake update --recreate-lock-file
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/efc960b6d6a6498c23868f4ba59fcb8bb51c9861";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = inputs: inputs.flake-utils.lib.eachDefaultSystem
