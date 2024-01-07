@@ -1,7 +1,6 @@
 :root {
-    --toc-width: 310px;
+    --toc-width: 270px;
     --center-content-toc-shift: calc(-1 * var(--toc-width) / 2);
-    --center-content-shift: 0;
 }
 
 .nav-chapters {
@@ -17,26 +16,42 @@
     margin-left: var(--page-padding);
 }
 
-@media only screen and (max-width: 1439px) {
-    .sidetoc {
-        display: none;
-    }
-}
-
-@media only screen and (min-width: 1440px) {
+@media only screen {
     main {
-        position: relative;
-        /* center the text */
-        /* left: var(--center-content-shift); */
-
-        /* or, center both the text and the TOC */
-        left: var(--center-content-toc-shift);
         display: flex;
     }
+
+    @media (max-width: 1179px) {
+        .sidebar-hidden .sidetoc {
+            display: none;
+        }
+    }
+
+    @media (max-width: 1439px) {
+        .sidebar-visible .sidetoc {
+            display: none;
+        }
+    }
+
+    @media (1180px <= width <= 1439px) {
+        .sidebar-hidden main {
+            position: relative;
+            left: var(--center-content-toc-shift);
+        }
+    }
+
+    @media (1440px <= width <= 1700px) {
+        .sidebar-visible main {
+            position: relative;
+            left: var(--center-content-toc-shift);
+        }
+    }
+
     .content-wrap {
         overflow-y: auto;
         width: 100%;
     }
+
     .sidetoc {
         margin-top: 20px;
         margin-left: 10px;
