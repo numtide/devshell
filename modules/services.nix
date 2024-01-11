@@ -58,7 +58,7 @@ let
             exit 1
           fi
           mkdir -p "$PRJ_DATA_DIR/pids/"
-          ${pkgs.honcho}/bin/honcho start -f ${procfile} -d $PRJ_ROOT &
+          ${pkgs.honcho}/bin/honcho start -f ${procfile} -d "$PRJ_ROOT" &
           pid=$!
           echo $pid > "$PRJ_DATA_DIR/pids/${gName}.pid"
           on_stop() {
