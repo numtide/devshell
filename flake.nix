@@ -40,6 +40,12 @@
 
         devShells.default = devshell.fromTOML ./devshell.toml;
 
+        legacyPackages = import inputs.self {
+          inherit system;
+          inputs = null;
+          nixpkgs = pkgs;
+        };
+
         apps.default = devShells.default.flakeApp;
 
         checks =
