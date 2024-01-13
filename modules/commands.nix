@@ -1,28 +1,40 @@
 { lib, config, pkgs, ... }:
 let
-  inherit (import ../nix/commands/devshell.nix { inherit pkgs; }) commandsToMenu commandToPackage devshellMenuCommandName;
-  inherit (import ../nix/commands/types.nix { inherit pkgs; }) commandsFlatType;
+  inherit (import ../nix/commands/lib.nix { inherit pkgs; })
+    commandsType
+    commandToPackage
+    devshellMenuCommandName
+    commandsToMenu
+    ;
 in
 {
   options.commands = lib.mkOption {
-    type = commandsFlatType;
+    type = commandsType;
     default = [ ];
     description = ''
       Add commands to the environment.
     '';
     example = lib.literalExpression ''
-      [
-        {
-          help = "print hello";
-          name = "hello";
-          command = "echo hello";
-        }
-
-        {
-          package = "nixpkgs-fmt";
-          category = "formatter";
-        }
-      ]
+      {
+        packages = [
+          "diffutils"
+          "goreleaser"
+        ];
+        scripts = [
+          {
+            prefix = "nix run .#";
+            inherit packages;
+          }
+          {
+            name = "nix fmt";
+            help = "format Nix files";
+          }
+        ];
+        utilites = [
+          [ "GitHub utility" "gitAndTools.hub" ]
+          [ "golang linter" "golangci-lint" ]
+        ];
+      }
     '';
   };
 
@@ -40,6 +52,10 @@ in
 
   # Add the commands to the devshell packages. Either as wrapper scripts, or
   # the whole package.
-  config.devshell.packages = map commandToPackage config.commands;
+  config.devshell.packages =
+    lib.filter
+      (x: x != null)
+      (map commandToPackage config.commands);
+
   # config.devshell.motd = "$(motd)";
 }

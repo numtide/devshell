@@ -47,6 +47,8 @@ let
     in
     map (p: repack (unpack p));
 
+  mkUrl = root: path: "${root.url}/tree/${root.branch}/${path}";
+
   # Transforms a module path into a (path, url) tuple where path is relative
   # to the repo root, and URL points to an online view of the module.
   mkDeclaration =
@@ -69,7 +71,7 @@ let
     else
       rec {
         path = removePrefix root.prefix decl;
-        url = "${root.url}/tree/${root.branch}/${path}";
+        url = mkUrl root path;
       };
 
   # Sort modules and put "enable" and "package" declarations first.
@@ -80,7 +82,7 @@ let
       compareWithPrio = pred: cmp: splitByAndCompare pred compare cmp;
       moduleCmp = compareWithPrio isEnable (compareWithPrio isPackage compare);
     in
-    compareLists moduleCmp a.loc b.loc < 0;
+    compareLists moduleCmp (map toString a.loc) (map toString b.loc) < 0;
 
   # Replace functions by the string <function>
   substFunction = x:
@@ -114,11 +116,22 @@ let
       )
   );
 
+  inherit (import ../nix/commands/lib.nix { inherit pkgs; }) mkLocSuffix nestedOptionsType flatOptionsType;
+
   # TODO: display values like TOML instead.
   toMarkdown = optionsDocs:
     let
-      optionsDocsPartitioned = partition (opt: head opt.loc != "_module") optionsDocs;
-
+      optionsDocsPartitionedIsMain = partition (opt: head opt.loc != "_module") optionsDocs;
+      nixOnlyLocPrefix = [ "commands" "<name>" ];
+      optionsDocsPartitionedIsNixOnly = partition (opt: (take 2 opt.loc) == nixOnlyLocPrefix) optionsDocsPartitionedIsMain.right;
+      nixOnly = optionsDocsPartitionedIsNixOnly.right;
+      nixOnlyPartitionedIsTop = partition (opt: opt.loc == nixOnlyLocPrefix ++ [ "*" ]) nixOnly;
+      nixOnlyPartitionedHasSuffix = partition (opt: ("${last opt.loc}" == "${mkLocSuffix nestedOptionsType.name}")) nixOnlyPartitionedIsTop.wrong;
+      nixOnlyOrdered = nixOnlyPartitionedIsTop.right ++ nixOnlyPartitionedHasSuffix.right ++ nixOnlyPartitionedHasSuffix.wrong;
+      nixAndTOMLOrdered = optionsDocsPartitionedIsNixOnly.wrong;
+      nixExtra = optionsDocsPartitionedIsMain.wrong;
+      concatOpts = opts: (concatStringsSep "\n\n" (map optToMd opts));
+      
       # TODO: handle opt.relatedPackages. What is it for?
       optToMd = opt:
         let heading = lib.showOption (filter isString opt.loc) + concatStrings (filter (x: !(isString x)) opt.loc); in
@@ -165,13 +178,30 @@ let
               opt.declarations
             )
         )
-        + "\n"
       ;
       doc = [
-        "## Options\n"
-        (concatStringsSep "\n" (map optToMd optionsDocsPartitioned.right))
-        "## Extra options\n"
-        (concatStringsSep "\n" (map optToMd optionsDocsPartitioned.wrong))
+        "# Options\n"
+        "## Available only in `Nix`\n"
+        (
+          let
+            root = head cfg.roots;
+            pathExamples = "nix/commands/examples.nix";
+            pathExamplesReal = ../${pathExamples};
+            pathCommandsLib = "tests/extra/commands.lib.nix";
+            pathCommandsLibReal = ../${pathCommandsLib};
+            mkLink = path: "[link](${mkUrl root path})";
+          in
+          assert lib.assertMsg (lib.pathExists pathExamplesReal) "Path `${pathExamplesReal} doesn't exist.`";
+          assert lib.assertMsg (lib.pathExists pathCommandsLibReal) "Path `${pathCommandsLibReal} doesn't exist.`";
+          ''
+            See how `commands.<name>` (${mkLink pathExamples}) maps to `commands.*` (${mkLink pathCommandsLib}).
+          ''
+        )
+        (concatOpts nixOnlyOrdered)
+        "## Available in `Nix` and `TOML`\n"
+        (concatOpts nixAndTOMLOrdered)
+        "## Extra options available only in `Nix`\n"
+        (concatOpts nixExtra)
       ];
     in
     concatStringsSep "\n" doc;
