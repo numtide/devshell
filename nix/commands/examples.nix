@@ -7,11 +7,7 @@ let inherit (pkgs) lib; in
     "category 1" = [
       {
         prefix = "nix run .#";
-        prefixes = {
-          a.b = {
-            d = "nix run ../#";
-          };
-        };
+        prefixes.a.b.yq-1 = "nix run ../#";
         packages = {
           a.b = {
             jq-1 = [ "[package] jq description" pkgs.jq ];
