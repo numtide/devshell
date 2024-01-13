@@ -61,7 +61,7 @@ Add commands to the environment.
 ```
 
 
-**Type**: list of (submodule)
+**Type**: list of ((package or string convertible to it) or (list with two elements of types: [ string (package or string convertible to it) ]) or (flatOptions))
 
 **Example value**:
 ```nix
@@ -72,7 +72,23 @@ Add commands to the environment.
 Declared in:
 * [modules/commands.nix](https://github.com/numtide/devshell/tree/main/modules/commands.nix)
 
-## `commands.*.package`
+## `commands.*`
+
+A config for a command when the `commands` option is a list.
+
+
+**Type**: (package or string convertible to it) or (list with two elements of types: [ string (package or string convertible to it) ]) or (flatOptions)
+
+**Example value**:
+```nix
+{"_type":"literalExpression","text":"[\n  {\n    category = \"scripts\";\n    package = \"black\";\n  }\n  [ \"[package] print hello\" \"hello\" ]\n  \"nodePackages.yarn\"\n]\n"}
+```
+
+
+Declared in:
+* [nix/commands/types.nix](https://github.com/numtide/devshell/tree/main/nix/commands/types.nix)
+
+## `commands.*.package (flatOptions)`
 
 Used to bring in a specific package. This package will be added to the
 environment.
@@ -84,15 +100,15 @@ environment.
 ```
 
 
-**Type**: null or (package or string convertible to it)
+**Type**: null or (package or string convertible to it) or package
 
 Declared in:
-* [modules/commands.nix](https://github.com/numtide/devshell/tree/main/modules/commands.nix)
+* [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
 
-## `commands.*.category`
+## `commands.*.category (flatOptions)`
 
-Set a free text category under which this command is grouped
-and shown in the help menu.
+Sets a free text category under which this command is grouped
+and shown in the devshell menu.
 
 
 **Default value**:
@@ -104,9 +120,9 @@ and shown in the help menu.
 **Type**: string
 
 Declared in:
-* [modules/commands.nix](https://github.com/numtide/devshell/tree/main/modules/commands.nix)
+* [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
 
-## `commands.*.command`
+## `commands.*.command (flatOptions)`
 
 If defined, it will add a script with the name of the command, and the
 content of this value.
@@ -130,9 +146,29 @@ provided.
 
 
 Declared in:
-* [modules/commands.nix](https://github.com/numtide/devshell/tree/main/modules/commands.nix)
+* [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
 
-## `commands.*.help`
+## `commands.*.expose (flatOptions)`
+
+When `true`, the `(flatOptions) command` 
+or the `(flatOptions) package` will be added to the environment.
+  
+Otherwise, they will not be added to the environment, but will be printed
+in the devshell menu.
+
+
+**Default value**:
+```nix
+{"_type":"literalExpression","text":"true"}
+```
+
+
+**Type**: boolean
+
+Declared in:
+* [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
+## `commands.*.help (flatOptions)`
 
 Describes what the command does in one line of text.
 
@@ -146,11 +182,15 @@ Describes what the command does in one line of text.
 **Type**: null or string
 
 Declared in:
-* [modules/commands.nix](https://github.com/numtide/devshell/tree/main/modules/commands.nix)
+* [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
 
-## `commands.*.name`
+## `commands.*.name (flatOptions)`
 
-Name of this command. Defaults to attribute name in commands.
+Name of this command. 
+
+Defaults to a `package (flatOptions)` name or pname if present.
+
+The value of this option is required for a `command (flatOptions)`.
 
 
 **Default value**:
@@ -162,7 +202,23 @@ Name of this command. Defaults to attribute name in commands.
 **Type**: null or string
 
 Declared in:
-* [modules/commands.nix](https://github.com/numtide/devshell/tree/main/modules/commands.nix)
+* [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
+## `commands.*.prefix (flatOptions)`
+
+Prefix of the command name in the devshell menu.
+
+
+**Default value**:
+```nix
+{"_type":"literalExpression","text":"\"\""}
+```
+
+
+**Type**: string
+
+Declared in:
+* [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
 
 ## `devshell.packages`
 
