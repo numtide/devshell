@@ -347,6 +347,21 @@ in
         options list (except that the 'name' field is ignored).
       '';
     };
+
+    menu = mkOption {
+      type = types.submodule {
+        options.interpolate = mkEnableOption "interpolation in the devshell menu";
+      };
+      default = { };
+      description = ''
+        Controls devshell menu
+      '';
+      example = literalExpression ''
+        {
+          interpolate = true;
+        }
+      '';
+    };
   };
 
   config.devshell = {
