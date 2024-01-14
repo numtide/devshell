@@ -117,60 +117,64 @@ let
   # TODO: display values like TOML instead.
   toMarkdown = optionsDocs:
     let
+      optionsDocsPartitioned = partition (opt: head opt.loc != "_module") optionsDocs;
+
       # TODO: handle opt.relatedPackages. What is it for?
       optToMd = opt:
+        let heading = lib.showOption opt.loc; in
         ''
-          ## `${opt.name}`
+          ### `${heading}`
 
         ''
         + (lib.optionalString opt.internal "\n**internal**\n")
-        + opt.description + "\n"
-        + (lib.optionalString (opt ? default && opt.default != null) ''
-
-          **Default value**:
-          ```nix
-          ${
-            # When defaultText is set on the module, we only get back a
-            # string here and defaultText has disappeared. Re-hydrate that
-            # knowledge by looking at the type.
-            if builtins.isString opt.default && !(lib.hasPrefix "string" opt.type) then
-              # If it's a defaultText, assume it's already formatted as nix
-              # code.
-              opt.default
-            else
-              builtins.toJSON opt.default
-          }
-          ```
-
-        '')
+        + opt.description
         + ''
 
-          **Type**: ${opt.type}
+          **Type**:
+          
+          ```console
+          ${opt.type}
+          ```
         ''
+        + (lib.optionalString (opt ? default && opt.default != null) ''
+          
+          **Default value**:
+          
+          ```nix
+          ${removeSuffix "\n" opt.default.text}
+          ```
+        '')
         + (lib.optionalString (opt ? example) ''
 
           **Example value**:
+          
           ```nix
-          ${builtins.toJSON opt.example}
+          ${removeSuffix "\n" opt.example.text}
           ```
-
         '')
         + ''
 
-          Declared in:
+          **Declared in**:
+
         ''
         + (
           lib.concatStringsSep
             "\n"
             (map
-              (decl: "* [${decl.path}](${decl.url})")
+              (decl: "- [${decl.path}](${decl.url})")
               opt.declarations
             )
         )
         + "\n"
       ;
+      doc = [
+        "## Options\n"
+        (concatStringsSep "\n" (map optToMd optionsDocsPartitioned.right))
+        "## Extra options\n"
+        (concatStringsSep "\n" (map optToMd optionsDocsPartitioned.wrong))
+      ];
     in
-    concatStringsSep "\n" (map optToMd optionsDocs);
+    concatStringsSep "\n" doc;
 in
 {
   options.modules-docs = {

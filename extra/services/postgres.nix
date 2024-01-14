@@ -63,7 +63,7 @@ in
       default = [ "--no-locale" ];
       example = [ "--data-checksums" "--allow-group-access" ];
       description = ''
-        Additional arguments passed to <literal>initdb</literal> during data dir
+        Additional arguments passed to `initdb` during data dir
         initialisation.
       '';
     };

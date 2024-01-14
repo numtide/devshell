@@ -1,5 +1,5 @@
 :root {
-    --toc-width: 270px;
+    --toc-width: 310px;
     --center-content-toc-shift: calc(-1 * var(--toc-width) / 2);
 }
 
@@ -21,26 +21,26 @@
         display: flex;
     }
 
-    @media (max-width: 1179px) {
+    @media (max-width: 1219px) {
         .sidebar-hidden .sidetoc {
             display: none;
         }
     }
 
-    @media (max-width: 1439px) {
+    @media (max-width: 1499px) {
         .sidebar-visible .sidetoc {
             display: none;
         }
     }
 
-    @media (1180px <= width <= 1439px) {
+    @media (1220px <= width <= 1519px) {
         .sidebar-hidden main {
             position: relative;
             left: var(--center-content-toc-shift);
         }
     }
 
-    @media (1440px <= width <= 1700px) {
+    @media (1500px <= width <= 1820px) {
         .sidebar-visible main {
             position: relative;
             left: var(--center-content-toc-shift);
