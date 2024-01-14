@@ -121,7 +121,7 @@ let
 
       # TODO: handle opt.relatedPackages. What is it for?
       optToMd = opt:
-        let heading = lib.showOption opt.loc; in
+        let heading = lib.showOption (filter isString opt.loc) + concatStrings (filter (x: !(isString x)) opt.loc); in
         ''
           ### `${heading}`
 
