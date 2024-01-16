@@ -1,4 +1,511 @@
-## Options
+# Options
+
+## Available only in `Nix`
+
+See how `commands.<name>` ([link](https://github.com/numtide/devshell/tree/main/nix/commands/examples.nix)) maps to `commands.*` ([link](https://github.com/numtide/devshell/tree/main/tests/extra/commands.lib.nix)).
+
+### `commands.<name>.*`
+
+A config for command(s) when the `commands` option is an attrset.
+
+**Type**:
+
+```console
+(package or string convertible to it) or (list with two elements of types: [ string (package or string convertible to it) ]) or (nestedOptions) or (flatOptions)
+```
+
+**Example value**:
+
+```nix
+{
+  category = [
+    {
+      packages.grep = pkgs.gnugrep;
+    }
+    pkgs.python3
+    [ "[package] vercel description" "nodePackages.vercel" ]
+    "nodePackages.yarn"
+  ];
+}
+```
+
+**Declared in**:
+
+- [nix/commands/types.nix](https://github.com/numtide/devshell/tree/main/nix/commands/types.nix)
+
+### `commands.<name>.*.packages (nestedOptions)`
+
+A leaf value:
+
+1. When a `string` with a value `<string>`,
+   devshell tries to resolve a derivation
+   `pkgs.<string>` and use it as `package (flatOptions)`.
+
+2. When a `derivation`, it's used as `package (flatOptions)`.
+
+3. When a list with two elements:
+   1. The first element is a `string`
+      that is used to select `help (flatOptions)`.
+      
+      Priority of this `string` (if present) when selecting `help (flatOptions)`: `4`.
+
+      Lowest priority: `1`.
+   2. The second element is interpreted as if
+      the leaf value were initially a `string` or a `derivation`.
+
+A path to a leaf value is concatenated via `.`
+and used as `name (flatOptions)`.
+
+Priority of `package.meta.description` (if present in the resolved `package (flatOptions)`) 
+when selecting `help (flatOptions)`: `2`
+
+Lowest priority: `1`.
+
+A user may prefer to not bring to the environment some of the packages.
+
+Priority of `expose = false` when selecting `expose (flatOptions)`: `1`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+(nested (max depth is 100) attribute set of ((package or string convertible to it) or (list with two elements of types: [ string (package or string convertible to it) ])))
+```
+
+**Default value**:
+
+```nix
+{ }
+```
+
+**Example value**:
+
+```nix
+{
+  packages.a.b = pkgs.jq;
+}
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.commands (nestedOptions)`
+
+A leaf value:
+
+1. When a `string`, it's used as `command (flatOptions)`.
+
+2. When a list with two elements:
+   1. The first element of type `string` with a value `<string>`
+      is used to select `help (flatOptions)`.
+
+      Priority of the `<string>` (if present) when selecting `help (flatOptions)`: `4`
+
+      Lowest priority: `1`.
+   1. The second element of type `string` is used as `command (flatOptions)`.
+
+A path to the leaf value is concatenated via `.`
+and used as `name (flatOptions)`.
+
+**Type**:
+
+```console
+(nested (max depth is 100) attribute set of (string or (list with two elements of types: [ string string ])))
+```
+
+**Default value**:
+
+```nix
+{ }
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.expose (nestedOptions)`
+
+Can be used as `expose (flatOptions)` for all
+`packages (nestedOptions)` and `commands (nestedOptions)`.
+
+Priority of this option when selecting `expose (flatOptions)`: `2`.
+
+When selecting `expose (flatOptions)` for
+- `package (flatOptions)`, priority of `false`: `1`.
+- `command (flatOptions)`, priority of `true`: `1`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+null or boolean
+```
+
+**Default value**:
+
+```nix
+null
+```
+
+**Example value**:
+
+```nix
+{
+  expose = true;
+}
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.exposes (nestedOptions)`
+
+A leaf value can be used as `expose (flatOptions)`
+for `package (flatOptions)` or `command (flatOptions)`
+with a matching path in `packages (nestedOptions)` or `commands (nestedOptions)`.
+
+Priority of this option when selecting `expose (flatOptions)`: `3`.
+
+When selecting `expose (flatOptions)` for
+- `package (flatOptions)`, priority of `false`: `1`.
+- `command (flatOptions)`, priority of `true`: `1`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+(nested (max depth is 100) attribute set of boolean)
+```
+
+**Default value**:
+
+```nix
+{ }
+```
+
+**Example value**:
+
+```nix
+{
+  packages.a.b = pkgs.jq;
+  exposes.a.b = true;
+}
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.help (nestedOptions)`
+
+Can be used as `hel (flatOptions)` for all
+`packages (nestedOptions)` and `commands (nestedOptions)`.
+
+Priority of this option when selecting a `help (flatOptions)`: `1`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+string
+```
+
+**Default value**:
+
+```nix
+""
+```
+
+**Example value**:
+
+```nix
+{
+  help = "default help";
+}
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.helps (nestedOptions)`
+
+A leaf value can be used as `help (flatOptions)`
+for `package (flatOptions)` or `command (flatOptions)`
+with a matching path in `packages (nestedOptions)` or `commands (nestedOptions)`.
+
+Priority of this option when selecting `help (flatOptions)`: `3`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+(nested (max depth is 100) attribute set of string)
+```
+
+**Default value**:
+
+```nix
+{ }
+```
+
+**Example value**:
+
+```nix
+{
+  packages.a.b = pkgs.jq;
+  helps.a.b = "run jq";
+}
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.prefix (nestedOptions)`
+
+Can be used as `prefix (flatOptions)` for all
+`packages (nestedOptions)` and `commands (nestedOptions)`.
+
+Priority of this option when selecting a `prefix (flatOptions)`: `1`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+string
+```
+
+**Default value**:
+
+```nix
+""
+```
+
+**Example value**:
+
+```nix
+{
+  prefix = "nix run .#";
+}
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.prefixes (nestedOptions)`
+
+A leaf value becomes `prefix (flatOptions)`
+of `package (flatOptions)` or `command (flatOptions)`
+with a matching path in `packages (nestedOptions)` or `commands (nestedOptions)`.
+
+Priority of this option when selecting a `prefix (flatOptions)`: `2`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+(nested (max depth is 100) attribute set of string)
+```
+
+**Default value**:
+
+```nix
+{ }
+```
+
+**Example value**:
+
+```nix
+{
+  packages.a.b = pkgs.jq;
+  prefixes.a.b = "nix run ../#";
+}
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.package (flatOptions)`
+
+Used to bring in a specific package. This package will be added to the
+environment.
+
+**Type**:
+
+```console
+null or (package or string convertible to it) or package
+```
+
+**Default value**:
+
+```nix
+null
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
+### `commands.<name>.*.category (flatOptions)`
+
+Sets a free text category under which this command is grouped
+and shown in the devshell menu.
+
+**Type**:
+
+```console
+string
+```
+
+**Default value**:
+
+```nix
+"[general commands]"
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
+### `commands.<name>.*.command (flatOptions)`
+
+If defined, it will add a script with the name of the command, and the
+content of this value.
+
+By default it generates a bash script, unless a different shebang is
+provided.
+
+**Type**:
+
+```console
+null or string
+```
+
+**Default value**:
+
+```nix
+null
+```
+
+**Example value**:
+
+```nix
+''
+  #!/usr/bin/env python
+  print("Hello")
+''
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
+### `commands.<name>.*.expose (flatOptions)`
+
+When `true`, `command (flatOptions)`
+or `package (flatOptions)` will be added to the environment.
+  
+Otherwise, they will not be added to the environment, but will be printed
+in the devshell menu.
+
+**Type**:
+
+```console
+boolean
+```
+
+**Default value**:
+
+```nix
+true
+```
+
+**Example value**:
+
+```nix
+true
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
+### `commands.<name>.*.help (flatOptions)`
+
+Describes what the command does in one line of text.
+
+**Type**:
+
+```console
+null or string
+```
+
+**Default value**:
+
+```nix
+null
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
+### `commands.<name>.*.name (flatOptions)`
+
+Name of the command.
+
+Defaults to a `package (flatOptions)` name or pname if present.
+
+The value of this option is required for `command (flatOptions)`.
+
+**Type**:
+
+```console
+null or string
+```
+
+**Default value**:
+
+```nix
+null
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
+### `commands.<name>.*.prefix (flatOptions)`
+
+Prefix of the command name in the devshell menu.
+
+**Type**:
+
+```console
+string
+```
+
+**Default value**:
+
+```nix
+""
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+## Available in `Nix` and `TOML`
 
 ### `commands`
 
@@ -7,7 +514,7 @@ Add commands to the environment.
 **Type**:
 
 ```console
-list of ((package or string convertible to it) or (list with two elements of types: [ string (package or string convertible to it) ]) or (flatOptions))
+(list of ((package or string convertible to it) or (list with two elements of types: [ string (package or string convertible to it) ]) or (flatOptions))) or (attribute set of list of ((package or string convertible to it) or (list with two elements of types: [ string (package or string convertible to it) ]) or (nestedOptions) or (flatOptions)))
 ```
 
 **Default value**:
@@ -19,18 +526,26 @@ list of ((package or string convertible to it) or (list with two elements of typ
 **Example value**:
 
 ```nix
-[
-  {
-    help = "print hello";
-    name = "hello";
-    command = "echo hello";
-  }
-
-  {
-    package = "nixpkgs-fmt";
-    category = "formatter";
-  }
-]
+{
+  packages = [
+    "diffutils"
+    "goreleaser"
+  ];
+  scripts = [
+    {
+      prefix = "nix run .#";
+      inherit packages;
+    }
+    {
+      name = "nix fmt";
+      help = "format Nix files";
+    }
+  ];
+  utilites = [
+    [ "GitHub utility" "gitAndTools.hub" ]
+    [ "golang linter" "golangci-lint" ]
+  ];
+}
 ```
 
 **Declared in**:
@@ -141,8 +656,8 @@ null
 
 ### `commands.*.expose (flatOptions)`
 
-When `true`, the `command (flatOptions)`
-or the `package (flatOptions)` will be added to the environment.
+When `true`, `command (flatOptions)`
+or `package (flatOptions)` will be added to the environment.
   
 Otherwise, they will not be added to the environment, but will be printed
 in the devshell menu.
@@ -154,6 +669,12 @@ boolean
 ```
 
 **Default value**:
+
+```nix
+true
+```
+
+**Example value**:
 
 ```nix
 true
@@ -185,11 +706,11 @@ null
 
 ### `commands.*.name (flatOptions)`
 
-Name of this command. 
+Name of the command.
 
 Defaults to a `package (flatOptions)` name or pname if present.
 
-The value of this option is required for a `command (flatOptions)`.
+The value of this option is required for `command (flatOptions)`.
 
 **Type**:
 
@@ -1489,8 +2010,7 @@ true
 **Declared in**:
 
 - [extra/services/postgres.nix](https://github.com/numtide/devshell/tree/main/extra/services/postgres.nix)
-
-## Extra options
+## Extra options available only in `Nix`
 
 ### `_module.args`
 
