@@ -3,4 +3,4 @@
 }:
 (import ./types.nix { inherit pkgs; }) //
 (import ./devshell.nix { inherit pkgs; }) //
-(import ./typesCommands.nix { inherit pkgs; })
+(import ./commandsType.nix { inherit pkgs; })
