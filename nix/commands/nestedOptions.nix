@@ -14,7 +14,7 @@ let
 in
 {
   prefix = mkOption {
-    type = types.nullOr types.str;
+    type = types.str;
     default = "";
     description = ''
       Can be used as ${flat "prefix"} for all
@@ -32,7 +32,7 @@ in
   };
 
   prefixes = mkOption {
-    type = types.nullOr (attrsNestedOf types.str);
+    type = attrsNestedOf types.str;
     default = { };
     description = ''
       A leaf value becomes ${flat "prefix"}
@@ -53,11 +53,12 @@ in
 
   packages = mkOption {
     type =
-      types.nullOr (
-        attrsNestedOf (types.oneOf [
+      attrsNestedOf (
+        types.oneOf [
           strOrPackage
           pairHelpPackageType
-        ]));
+        ]
+      );
     default = { };
     description = ''
       A leaf value:
@@ -101,11 +102,12 @@ in
 
   commands = mkOption {
     type =
-      types.nullOr (
-        attrsNestedOf (types.oneOf [
+      attrsNestedOf (
+        types.oneOf [
           types.str
           pairHelpCommandType
-        ]));
+        ]
+      );
     default = { };
     description = ''        
       A leaf value:
@@ -127,7 +129,7 @@ in
   };
 
   help = mkOption {
-    type = types.nullOr types.str;
+    type = types.str;
     default = "";
     description = ''
       Can be used as ${flat "hel"} for all
@@ -145,7 +147,7 @@ in
   };
 
   helps = mkOption {
-    type = types.nullOr (attrsNestedOf types.str);
+    type = attrsNestedOf types.str;
     default = { };
     description = ''
       A leaf value can be used as ${flat "help"}
@@ -187,7 +189,7 @@ in
   };
 
   exposes = mkOption {
-    type = types.nullOr (attrsNestedOf types.bool);
+    type = attrsNestedOf types.bool;
     default = { };
     description = ''
       A leaf value can be used as ${flat "expose"}
