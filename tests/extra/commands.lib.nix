@@ -62,7 +62,7 @@ let inherit (pkgs) lib; in
         {
           category = "category 1";
           command = "${lib.getExe pkgs.gawk} $@";
-          expose = false;
+          expose = true;
           help = "[command] run awk";
           name = "a.b.awk";
           package = null;
@@ -71,7 +71,7 @@ let inherit (pkgs) lib; in
         {
           category = "category 1";
           command = "${lib.getExe pkgs.jq} $@";
-          expose = false;
+          expose = true;
           help = "[command] run jq";
           name = "a.b.jq-2";
           package = null;
@@ -80,7 +80,7 @@ let inherit (pkgs) lib; in
         {
           category = "category 1";
           command = ''printf "hello\n"'';
-          expose = false;
+          expose = true;
           help = ''[command] print "hello"'';
           name = "command with spaces";
           package = null;

@@ -166,7 +166,7 @@ in
 
   expose = mkOption {
     type = types.nullOr types.bool;
-    default = false;
+    default = null;
     description = ''
       Can be used as ${flat "expose"} for all
       ${nested "packages"} and ${nested "commands"}.

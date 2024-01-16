@@ -106,9 +106,15 @@ rec {
                               )
                               helps;
 
-                        prefix = attrByPath path (config.prefix or "") prefixes;
+                        prefix = attrByPath path config.prefix prefixes;
 
-                        expose = attrByPath path (config.expose or (!forPackages)) exposes;
+                        expose = attrByPath path
+                          (
+                            if config.expose != null
+                            then config.expose
+                            else (!forPackages)
+                          )
+                          exposes;
                       in
                       {
                         "${if forPackages then "package" else "command"}" = value;
