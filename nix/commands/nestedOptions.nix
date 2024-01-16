@@ -8,14 +8,19 @@
 , maxDepth
 }:
 with pkgs.lib;
+let
+  flat = name: "`${name} (${flatOptionsType.name})`";
+  nested = name: "`${name} (${nestedOptionsType.name})`";
+in
 {
   prefix = mkOption {
     type = types.nullOr types.str;
     default = "";
     description = ''
-      Possible `(${flatOptionsType.name}) prefix`.
+      Can be used as ${flat "prefix"} for all
+      ${nested "packages"} and ${nested "commands"}.
       
-      Priority of this option when selecting a prefix: `1`.
+      Priority of this option when selecting a ${flat "prefix"}: `1`.
       
       Lowest priority: `1`.
     '';
@@ -30,10 +35,11 @@ with pkgs.lib;
     type = types.nullOr (attrsNestedOf types.str);
     default = { };
     description = ''
-      A leaf value becomes a `(${flatOptionsType.name}) prefix`
-      of a `package` (`command`) with a matching path in `packages` (`commands`).
+      A leaf value becomes ${flat "prefix"}
+      of ${flat "package"} or ${flat "command"}
+      with a matching path in ${nested "packages"} or ${nested "commands"}.
 
-      Priority of this option when selecting a prefix: `2`.
+      Priority of this option when selecting a ${flat "prefix"}: `2`.
       
       Lowest priority: `1`.
     '';
@@ -54,38 +60,35 @@ with pkgs.lib;
         ]));
     default = { };
     description = ''
-      A nested (max depth is ${toString maxDepth}) attrset of `(${flatOptionsType.name}) package`-s
-      to describe in the devshell menu
-      and optionally bring to the environment.
+      A leaf value:
 
-      A path to a leaf value is concatenated via `.`
-      and used as a `(${flatOptionsType.name}) name`.
-
-      A leaf value can be of three types.
-        
       1. When a `string` with a value `<string>`,
          devshell tries to resolve a derivation
-         `pkgs.<string>` and use it as a `(${flatOptionsType.name}) package`.
+         `pkgs.<string>` and use it as ${flat "package"}.
 
-      2. When a `derivation`, it's used as a `(${flatOptionsType.name}) package`.
+      2. When a `derivation`, it's used as ${flat "package"}.
 
       3. When a list with two elements:
          1. The first element is a `string`
-            that is used to select a `(${flatOptionsType.name}) help`.
-            - Priority of this `string` (if present) when selecting a `(${flatOptionsType.name}) help`: `4`.
+            that is used to select ${flat "help"}.
+            
+            Priority of this `string` (if present) when selecting ${flat "help"}: `4`.
 
-              Lowest priority: `1`.
+            Lowest priority: `1`.
          2. The second element is interpreted as if
             the leaf value were initially a `string` or a `derivation`.
-        
-      Priority of `package.meta.description` (if present in the resolved `(${flatOptionsType.name}) package`) 
-      when selecting a `(${flatOptionsType.name}) help`: 2
+      
+      A path to a leaf value is concatenated via `.`
+      and used as ${flat "name"}.
+
+      Priority of `package.meta.description` (if present in the resolved ${flat "package"}) 
+      when selecting ${flat "help"}: `2`
       
       Lowest priority: `1`.
 
-      A user may prefer not to bring the environment some of the packages.
+      A user may prefer to not bring to the environment some of the packages.
       
-      Priority of `expose = false` when selecting a `(${flatOptionsType.name}) expose`: `1`.
+      Priority of `expose = false` when selecting ${flat "expose"}: `1`.
       
       Lowest priority: `1`.
     '';
@@ -104,26 +107,22 @@ with pkgs.lib;
           pairHelpCommandType
         ]));
     default = { };
-    description = ''
-      A nested (max depth is ${toString maxDepth}) attrset of `(${flatOptionsType.name}) command`-s
-      to describe in the devshell menu
-      and bring to the environment.
+    description = ''        
+      A leaf value:
 
-      A path to a leaf value is concatenated via `.`
-      and used in the `(${flatOptionsType.name}) name`.
-
-      A leaf value can be of two types.
-        
-      1. When a `string`, it's used as a `(${flatOptionsType.name}) command`.
+      1. When a `string`, it's used as ${flat "command"}.
 
       2. When a list with two elements:
-         1. the first element of type `string` with a value `<string>`
-            that is used to select a `help`;
+         1. The first element of type `string` with a value `<string>`
+            is used to select ${flat "help"}.
 
-            Priority of the `<string>` (if present) when selecting a `(${flatOptionsType.name}) help`: `4`
+            Priority of the `<string>` (if present) when selecting ${flat "help"}: `4`
 
             Lowest priority: `1`.
-         1. the second element of type `string` is used as a `(${flatOptionsType.name}) command`.
+         1. The second element of type `string` is used as ${flat "command"}.
+
+      A path to the leaf value is concatenated via `.`
+      and used as ${flat "name"}.
     '';
   };
 
@@ -131,7 +130,10 @@ with pkgs.lib;
     type = types.nullOr types.str;
     default = "";
     description = ''
-      Priority of this option when selecting a `(${flatOptionsType.name}) help`: `1`.
+      Can be used as ${flat "hel"} for all
+      ${nested "packages"} and ${nested "commands"}.
+
+      Priority of this option when selecting a ${flat "help"}: `1`.
       
       Lowest priority: `1`.
     '';
@@ -146,11 +148,11 @@ with pkgs.lib;
     type = types.nullOr (attrsNestedOf types.str);
     default = { };
     description = ''
-      A leaf value can be used as `(${flatOptionsType.name}) help`
-      for a `(${flatOptionsType.name}) package` (`(${flatOptionsType.name}) command`) 
-      with a matching path in `(${nestedOptionsType.name}) packages` (`(${nestedOptionsType.name}) commands`).
+      A leaf value can be used as ${flat "help"}
+      for ${flat "package"} or ${flat "command"}
+      with a matching path in ${nested "packages"} or ${nested "commands"}.
 
-      Priority of this option when selecting a `(${flatOptionsType.name}) help`: `3`.
+      Priority of this option when selecting ${flat "help"}: `3`.
       
       Lowest priority: `1`.
     '';
@@ -166,12 +168,14 @@ with pkgs.lib;
     type = types.nullOr types.bool;
     default = false;
     description = ''
-      When `true`, all `packages` can be added to the environment.
+      Can be used as ${flat "expose"} for all
+      ${nested "packages"} and ${nested "commands"}.
       
-      Otherwise, they can not be added to the environment,
-      but will be printed in the devshell description.
+      Priority of this option when selecting ${flat "expose"}: `2`.
       
-      Priority of this option when selecting a `(${flatOptionsType.name}) expose`: `2`.
+      When selecting ${flat "expose"} for
+      - ${flat "package"}, priority of `false`: `1`.
+      - ${flat "command"}, priority of `true`: `1`.
       
       Lowest priority: `1`.
     '';
@@ -186,14 +190,16 @@ with pkgs.lib;
     type = types.nullOr (attrsNestedOf types.bool);
     default = { };
     description = ''
-      A nested (max depth is ${toString maxDepth}) attrset of `(${flatOptionsType.name}) expose`-s.
-      
-      A leaf value can be used as `(${flatOptionsType.name}) expose` 
-      for a `(${flatOptionsType.name}) package` (`(${flatOptionsType.name}) command`)
-      with a matching path in `(${nestedOptionsType.name}) packages` (`(${nestedOptionsType.name}) commands`).
+      A leaf value can be used as ${flat "expose"}
+      for ${flat "package"} or ${flat "command"}
+      with a matching path in ${nested "packages"} or ${nested "commands"}.
 
-      Priority of this option when selecting a `(${flatOptionsType.name}) expose`: `3`.
+      Priority of this option when selecting ${flat "expose"}: `3`.
       
+      When selecting ${flat "expose"} for
+      - ${flat "package"}, priority of `false`: `1`.
+      - ${flat "command"}, priority of `true`: `1`.
+
       Lowest priority: `1`.
     '';
     example = literalExpression ''

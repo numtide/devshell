@@ -1,5 +1,6 @@
 { lib, strOrPackage, flatOptionsType }:
 with lib;
+let flat = name: "`${name} (${flatOptionsType.name})`"; in
 # These are all the options available for the commands.
 {
   prefix = mkOption {
@@ -14,11 +15,11 @@ with lib;
     type = types.nullOr types.str;
     default = null;
     description = ''
-      Name of this command. 
+      Name of the command.
       
-      Defaults to a `package (${flatOptionsType.name})` name or pname if present.
+      Defaults to a ${flat "package"} name or pname if present.
 
-      The value of this option is required for a `command (${flatOptionsType.name})`.
+      The value of this option is required for ${flat "command"}.
     '';
   };
 
@@ -68,11 +69,12 @@ with lib;
     type = types.bool;
     default = true;
     description = ''
-      When `true`, the `command (${flatOptionsType.name})`
-      or the `package (${flatOptionsType.name})` will be added to the environment.
+      When `true`, ${flat "command"}
+      or ${flat "package"} will be added to the environment.
         
       Otherwise, they will not be added to the environment, but will be printed
       in the devshell menu.
     '';
+    example = true;
   };
 }
