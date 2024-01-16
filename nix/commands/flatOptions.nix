@@ -12,7 +12,13 @@ let flat = name: "`${name} (${flatOptionsType.name})`"; in
   };
 
   name = mkOption {
-    type = types.nullOr types.str;
+    type = types.nullOr (types.str // (
+      let regex = "[^$\r\n]+"; in
+      {
+        description = "string matching ${regex}";
+        check = x: lib.isString x && match regex x != null;
+      }
+    ));
     default = null;
     description = ''
       Name of the command.
