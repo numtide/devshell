@@ -45,7 +45,7 @@ rec {
       then null
       else cmd.package;
 
-  commandsToMenu = cmds:
+  commandsToMenu = menuConfig: cmds:
     let
       cleanName = { name, package, ... }@cmd:
         if
@@ -108,16 +108,30 @@ rec {
         let
           category = kv.name;
           cmd = kv.value;
-          opCmd = { name, help, ... }:
+          opCmd = { name, help, interpolate, ... }:
             let
               len = maxCommandLength - (lib.stringLength name);
             in
             if help == null || help == "" then
-              "  ${name}"
+              "printf '  ${name}'"
             else
-              "  ${pad name len} - ${help}";
+              "printf '  ${pad name len} - '\n" +
+              (
+                let
+                  highlyUnlikelyName = "ABDH_OKKD_VOAP_DOEE_PJGD";
+                  quotedName = (
+                    x:
+                    if (if interpolate != null then interpolate else menuConfig.interpolate)
+                    then ''${x}''
+                    else "'${x}'"
+                  )
+                    highlyUnlikelyName;
+                in
+                "cat <<${quotedName}\n${help}\n${highlyUnlikelyName}\n"
+              );
         in
-        "\n${ansi.bold}[${category}]${ansi.reset}\n\n" + lib.concatStringsSep "\n" (map opCmd cmd);
+        ''printf '\n${ansi.bold}[${category}]${ansi.reset}\n\n''
+        + "'\n\n" + lib.concatStringsSep "\n" (map opCmd cmd);
     in
     lib.concatStringsSep "\n" (map opCat commandByCategoriesSorted) + "\n";
 }

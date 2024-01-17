@@ -42,11 +42,7 @@ in
     {
       help = "prints this menu";
       name = devshellMenuCommandName;
-      command = ''
-        cat <<${(x: if config.devshell.menu.interpolate then x else "'${x}'") "DEVSHELL_MENU"}
-        ${commandsToMenu config.commands}
-        DEVSHELL_MENU
-      '';
+      command = commandsToMenu config.devshell.menu config.commands;
     }
   ];
 
