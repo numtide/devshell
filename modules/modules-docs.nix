@@ -131,7 +131,7 @@ let
       nixAndTOMLOrdered = optionsDocsPartitionedIsNixOnly.wrong;
       nixExtra = optionsDocsPartitionedIsMain.wrong;
       concatOpts = opts: (concatStringsSep "\n\n" (map optToMd opts));
-      
+
       # TODO: handle opt.relatedPackages. What is it for?
       optToMd = opt:
         let heading = lib.showOption (filter isString opt.loc) + concatStrings (filter (x: !(isString x)) opt.loc); in

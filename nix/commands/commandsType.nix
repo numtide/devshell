@@ -46,9 +46,7 @@ rec {
       }]
     else alternative;
 
-  unknownFileName = "<unknown>";
-
-  normalizeCommandsFlat_ = { file ? unknownFileName, loc ? [ ], arg ? [ ] }:
+  normalizeCommandsFlat_ = { file ? unknownModule, loc ? [ ], arg ? [ ] }:
     pipe arg [
       (value: (mergeDefs loc [{ inherit file value; }]).defsFlat)
       (map (config: flattenNonAttrsOrElse config config))
@@ -69,7 +67,7 @@ rec {
     ];
 
 
-  normalizeCommandsNested_ = { file ? unknownFileName, loc ? [ ], arg ? { } }:
+  normalizeCommandsNested_ = { file ? unknownModule, loc ? [ ], arg ? { } }:
     pipe arg [
       # typecheck and augment configs with missing attributes (if a config is an attrset)
       (value: (mergeDefs loc [{ inherit file value; }]).defsNested)
