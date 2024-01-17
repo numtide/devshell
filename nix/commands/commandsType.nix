@@ -1,10 +1,11 @@
 { system ? builtins.currentSystem
 , pkgs ? import ../nixpkgs.nix { inherit system; }
+, options ? { }
 }:
 with pkgs.lib;
 with builtins;
 let
-  inherit (import ./types.nix { inherit pkgs; })
+  inherit (import ./types.nix { inherit pkgs options; })
     commandsFlatType
     commandsNestedType
     resolveKey

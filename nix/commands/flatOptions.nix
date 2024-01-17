@@ -1,4 +1,4 @@
-{ lib, strOrPackage, flatOptionsType }:
+{ lib, strOrPackage, flatOptionsType, options }:
 with lib;
 let flat = name: "`${name} (${flatOptionsType.name})`"; in
 # These are all the options available for the commands.

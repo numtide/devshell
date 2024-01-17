@@ -1,6 +1,6 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, options, ... }:
 let
-  inherit (import ../nix/commands/lib.nix { inherit pkgs; })
+  inherit (import ../nix/commands/lib.nix { inherit pkgs options; })
     commandsType
     commandToPackage
     devshellMenuCommandName

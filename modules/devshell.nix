@@ -12,7 +12,7 @@ let
   # environment.
   strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
 
-  inherit (import ../nix/commands/devshell.nix { inherit pkgs; }) devshellMenuCommandName;
+  inherit (import ../nix/commands/lib.nix { inherit pkgs options; }) devshellMenuCommandName;
 
   # Use this to define a flake app for the environment.
   mkFlakeApp = bin: {

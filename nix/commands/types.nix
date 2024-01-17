@@ -1,5 +1,6 @@
 { system ? builtins.currentSystem
 , pkgs ? import ../nixpkgs.nix { inherit system; }
+, options ? { }
 }:
 let lib = builtins // pkgs.lib; in
 rec {
@@ -35,7 +36,9 @@ rec {
     merge = lib.mergeOneOption;
   };
 
-  flatOptions = import ./flatOptions.nix { inherit lib strOrPackage flatOptionsType; };
+  flatOptions = import ./flatOptions.nix {
+    inherit lib strOrPackage flatOptionsType options;
+  };
 
   mkAttrsToString = str: { __toString = _: str; };
 
