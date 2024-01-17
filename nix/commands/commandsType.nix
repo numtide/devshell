@@ -78,7 +78,7 @@ rec {
             # a nestedOptionsType at this point has all attributes due to augmentation
             if config?packages then
               let
-                inherit (config) packages commands helps prefixes exposes;
+                inherit (config) packages commands helps prefixes exposes interpolates;
 
                 mkCommands = forPackages:
                   pipe (collectLeaves (if forPackages then packages else commands)) [
@@ -114,10 +114,12 @@ rec {
                             else (!forPackages)
                           )
                           exposes;
+
+                        interpolate = attrByPath path config.interpolate interpolates;
                       in
                       {
                         "${if forPackages then "package" else "command"}" = value;
-                        inherit name prefix help category expose;
+                        inherit name prefix help category expose interpolate;
                       }))
                   ];
               in
