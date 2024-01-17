@@ -40,6 +40,9 @@
 
         devShells = {
           default = devshell.mkShell {
+            bash.extra = ''
+              export MDBOOK_SERVER_ADDRESS="http://localhost:3000"
+            '';
             commands = {
               packages = [
                 "diffutils" # used by golangci-lint
@@ -49,6 +52,8 @@
                 {
                   prefix = "nix run .#";
                   inherit packages;
+                  helps.docs = ''Run mdBook server at "$MDBOOK_SERVER_ADDRESS"'';
+                  interpolates.docs = true;
                 }
                 {
                   name = "nix fmt";
