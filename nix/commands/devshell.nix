@@ -1,5 +1,6 @@
 { system ? builtins.currentSystem
 , pkgs ? import ../nixpkgs.nix { inherit system; }
+, config ? { }
 }:
 let
   lib = builtins // pkgs.lib;
@@ -111,27 +112,41 @@ rec {
           opCmd = { name, help, interpolate, ... }:
             let
               len = maxCommandLength - (lib.stringLength name);
+
+              nameWidth = toString maxCommandLength;
+              helpWidth = toString (config.devshell.menu.width - (maxCommandLength + 5));
+              helpHeight = toString 100;
+
+              processHelp = x:
+                if (if interpolate != null then interpolate else menuConfig.interpolate)
+                then ''\'' + "\n" +
+                  ''
+                    "$(
+                    cat << EOF
+                    ${x}
+                    EOF
+                    )"
+                  ''
+                else lib.escapeShellArg x;
+
+              highlyUnlikelyName = "ABDH_OKKD_VOAP_DOEE_PJGD";
+
+              command = ''
+                ${highlyUnlikelyName}=${
+                  if help == null || help == ""
+                  then ""
+                  else processHelp help
+                }
+                ${lib.getExe pkgs.perl} ${./scripts/formatCommand.pl} '${toString nameWidth}' '${helpWidth}' '${helpHeight}' '${name}' "''$${highlyUnlikelyName}"'';
             in
-            if help == null || help == "" then
-              "printf '  ${name}'"
-            else
-              "printf '  ${pad name len} - '\n" +
-              (
-                let
-                  highlyUnlikelyName = "ABDH_OKKD_VOAP_DOEE_PJGD";
-                  quotedName = (
-                    x:
-                    if (if interpolate != null then interpolate else menuConfig.interpolate)
-                    then ''${x}''
-                    else "'${x}'"
-                  )
-                    highlyUnlikelyName;
-                in
-                "cat <<${quotedName}\n${help}\n${highlyUnlikelyName}\n"
-              );
+            command;
+          commandsColumns = lib.concatMapStringsSep "\n" opCmd cmd;
         in
-        ''printf '\n${ansi.bold}[${category}]${ansi.reset}\n\n''
-        + "'\n\n" + lib.concatStringsSep "\n" (map opCmd cmd);
+        ''
+          printf '\n${ansi.bold}[${category}]${ansi.reset}\n\n'
+          
+          ${commandsColumns}
+        '';
     in
     lib.concatStringsSep "\n" (map opCat commandByCategoriesSorted) + "\n";
 }
