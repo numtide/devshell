@@ -5,16 +5,16 @@
       shell = devshell.mkShell {
         devshell.menu.interpolate = true;
         commands = [
-          { package = "hello"; help = "hello from '$PRJ_ROOT'!"; }
-          { package = "jq"; help = ''jq from '\$PRJ_ROOT'!''; }
+          { prefix = "hello"; help = ''hello from "$PRJ_ROOT"!''; }
+          { prefix = "hola"; help = ''hola from '\$PRJ_ROOT'!''; }
         ];
       };
     in
     runTest "interpolate" { } ''
       # Check interpolation is enabled
-      cat ${shell}/bin/menu | grep '<<DEVSHELL_MENU'
+      eval ${shell}/bin/menu | grep "hello from \"$PRJ_ROOT\"!"
       
       # Check escaped variable
-      eval ${shell}/bin/menu | grep '\$PRJ_ROOT'
+      eval ${shell}/bin/menu | grep 'hola from '\'''$PRJ_ROOT'\'
     '';
 }
