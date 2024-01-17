@@ -351,6 +351,14 @@ in
     menu = mkOption {
       type = types.submodule {
         options.interpolate = mkEnableOption "interpolation in the devshell menu";
+        options.width = mkOption {
+          type = types.numbers.positive;
+          default = 75;
+          description = ''
+            Width of the devshell message.
+          '';
+          example = 75;
+        };
       };
       default = { };
       description = ''
@@ -359,6 +367,7 @@ in
       example = literalExpression ''
         {
           interpolate = true;
+          width = 75;
         }
       '';
     };
