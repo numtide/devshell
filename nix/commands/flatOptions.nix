@@ -83,4 +83,18 @@ let flat = name: "`${name} (${flatOptionsType.name})`"; in
     '';
     example = true;
   };
+
+  interpolate = mkOption {
+    type = types.nullOr types.bool;
+    default = null;
+    description = ''
+      When `true` or when `null` and `${
+        showOption (options.devshell.menu.type.getSubOptions options.devshell.menu.loc).interpolate.loc
+      }` is `true`, shell variables in ${flat "help"}
+      will be interpolated.
+
+      Otherwise, they will not.
+    '';
+    example = true;
+  };
 }

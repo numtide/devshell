@@ -211,4 +211,33 @@ in
       }
     '';
   };
+
+  interpolate = mkOption {
+    type = types.nullOr types.bool;
+    default = null;
+    description = ''
+      When `true`, shell variables in ${flat "help"}
+      can be interpolated.
+
+      Priority of this option when selecting ${flat "interpolate"}: `1`.
+      
+      Lowest priority: `1`.
+    '';
+    example = true;
+  };
+
+  interpolates = mkOption {
+    type = attrsNestedOf types.bool;
+    default = { };
+    description = ''
+      A leaf value is used as ${flat "interpolate"}
+      for ${flat "package"} or ${flat "command"}
+      with a matching path in ${nested "packages"} or ${nested "commands"}.
+
+      Priority of this option when selecting ${flat "interpolate"}: `2`.
+      
+      Lowest priority: `1`.
+    '';
+    example = true;
+  };
 }
