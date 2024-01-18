@@ -269,6 +269,69 @@ Lowest priority: `1`.
 
 - [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
 
+### `commands.<name>.*.interpolate (nestedOptions)`
+
+When `true`, shell variables in `help (flatOptions)`
+can be interpolated.
+
+Priority of this option when selecting `interpolate (flatOptions)`: `1`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+null or boolean
+```
+
+**Default value**:
+
+```nix
+null
+```
+
+**Example value**:
+
+```nix
+true
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
+### `commands.<name>.*.interpolates (nestedOptions)`
+
+A leaf value is used as `interpolate (flatOptions)`
+for `package (flatOptions)` or `command (flatOptions)`
+with a matching path in `packages (nestedOptions)` or `commands (nestedOptions)`.
+
+Priority of this option when selecting `interpolate (flatOptions)`: `2`.
+
+Lowest priority: `1`.
+
+**Type**:
+
+```console
+(nested (max depth is 100) attribute set of boolean)
+```
+
+**Default value**:
+
+```nix
+{ }
+```
+
+**Example value**:
+
+```nix
+true
+```
+
+**Declared in**:
+
+- [nix/commands/nestedOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/nestedOptions.nix)
+
 ### `commands.<name>.*.prefix (nestedOptions)`
 
 Can be used as `prefix (flatOptions)` for all
@@ -462,6 +525,35 @@ null
 
 - [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
 
+### `commands.<name>.*.interpolate (flatOptions)`
+
+When `true` or when `null` and `devshell.menu.interpolate` is `true`, shell variables in `help (flatOptions)`
+will be interpolated.
+
+Otherwise, they will not.
+
+**Type**:
+
+```console
+null or boolean
+```
+
+**Default value**:
+
+```nix
+null
+```
+
+**Example value**:
+
+```nix
+true
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
 ### `commands.<name>.*.name (flatOptions)`
 
 Name of the command.
@@ -473,7 +565,8 @@ The value of this option is required for `command (flatOptions)`.
 **Type**:
 
 ```console
-null or string
+null or string matching [^$
+]+
 ```
 
 **Default value**:
@@ -704,6 +797,35 @@ null
 
 - [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
 
+### `commands.*.interpolate (flatOptions)`
+
+When `true` or when `null` and `devshell.menu.interpolate` is `true`, shell variables in `help (flatOptions)`
+will be interpolated.
+
+Otherwise, they will not.
+
+**Type**:
+
+```console
+null or boolean
+```
+
+**Default value**:
+
+```nix
+null
+```
+
+**Example value**:
+
+```nix
+true
+```
+
+**Declared in**:
+
+- [nix/commands/flatOptions.nix](https://github.com/numtide/devshell/tree/main/nix/commands/flatOptions.nix)
+
 ### `commands.*.name (flatOptions)`
 
 Name of the command.
@@ -715,7 +837,8 @@ The value of this option is required for `command (flatOptions)`.
 **Type**:
 
 ```console
-null or string
+null or string matching [^$
+]+
 ```
 
 **Default value**:
@@ -845,6 +968,86 @@ false
 
 ```nix
 true
+```
+
+**Declared in**:
+
+- [modules/devshell.nix](https://github.com/numtide/devshell/tree/main/modules/devshell.nix)
+
+### `devshell.menu`
+
+Controls devshell menu
+
+**Type**:
+
+```console
+submodule
+```
+
+**Default value**:
+
+```nix
+{ }
+```
+
+**Example value**:
+
+```nix
+{
+  interpolate = true;
+  width = 75;
+}
+```
+
+**Declared in**:
+
+- [modules/devshell.nix](https://github.com/numtide/devshell/tree/main/modules/devshell.nix)
+
+### `devshell.menu.interpolate`
+
+Whether to enable interpolation in the devshell menu.
+**Type**:
+
+```console
+boolean
+```
+
+**Default value**:
+
+```nix
+false
+```
+
+**Example value**:
+
+```nix
+true
+```
+
+**Declared in**:
+
+- [modules/devshell.nix](https://github.com/numtide/devshell/tree/main/modules/devshell.nix)
+
+### `devshell.menu.width`
+
+Width of the devshell message.
+
+**Type**:
+
+```console
+positive integer or floating point number, meaning >0
+```
+
+**Default value**:
+
+```nix
+75
+```
+
+**Example value**:
+
+```nix
+75
 ```
 
 **Declared in**:
