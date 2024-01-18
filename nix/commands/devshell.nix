@@ -137,7 +137,8 @@ rec {
                   then ""
                   else processHelp help
                 }
-                ${lib.getExe pkgs.perl} ${./scripts/formatCommand.pl} '${toString nameWidth}' '${helpWidth}' '${helpHeight}' '${name}' "''$${highlyUnlikelyName}"'';
+                ${lib.getExe pkgs.perl} ${./scripts/formatCommand.pl} '${toString nameWidth}' '${helpWidth}' '${helpHeight}' '${name}' "''$${highlyUnlikelyName}"
+              '';
             in
             command;
           commandsColumns = lib.concatMapStringsSep "\n" opCmd cmd;
@@ -148,5 +149,10 @@ rec {
           ${commandsColumns}
         '';
     in
-    lib.concatStringsSep "\n" (map opCat commandByCategoriesSorted) + "\n";
+    ''
+      {
+        export LC_ALL="C"
+        ${lib.concatStringsSep "\n" (map opCat commandByCategoriesSorted) + "\n"}
+      }
+    '';
 }
