@@ -74,7 +74,12 @@
 
         checks =
           with pkgs.lib;
-          pipe (import ./tests { inherit pkgs; }) [
+          pipe { } [
+            (x:
+              x // (import ./tests { inherit pkgs; })
+                // devShells
+                // { inherit (devshell.modules-docs) markdown; }
+            )
             (collect isDerivation)
             (map (x: { name = x.name or x.pname; value = x; }))
             listToAttrs
