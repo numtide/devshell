@@ -1,11 +1,11 @@
 { bashInteractive
 , coreutils
-, system
+, stdenv
 , writeTextFile
 }:
 let
   bashPath = "${bashInteractive}/bin/bash";
-  stdenv = writeTextFile {
+  nakedStdenv = writeTextFile {
     name = "naked-stdenv";
     destination = "/setup";
     text = ''
@@ -27,7 +27,9 @@ in
 , passthru ? { }
 }:
 (derivation {
-  inherit name system;
+  inherit name;
+
+  system = stdenv.hostPlatform.system;
 
   # `nix develop` actually checks and uses builder. And it must be bash.
   builder = bashPath;
@@ -37,7 +39,7 @@ in
 
   # $stdenv/setup is loaded by nix-shell during startup.
   # https://github.com/nixos/nix/blob/377345e26f1ac4bbc87bb21debcc52a1d03230aa/src/nix-build/nix-build.cc#L429-L432
-  stdenv = stdenv;
+  stdenv = nakedStdenv;
 
   # The shellHook is loaded directly by `nix develop`. But nix-shell
   # requires that other trampoline.
