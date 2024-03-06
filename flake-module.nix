@@ -21,7 +21,7 @@ in
           '';
 
           type = types.lazyAttrsOf (
-            types.submoduleWith { modules = import ./modules/modules.nix { inherit pkgs lib; }; }
+            types.submoduleWith (import ./modules/eval-args.nix { inherit pkgs lib; })
           );
           default = { };
         };
