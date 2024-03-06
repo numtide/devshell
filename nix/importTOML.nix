@@ -7,14 +7,14 @@ let
       dir = toString (builtins.dirOf file);
       data = builtins.fromTOML (builtins.readFile file);
 
-      extraModulesDir = toString ../extra;
-      extraModules = builtins.readDir extraModulesDir;
+      extraModulesPath = toString ../extra;
+      extraModules = builtins.readDir extraModulesPath;
 
       importModule =
         str:
         let
           repoFile = "${dir}/${str}";
-          extraFile = "${extraModulesDir}/${builtins.replaceStrings [ "." ] [ "/" ] str}.nix";
+          extraFile = "${extraModulesPath}/${builtins.replaceStrings [ "." ] [ "/" ] str}.nix";
         in
         # First try to import from the user's repository
         if lib.hasPrefix "./" str || lib.hasSuffix ".nix" str || lib.hasSuffix ".toml" str then
