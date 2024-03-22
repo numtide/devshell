@@ -13,8 +13,8 @@ stdenv.mkDerivation {
       root = ./.;
       fileset = fs.unions [
         (fs.fileFilter (file: file.hasExt "md") ./src)
-        (fs.fileFilter (file: true) ./theme)
         ./book.toml
+        ./theme
       ];
     };
 
