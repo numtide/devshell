@@ -12,6 +12,8 @@ let
   # environment.
   strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
 
+  inherit (import ../nix/commands/lib.nix { inherit pkgs options; }) devshellMenuCommandName;
+
   # Use this to define a flake app for the environment.
   mkFlakeApp = bin: {
     type = "app";
@@ -255,7 +257,7 @@ in
       type = types.str;
       default = ''
         {202}🔨 Welcome to ${cfg.name}{reset}
-        $(type -p menu &>/dev/null && menu)
+        $(type -p ${devshellMenuCommandName} &>/dev/null && ${devshellMenuCommandName})
       '';
       apply = replaceStrings
         (map (key: "{${key}}") (attrNames ansi))
@@ -343,6 +345,30 @@ in
         Otherwise, you can set this to a string representing the desired
         default path, or to a submodule of the same type valid in the 'env'
         options list (except that the 'name' field is ignored).
+      '';
+    };
+
+    menu = mkOption {
+      type = types.submodule {
+        options.interpolate = mkEnableOption "interpolation in the devshell menu";
+        options.width = mkOption {
+          type = types.numbers.positive;
+          default = 75;
+          description = ''
+            Width of the devshell message.
+          '';
+          example = 75;
+        };
+      };
+      default = { };
+      description = ''
+        Controls devshell menu
+      '';
+      example = literalExpression ''
+        {
+          interpolate = true;
+          width = 75;
+        }
       '';
     };
   };
