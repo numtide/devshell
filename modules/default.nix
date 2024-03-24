@@ -5,18 +5,11 @@ nixpkgs:
 , extraSpecialArgs ? { }
 }:
 let
-  devenvModules = import ./modules.nix {
+  module = lib.evalModules (import ./eval-args.nix {
+    inherit lib extraSpecialArgs;
     pkgs = nixpkgs;
-    inherit lib;
-  };
-
-  module = lib.evalModules {
-    modules = [ configuration ] ++ devenvModules;
-    specialArgs = {
-      modulesPath = builtins.toString ./.;
-      extraModulesPath = builtins.toString ../extra;
-    } // extraSpecialArgs;
-  };
+    modules = [ configuration ];
+  });
 in
 {
   inherit (module) config options;
