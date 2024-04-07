@@ -18,13 +18,26 @@ with lib;
       example = literalExpression "pkgs.go";
       description = "Which go package to use";
     };
+
+    GOPATH = mkOption {
+      type = types.either types.path types.str;
+      default = "$HOME/go";
+      example = literalExpression "/home/user/go";
+      description = "Path to your go directory";
+    };
   };
 
   config = {
-    env = [{
-      name = "GO111MODULE";
-      value = cfg.GO111MODULE;
-    }];
+    env = [
+      {
+        name = "GO111MODULE";
+        value = cfg.GO111MODULE;
+      }
+      {
+        name = "GOPATH";
+        eval = cfg.GOPATH;
+      }
+    ];
 
     devshell.packages = [ cfg.package ];
   };
