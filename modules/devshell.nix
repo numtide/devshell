@@ -2,6 +2,7 @@
 with lib;
 let
   cfg = config.devshell;
+  sanitizedName = strings.sanitizeDerivationName cfg.name;
 
   ansi = import ../nix/ansi.nix;
 
@@ -186,14 +187,31 @@ let
   '';
 
   # Builds the DEVSHELL_DIR with all the dependencies
-  devshell_dir = pkgs.buildEnv {
-    name = "devshell-dir";
+  devshell_dir = pkgs.buildEnv rec {
+    name = "${sanitizedName}-dir";
     paths = cfg.packages;
     postBuild = ''
       substitute ${envBash} $out/env.bash --subst-var-by DEVSHELL_DIR $out
       substitute ${entrypoint} $out/entrypoint --subst-var-by DEVSHELL_DIR $out
       chmod +x $out/entrypoint
+
+      mainProgram="${meta.mainProgram}"
+      # ensure mainProgram doesn't collide
+      if [ -e "$out/bin/$mainProgram" ]; then
+        echo "Warning: Cannot create entry point for this devshell at '\$out/bin/$mainProgram' because an executable with that name already exists." >&2
+        echo "Set meta.mainProgram to something else than '$mainProgram'." >&2
+      else
+        # if $out/bin is a single symlink, transform it into a directory tree
+        # (buildEnv does that when there is only one package in the environment)
+        if [ -L "$out/bin" ]; then
+          mv "$out/bin" bin-tmp
+          mkdir "$out/bin"
+          ln -s bin-tmp/* "$out/bin/"
+        fi
+        ln -s $out/entrypoint "$out/bin/$mainProgram"
+      fi
     '';
+    meta.mainProgram = config.meta.mainProgram or sanitizedName;
   };
 
   # Returns a list of all the input derivation ... for a derivation.
@@ -421,11 +439,16 @@ in
 
     # Use a naked derivation to limit the amount of noise passed to nix-shell.
     shell = mkNakedShell {
-      name = strings.sanitizeDerivationName cfg.name;
-      inherit (cfg) meta;
+      name = sanitizedName;
+      meta =
+        # set default for meta.mainProgram here to gain compatibility with:
+        #  `lib.getExe`, `nix run`, `nix bundle`, etc.
+        {mainProgram = cfg.package.meta.mainProgram;}
+        // cfg.meta;
       profile = cfg.package;
       passthru = {
         inherit config;
+        # keep flakeApp attribute for backward compatibility
         flakeApp = mkFlakeApp "${devshell_dir}/entrypoint";
         hook = mkSetupHook "${devshell_dir}/env.bash";
         inherit (config._module.args) pkgs;
