@@ -118,9 +118,7 @@ nix-build shell.nix | cachix push <mycache>
 
 ### Runnable as a Nix application
 
-Devshells are runnable as Nix applications (via `nix run`).  This makes it
-possible to run commands defined in your devshell without entering a
-`nix-shell` or `nix develop` session:
+Devshells are runnable (via `nix run`).  This makes it possible to run commands defined in your devshell without entering a `nix-shell` or `nix develop` session:
 
 ```sh
 nix run '.#<myapp>' -- <devshell-command> <and-args>
@@ -132,7 +130,7 @@ This project itself exposes a Nix application; you can try it out with:
 nix run 'github:numtide/devshell' -- hello
 ```
 
-See [here](docs/flake-app.md) for how to export your devshell as a flake app.
+See [here](docs/src/flake-app.md) for more details.
 
 ## TODO
 

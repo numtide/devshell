@@ -80,4 +80,20 @@
       # Packages available through entrypoint in pure mode
       entrypoint_clean --pure --env-bin env --prj-root . /bin/sh -c 'type -p git'
     '';
+
+  # Use devshell as executable
+  devshell-executable-1 =
+    let
+      shell = devshell.mkShell {
+        devshell.name = "devshell-executable-1";
+        devshell.packages = [ pkgs.hello ];
+      };
+    in
+    runTest "devshell-executable-1" { } ''
+      # Devshell is executable
+      assert -x ${pkgs.lib.getExe shell}
+
+      # Packages inside the devshell are executable
+      ${pkgs.lib.getExe shell} hello
+    '';
 }

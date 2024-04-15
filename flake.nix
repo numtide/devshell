@@ -36,6 +36,8 @@
                 'nix-instantiate ./nixpkgs-mkshell.nix'
             '';
           };
+          # expose devshell as an executable package
+          default = devShells.default;
         };
 
         devShells.default = devshell.fromTOML ./devshell.toml;
@@ -45,8 +47,6 @@
           inputs = null;
           nixpkgs = pkgs;
         };
-
-        apps.default = devShells.default.flakeApp;
 
         checks =
           with pkgs.lib;

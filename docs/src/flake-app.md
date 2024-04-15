@@ -1,12 +1,16 @@
-# Using a devshell as a Nix application
+# Using a devshell as a Nix package
 
-Devshells provide the attribute `flakeApp`, which contains an attribute set
-suitable for use as an entry in the `apps` flake output structure.  Export this
-attribute under `apps.<system>.<myapp>`, and then you can run commands within
-your devshell as follows:
+Devshells can be treated as executable packages. This allows running commands inside a devshell's environment without having to enter it first via `nix-shell` or `nix develop`.
+
+Each devshell in a flake can be executed using nix run:
+```sh
+nix run '.#devShells.<system>.<myshell>' -- <devshell-command> <and-args>
+```
+
+To simplify this command further, re-expose the devshell under `packages.<system>.<myshell>`. This allows running it like this:
 
 ```sh
-nix run '.#<myapp>' -- <devshell-command> <and-args>
+nix run '.#<myshell>' -- <devshell-command> <and-args>
 ```
 
 For example, given the following `flake.nix`:
@@ -18,7 +22,7 @@ For example, given the following `flake.nix`:
 
   outputs = { self, flake-utils, devshell, nixpkgs }:
     flake-utils.lib.eachDefaultSystem (system: {
-      apps.devshell = self.outputs.devShells.${system}.default.flakeApp;
+      packages.devshell = self.outputs.devShells.${system}.default;
 
       devShells.default =
         let
