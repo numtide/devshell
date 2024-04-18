@@ -216,10 +216,11 @@ let
 
   # Returns a list of all the input derivation ... for a derivation.
   inputsOf = drv:
-    (drv.buildInputs or [ ]) ++
-    (drv.nativeBuildInputs or [ ]) ++
-    (drv.propagatedBuildInputs or [ ]) ++
-    (drv.propagatedNativeBuildInputs or [ ])
+    filter lib.isDerivation
+      ((drv.buildInputs or [ ]) ++
+        (drv.nativeBuildInputs or [ ]) ++
+        (drv.propagatedBuildInputs or [ ]) ++
+        (drv.propagatedNativeBuildInputs or [ ]))
   ;
 
 in
