@@ -6,6 +6,9 @@
       shell = devshell.mkShell {
         devshell.name = "devshell-1";
         devshell.packages = [ pkgs.git ];
+        devshell.packagesFrom = [
+          (pkgs.hello.overrideAttrs { buildInputs = [ null pkgs.cowsay ]; })
+        ];
       };
     in
     runTest "devshell-1" { } ''
@@ -20,6 +23,9 @@
 
       # Adds packages to the PATH
       type -p git
+      
+      # Adds packages from packagesFrom to the PATH
+      type -p cowsay
     '';
 
   # Only load profiles
