@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v26
+      - uses: cachix/install-nix-action@V27
       - uses: cachix/cachix-action@v14
         with:
           name: numtide
@@ -35,7 +35,7 @@ jobs:
         with:
           # Nix Flakes doesn't work on shallow clones
           fetch-depth: 0
-      - uses: cachix/install-nix-action@v26
+      - uses: cachix/install-nix-action@V27
       - uses: cachix/cachix-action@v14
         with:
           name: numtide
@@ -51,7 +51,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v26
+      - uses: cachix/install-nix-action@V27
       - uses: cachix/cachix-action@v14
         with:
           name: numtide
