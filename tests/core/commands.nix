@@ -1,4 +1,5 @@
 { pkgs, devshell, runTest }:
+let inherit (import ../../nix/commands/lib.nix { inherit pkgs; }) devshellMenuCommandName; in
 {
   # Basic devshell usage
   commands-1 =
@@ -33,7 +34,7 @@
       # Load the devshell
       source ${shell}/env.bash
 
-      menu
+      ${devshellMenuCommandName}
 
       # Checks that all the commands are available
       type -p bash-script

@@ -13,6 +13,8 @@ let
   # environment.
   strOrPackage = import ../nix/strOrPackage.nix { inherit lib pkgs; };
 
+  inherit (import ../nix/commands/devshell.nix { inherit pkgs; }) devshellMenuCommandName;
+
   # Use this to define a flake app for the environment.
   mkFlakeApp = bin: {
     type = "app";
@@ -274,7 +276,7 @@ in
       type = types.str;
       default = ''
         {202}🔨 Welcome to ${cfg.name}{reset}
-        $(type -p menu &>/dev/null && menu)
+        $(type -p ${devshellMenuCommandName} &>/dev/null && ${devshellMenuCommandName})
       '';
       apply = replaceStrings
         (map (key: "{${key}}") (attrNames ansi))
