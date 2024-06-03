@@ -18,9 +18,7 @@ in
           Used to define devshells. not to be confused with `devShells`
         '';
 
-        type = types.lazyAttrsOf (types.submoduleWith {
-          modules = import ./modules/modules.nix { inherit pkgs lib; };
-        });
+        type = types.lazyAttrsOf (types.submoduleWith (import ./modules/eval-args.nix { inherit pkgs lib; }));
         default = { };
       };
       config.devShells = lib.mapAttrs (_name: devshell: devshell.devshell.shell) config.devshells;
