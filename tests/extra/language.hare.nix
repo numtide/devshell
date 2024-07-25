@@ -2,7 +2,8 @@
   pkgs,
   devshell,
   runTest,
-}: {
+}:
+pkgs.lib.optionalAttrs (!pkgs.hostPlatform.isDarwin) {
   # Basic test
   language-hare-1 = let
     shell = devshell.mkShell {

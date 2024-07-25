@@ -5,7 +5,13 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
-  outputs = inputs: inputs.flake-utils.lib.eachDefaultSystem
+  outputs = inputs: inputs.flake-utils.lib.eachSystem [
+    "x86_64-linux"
+    "aarch64-linux"
+    "riscv64-linux"
+    "x86_64-darwin"
+    "aarch64-darwin"
+  ]
     (system:
       let
         pkgs = inputs.nixpkgs.legacyPackages.${system};
