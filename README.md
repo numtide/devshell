@@ -75,20 +75,23 @@ When running `nix-shell` or `nix develop`, `mkShell` prints a welcome message:
 
 [[general commands]]
 
-  hello         - prints hello
-  menu          - prints this menu
+  menu                    - prints this menu
 
-[formatters]
+[packages]
 
-  nixpkgs-fmt   - Nix code formatter for nixpkgs
+  diffutils-3.10          - Commands for showing the differences between files (diff, cmp, etc.)
+  goreleaser-1.23.0       - Deliver Go binaries as fast and easily as possible
 
-[linters]
+[scripts]
 
-  golangci-lint - golang linter
+  nix fmt                 - format Nix files
+  nix run .#bench         - Run benchmark
+  nix run .#docs          - Run mdBook server at http://localhost:3000
 
 [utilites]
 
-  hub           - github utility
+  golangci-lint-1.55.2    - golang linter
+  hub-unstable-2022-12-01 - GitHub utility
 
 [devshell]$ 
 ```

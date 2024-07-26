@@ -46,7 +46,31 @@
           default = devShells.default;
         };
 
-        devShells.default = devshell.fromTOML ./devshell.toml;
+        devShells = {
+          default = devshell.mkShell {
+            commands = {
+              packages = [
+                "diffutils" # used by golangci-lint
+                "goreleaser"
+              ];
+              scripts = [
+                {
+                  prefix = "nix run .#";
+                  inherit packages;
+                }
+                {
+                  name = "nix fmt";
+                  help = "format Nix files";
+                }
+              ];
+              utilites = [
+                [ "GitHub utility" "gitAndTools.hub" ]
+                [ "golang linter" "golangci-lint" ]
+              ];
+            };
+          };
+          toml = devshell.fromTOML ./devshell.toml;
+        };
 
         legacyPackages = import inputs.self {
           inherit system;
@@ -56,7 +80,12 @@
 
         checks =
           with pkgs.lib;
-          pipe (import ./tests { inherit pkgs; }) [
+          pipe { } [
+            (x:
+              x // (import ./tests { inherit pkgs; })
+                // devShells
+                // { inherit (devshell.modules-docs) markdown; }
+            )
             (collect isDerivation)
             (map (x: { name = x.name or x.pname; value = x; }))
             listToAttrs
