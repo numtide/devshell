@@ -1,8 +1,9 @@
 # Evaluate the devshell environment
 nixpkgs:
-{ configuration
-, lib ? nixpkgs.lib
-, extraSpecialArgs ? { }
+{
+  configuration,
+  lib ? nixpkgs.lib,
+  extraSpecialArgs ? { },
 }:
 let
   devenvModules = import ./modules.nix {

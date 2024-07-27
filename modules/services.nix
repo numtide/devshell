@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 with lib;
 let
   serviceOptions = {
@@ -39,10 +44,15 @@ let
       '';
     };
   };
-  groupToProcfile = name: g: pkgs.writeText "Procfile.${name}" (concatLines
-    (mapAttrsToList (sName: s: "${if s.name == null then sName else s.name}: ${s.command}") g.services)
-  );
-  groupToCommands = gName: g:
+  groupToProcfile =
+    name: g:
+    pkgs.writeText "Procfile.${name}" (
+      concatLines (
+        mapAttrsToList (sName: s: "${if s.name == null then sName else s.name}: ${s.command}") g.services
+      )
+    );
+  groupToCommands =
+    gName: g:
     let
       procfile = groupToProcfile gName g;
       description = if g.description == null then gName else g.description;
@@ -52,35 +62,37 @@ let
         name = "${gName}:start";
         category = "service groups";
         help = "Start ${description} services";
-        command = (pkgs.writeShellScript "${gName}-services-start" ''
-          if [ -e "$PRJ_DATA_DIR/pids/${gName}.pid" ]; then
-            echo "Already running, refusing to start"
-            exit 1
-          fi
-          mkdir -p "$PRJ_DATA_DIR/pids/"
-          ${pkgs.honcho}/bin/honcho start -f ${procfile} -d "$PRJ_ROOT" &
-          pid=$!
-          echo $pid > "$PRJ_DATA_DIR/pids/${gName}.pid"
-          on_stop() {
-              kill -TERM $pid
-              rm "$PRJ_DATA_DIR/pids/${gName}.pid"
-              wait $pid
-          }
-          trap "on_stop" SIGINT SIGTERM SIGHUP
-          wait $pid
-        '').outPath;
+        command =
+          (pkgs.writeShellScript "${gName}-services-start" ''
+            if [ -e "$PRJ_DATA_DIR/pids/${gName}.pid" ]; then
+              echo "Already running, refusing to start"
+              exit 1
+            fi
+            mkdir -p "$PRJ_DATA_DIR/pids/"
+            ${pkgs.honcho}/bin/honcho start -f ${procfile} -d "$PRJ_ROOT" &
+            pid=$!
+            echo $pid > "$PRJ_DATA_DIR/pids/${gName}.pid"
+            on_stop() {
+                kill -TERM $pid
+                rm "$PRJ_DATA_DIR/pids/${gName}.pid"
+                wait $pid
+            }
+            trap "on_stop" SIGINT SIGTERM SIGHUP
+            wait $pid
+          '').outPath;
       }
       {
         name = "${gName}:stop";
         category = "service groups";
         help = "Stop ${description} services";
-        command = (pkgs.writeShellScript "${gName}-services-stop" ''
-          if [ -e "$PRJ_DATA_DIR/pids/${gName}.pid" ]; then
-            pid=$(cat "$PRJ_DATA_DIR/pids/${gName}.pid")
-            kill -TERM $pid
-            rm "$PRJ_DATA_DIR/pids/${gName}.pid"
-          fi
-        '').outPath;
+        command =
+          (pkgs.writeShellScript "${gName}-services-stop" ''
+            if [ -e "$PRJ_DATA_DIR/pids/${gName}.pid" ]; then
+              pid=$(cat "$PRJ_DATA_DIR/pids/${gName}.pid")
+              kill -TERM $pid
+              rm "$PRJ_DATA_DIR/pids/${gName}.pid"
+            fi
+          '').outPath;
       }
     ];
 in
@@ -93,5 +105,9 @@ in
     '';
   };
 
-  config.commands = foldl (l: r: l ++ r) [ ] (mapAttrsToList (gName: g: groupToCommands (if g.name == null then gName else g.name) g) config.serviceGroups);
+  config.commands = foldl (l: r: l ++ r) [ ] (
+    mapAttrsToList (
+      gName: g: groupToCommands (if g.name == null then gName else g.name) g
+    ) config.serviceGroups
+  );
 }

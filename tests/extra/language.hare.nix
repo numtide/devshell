@@ -5,13 +5,14 @@
 }:
 pkgs.lib.optionalAttrs (!pkgs.hostPlatform.isDarwin) {
   # Basic test
-  language-hare-1 = let
-    shell = devshell.mkShell {
-      imports = [../../extra/language/hare.nix];
-      devshell.name = "devshell-1";
-    };
-  in
-    runTest "language-hare-1" {} ''
+  language-hare-1 =
+    let
+      shell = devshell.mkShell {
+        imports = [ ../../extra/language/hare.nix ];
+        devshell.name = "devshell-1";
+      };
+    in
+    runTest "language-hare-1" { } ''
       # Load the devshell
       source ${shell}/env.bash
 
@@ -21,17 +22,18 @@ pkgs.lib.optionalAttrs (!pkgs.hostPlatform.isDarwin) {
   # Test good HAREPATH value
   # TODO: When the nixpkgs input is updated, change hare-ev to hare-png, so
   # that the inclusion of propagatedBuildInputs third-party libraries is also tested.
-  language-hare-2 = let
-    shell = devshell.mkShell {
-      imports = [../../extra/language/hare.nix];
-      devshell.name = "devshell-2";
-      language.hare = {
-        thirdPartyLibs = [pkgs.hareThirdParty.hare-compress];
-        vendoredLibs = ["./vendor/lib"];
+  language-hare-2 =
+    let
+      shell = devshell.mkShell {
+        imports = [ ../../extra/language/hare.nix ];
+        devshell.name = "devshell-2";
+        language.hare = {
+          thirdPartyLibs = [ pkgs.hareThirdParty.hare-compress ];
+          vendoredLibs = [ "./vendor/lib" ];
+        };
       };
-    };
-  in
-    runTest "language-hare-2" {} ''
+    in
+    runTest "language-hare-2" { } ''
       # Load the devshell
       source ${shell}/env.bash
 

@@ -1,17 +1,21 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 with lib;
 let
   cfg = config.git.hooks;
 
   # These are all the options available for a git hook.
-  hookOptions = desc:
-    {
-      text = mkOption {
-        description = "Text of the script to install";
-        default = "";
-        type = types.str;
-      };
+  hookOptions = desc: {
+    text = mkOption {
+      description = "Text of the script to install";
+      default = "";
+      type = types.str;
     };
+  };
 
   # All of the hook types supported by this module.
   allHooks = filterAttrs (k: v: k != "enable") cfg;
@@ -36,26 +40,26 @@ let
     mkdir -p $out/bin
 
     ${lib.concatMapStringsSep "\n" (k: ''
-    cat <<'WRAPPER' > $out/bin/${k}
-    #!${pkgs.bash}/bin/bash
-    set -euo pipefail
+      cat <<'WRAPPER' > $out/bin/${k}
+      #!${pkgs.bash}/bin/bash
+      set -euo pipefail
 
-    if [[ -z "''${DEVSHELL_DIR:-}" ]]; then
-      echo "${k}: ignoring git hook outside of devshell"; >&2
-      exit;
-    elif [[ -z "''${DEVSHELL_GIT_HOOKS_DIR:-}" ]]; then
-      echo "${k}: git hooks are not activated in this environment"; >&2
-      exit;
-    elif ! [[ -x "''${DEVSHELL_GIT_HOOKS_DIR}/bin/${k}" ]]; then
-      echo "${k}: the ${k} git hook is not activated in this environment"; >&2
-      exit;
-    fi
+      if [[ -z "''${DEVSHELL_DIR:-}" ]]; then
+        echo "${k}: ignoring git hook outside of devshell"; >&2
+        exit;
+      elif [[ -z "''${DEVSHELL_GIT_HOOKS_DIR:-}" ]]; then
+        echo "${k}: git hooks are not activated in this environment"; >&2
+        exit;
+      elif ! [[ -x "''${DEVSHELL_GIT_HOOKS_DIR}/bin/${k}" ]]; then
+        echo "${k}: the ${k} git hook is not activated in this environment"; >&2
+        exit;
+      fi
 
-    exec "''${DEVSHELL_GIT_HOOKS_DIR}/bin/${k}" "$@"
-    WRAPPER
+      exec "''${DEVSHELL_GIT_HOOKS_DIR}/bin/${k}" "$@"
+      WRAPPER
 
-    # Mark as executable
-    chmod +x "$out/bin/${k}"
+      # Mark as executable
+      chmod +x "$out/bin/${k}"
     '') (builtins.attrNames allHooks)}
   '';
 

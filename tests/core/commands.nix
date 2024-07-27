@@ -1,4 +1,8 @@
-{ pkgs, devshell, runTest }:
+{
+  pkgs,
+  devshell,
+  runTest,
+}:
 {
   # Basic devshell usage
   commands-1 =
@@ -23,9 +27,7 @@
               print("hello-python")
             '';
           }
-          {
-            package = "git";
-          }
+          { package = "git"; }
         ];
       };
     in

@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 with lib;
 let
   ansi = import ../nix/ansi.nix;
@@ -11,87 +16,78 @@ let
     inherit (pkgs) lib writeTextFile bash;
   };
 
-  pad = str: num:
-    if num > 0 then
-      pad "${str} " (num - 1)
-    else
-      str;
+  pad = str: num: if num > 0 then pad "${str} " (num - 1) else str;
 
   # Fallback to the package pname if the name is unset
-  resolveName = cmd:
+  resolveName =
+    cmd:
     if cmd.name == null then
       cmd.package.pname or (builtins.parseDrvName cmd.package.name).name
     else
       cmd.name;
 
   # Fill in default options for a command.
-  commandToPackage = cmd:
-    assert lib.assertMsg (cmd.command == null || cmd.name != cmd.command) "[[commands]]: ${toString cmd.name} cannot be set to both the `name` and the `command` attributes. Did you mean to use the `package` attribute?";
-    assert lib.assertMsg (cmd.package != null || (cmd.command != null && cmd.command != "")) "[[commands]]: ${resolveName cmd} expected either a command or package attribute.";
+  commandToPackage =
+    cmd:
+    assert lib.assertMsg (cmd.command == null || cmd.name != cmd.command)
+      "[[commands]]: ${toString cmd.name} cannot be set to both the `name` and the `command` attributes. Did you mean to use the `package` attribute?";
+    assert lib.assertMsg (
+      cmd.package != null || (cmd.command != null && cmd.command != "")
+    ) "[[commands]]: ${resolveName cmd} expected either a command or package attribute.";
     if cmd.package == null then
-      writeDefaultShellScript
-        {
-          name = cmd.name;
-          text = cmd.command;
-          binPrefix = true;
-        }
+      writeDefaultShellScript {
+        name = cmd.name;
+        text = cmd.command;
+        binPrefix = true;
+      }
     else
       cmd.package;
 
-  commandsToMenu = cmds:
+  commandsToMenu =
+    cmds:
     let
-      cleanName = { name, package, ... }@cmd:
-        assert lib.assertMsg (cmd.name != null || cmd.package != null) "[[commands]]: some command is missing both a `name` or `package` attribute.";
+      cleanName =
+        { name, package, ... }@cmd:
+        assert lib.assertMsg (
+          cmd.name != null || cmd.package != null
+        ) "[[commands]]: some command is missing both a `name` or `package` attribute.";
         let
           name = resolveName cmd;
 
-          help =
-            if cmd.help == null then
-              cmd.package.meta.description or ""
-            else
-              cmd.help;
+          help = if cmd.help == null then cmd.package.meta.description or "" else cmd.help;
         in
-        cmd // {
-          inherit name help;
-        };
+        cmd // { inherit name help; };
 
       commands = map cleanName cmds;
 
-      commandLengths =
-        map ({ name, ... }: builtins.stringLength name) commands;
+      commandLengths = map ({ name, ... }: builtins.stringLength name) commands;
 
-      maxCommandLength =
-        builtins.foldl'
-          (max: v: if v > max then v else max)
-          0
-          commandLengths
-      ;
+      maxCommandLength = builtins.foldl' (max: v: if v > max then v else max) 0 commandLengths;
 
       commandCategories = lib.unique (
         (zipAttrsWithNames [ "category" ] (name: vs: vs) commands).category
       );
 
-      commandByCategoriesSorted =
-        builtins.attrValues (lib.genAttrs
-          commandCategories
-          (category: lib.nameValuePair category (builtins.sort
-            (a: b: a.name < b.name)
-            (builtins.filter (x: x.category == category) commands)
-          ))
-        );
+      commandByCategoriesSorted = builtins.attrValues (
+        lib.genAttrs commandCategories (
+          category:
+          lib.nameValuePair category (
+            builtins.sort (a: b: a.name < b.name) (builtins.filter (x: x.category == category) commands)
+          )
+        )
+      );
 
-      opCat = kv:
+      opCat =
+        kv:
         let
           category = kv.name;
           cmd = kv.value;
-          opCmd = { name, help, ... }:
+          opCmd =
+            { name, help, ... }:
             let
               len = maxCommandLength - (builtins.stringLength name);
             in
-            if help == null || help == "" then
-              "  ${name}"
-            else
-              "  ${pad name len} - ${help}";
+            if help == null || help == "" then "  ${name}" else "  ${pad name len} - ${help}";
         in
         "\n${ansi.bold}[${category}]${ansi.reset}\n\n" + builtins.concatStringsSep "\n" (map opCmd cmd);
     in

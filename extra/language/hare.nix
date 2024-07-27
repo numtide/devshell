@@ -1,23 +1,24 @@
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
   cfg = config.language.hare;
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
-  makeHareFullPath = thirdParty:
+  makeHareFullPath =
+    thirdParty:
     let
       allHareThirdPartyPkgs = builtins.attrValues (pkgs.hareThirdParty.packages pkgs);
       isPropagatedLib = drv: builtins.any (x: drv == x) allHareThirdPartyPkgs;
       pkgsPropagatedBuildInputs = builtins.foldl' (acc: e: acc ++ e.propagatedBuildInputs) [ ] thirdParty;
       propagatedLibs = builtins.filter isPropagatedLib pkgsPropagatedBuildInputs;
     in
-    lib.makeSearchPath
-      "src/hare/third-party"
-      (thirdParty ++ propagatedLibs);
+    lib.makeSearchPath "src/hare/third-party" (thirdParty ++ propagatedLibs);
 in
-with lib; {
+with lib;
+{
   options.language.hare = {
     thirdPartyLibs = mkOption {
       type = types.listOf strOrPackage;
