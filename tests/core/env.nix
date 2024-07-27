@@ -1,4 +1,8 @@
-{ pkgs, devshell, runTest }:
+{
+  pkgs,
+  devshell,
+  runTest,
+}:
 {
   # Test the environment variables
   env-1 =

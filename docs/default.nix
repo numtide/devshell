@@ -1,14 +1,17 @@
-{ mdbook
-, modules-docs
-, stdenv
-, lib
+{
+  mdbook,
+  modules-docs,
+  stdenv,
+  lib,
 }:
 with lib;
 stdenv.mkDerivation {
   name = "devshell-docs";
   buildInputs = [ mdbook ];
   src =
-    let fs = lib.fileset; in
+    let
+      fs = lib.fileset;
+    in
     fs.toSource {
       root = ./.;
       fileset = fs.unions [

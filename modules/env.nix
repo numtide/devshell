@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 with lib;
 let
   envOptions = {
@@ -8,7 +13,14 @@ let
     };
 
     value = mkOption {
-      type = with types; nullOr (oneOf [ str int bool package ]);
+      type =
+        with types;
+        nullOr (oneOf [
+          str
+          int
+          bool
+          package
+        ]);
       default = null;
       description = "Shell-escaped value to set";
     };
@@ -46,7 +58,15 @@ let
     };
   };
 
-  envToBash = { name, value, eval, prefix, unset, ... }@args:
+  envToBash =
+    {
+      name,
+      value,
+      eval,
+      prefix,
+      unset,
+      ...
+    }@args:
     let
       vals = filter (key: args.${key} != null && args.${key} != false) [
         "eval"
@@ -56,9 +76,14 @@ let
       ];
       valType = head vals;
     in
-    assert assertMsg ((length vals) > 0) "[[environ]]: ${name} expected one of (value|eval|prefix|unset) to be set.";
-    assert assertMsg ((length vals) < 2) "[[environ]]: ${name} expected only one of (value|eval|prefix|unset) to be set. Not ${toString vals}";
-    assert assertMsg (!(name == "PATH" && valType == "value")) "[[environ]]: ${name} should not override the value. Use 'prefix' instead.";
+    assert assertMsg (
+      (length vals) > 0
+    ) "[[environ]]: ${name} expected one of (value|eval|prefix|unset) to be set.";
+    assert assertMsg ((length vals) < 2)
+      "[[environ]]: ${name} expected only one of (value|eval|prefix|unset) to be set. Not ${toString vals}";
+    assert assertMsg (
+      !(name == "PATH" && valType == "value")
+    ) "[[environ]]: ${name} should not override the value. Use 'prefix' instead.";
     if valType == "value" then
       "export ${name}=${escapeShellArg (toString value)}"
     else if valType == "eval" then

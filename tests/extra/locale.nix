@@ -1,4 +1,8 @@
-{ pkgs, devshell, runTest }:
+{
+  pkgs,
+  devshell,
+  runTest,
+}:
 {
   # Basic test
   simple =

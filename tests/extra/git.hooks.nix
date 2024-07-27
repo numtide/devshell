@@ -1,4 +1,8 @@
-{ pkgs, devshell, runTest }:
+{
+  pkgs,
+  devshell,
+  runTest,
+}:
 {
   # Basic git.hooks module tests
   git-hooks-1 =
@@ -19,9 +23,7 @@
         git.hooks.enable = true;
       };
 
-      shell3 = devshell.mkShell {
-        devshell.name = "git-hooks-1c";
-      };
+      shell3 = devshell.mkShell { devshell.name = "git-hooks-1c"; };
 
       shell4 = devshell.mkShell {
         imports = [ ../../extra/git/hooks.nix ];

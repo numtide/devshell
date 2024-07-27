@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 with lib;
 let
   cfg = config.extra.locale;
@@ -20,11 +25,10 @@ in
     };
   };
   config.env =
-    lib.optional pkgs.stdenv.isLinux
-      {
-        name = "LOCALE_ARCHIVE";
-        value = "${cfg.package}/lib/locale/locale-archive";
-      }
+    lib.optional pkgs.stdenv.isLinux {
+      name = "LOCALE_ARCHIVE";
+      value = "${cfg.package}/lib/locale/locale-archive";
+    }
     ++ lib.optionals (cfg.lang != null) [
       {
         name = "LANG";

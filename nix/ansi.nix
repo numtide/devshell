@@ -10,4 +10,7 @@ in
   bold = "${esc}[1m";
   italic = "${esc}[3m";
   underline = "${esc}[4m";
-} // (foldl' (x: y: x // { "${toString y}" = "${esc}[38;5;${toString y}m"; }) { } (genList (x: x) 256))
+}
+// (foldl' (x: y: x // { "${toString y}" = "${esc}[38;5;${toString y}m"; }) { } (
+  genList (x: x) 256
+))

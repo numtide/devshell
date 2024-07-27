@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 let
   cfg = config.language.go;
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
@@ -7,7 +12,11 @@ with lib;
 {
   options.language.go = {
     GO111MODULE = mkOption {
-      type = types.enum [ "on" "off" "auto" ];
+      type = types.enum [
+        "on"
+        "off"
+        "auto"
+      ];
       default = "on";
       description = "Enable Go modules";
     };
@@ -21,10 +30,12 @@ with lib;
   };
 
   config = {
-    env = [{
-      name = "GO111MODULE";
-      value = cfg.GO111MODULE;
-    }];
+    env = [
+      {
+        name = "GO111MODULE";
+        value = cfg.GO111MODULE;
+      }
+    ];
 
     devshell.packages = [ cfg.package ];
   };

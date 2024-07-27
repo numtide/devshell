@@ -1,4 +1,9 @@
-{ lib, config, pkgs, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  ...
+}:
 let
   cfg = config.language.ruby;
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
@@ -35,12 +40,26 @@ with lib;
       gnumake
     ];
     env = [
-      { name = "CC"; value = "cc"; }
-      { name = "CPP"; value = "cpp"; }
-      { name = "CXX"; value = "c++"; }
-      { name = "GEM_HOME"; eval = "$PRJ_DATA_DIR/ruby/bundle/$(ruby -e 'puts RUBY_VERSION')"; }
-      { name = "PATH"; prefix = "$GEM_HOME/bin"; }
+      {
+        name = "CC";
+        value = "cc";
+      }
+      {
+        name = "CPP";
+        value = "cpp";
+      }
+      {
+        name = "CXX";
+        value = "c++";
+      }
+      {
+        name = "GEM_HOME";
+        eval = "$PRJ_DATA_DIR/ruby/bundle/$(ruby -e 'puts RUBY_VERSION')";
+      }
+      {
+        name = "PATH";
+        prefix = "$GEM_HOME/bin";
+      }
     ];
   };
 }
-  

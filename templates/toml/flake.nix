@@ -9,7 +9,14 @@
     flake = false;
   };
 
-  outputs = { self, flake-utils, devshell, nixpkgs, ... }:
+  outputs =
+    {
+      self,
+      flake-utils,
+      devshell,
+      nixpkgs,
+      ...
+    }:
     flake-utils.lib.eachDefaultSystem (system: {
       devShells.default =
         let
@@ -19,8 +26,6 @@
             overlays = [ devshell.overlays.default ];
           };
         in
-        pkgs.devshell.mkShell {
-          imports = [ (pkgs.devshell.importTOML ./devshell.toml) ];
-        };
+        pkgs.devshell.mkShell { imports = [ (pkgs.devshell.importTOML ./devshell.toml) ]; };
     });
 }

@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 # Avoid breaking back-compat for now.
 let
   # Because we want to be able to push pure JSON-like data into the
@@ -54,6 +59,5 @@ with lib;
       interactive.bash_interactive = noDepEntry config.bash.interactive;
     }
     // (lib.optionalAttrs (config.motd != null) { motd = config.motd; })
-    // (lib.optionalAttrs (config.name != null) { name = config.name; })
-  ;
+    // (lib.optionalAttrs (config.name != null) { name = config.name; });
 }
