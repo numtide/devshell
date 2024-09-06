@@ -20,15 +20,13 @@ pkgs.lib.optionalAttrs (!pkgs.hostPlatform.isDarwin) {
       type -p hare
     '';
   # Test good HAREPATH value
-  # TODO: When the nixpkgs input is updated, change hare-ev to hare-png, so
-  # that the inclusion of propagatedBuildInputs third-party libraries is also tested.
   language-hare-2 =
     let
       shell = devshell.mkShell {
         imports = [ ../../extra/language/hare.nix ];
         devshell.name = "devshell-2";
         language.hare = {
-          thirdPartyLibs = [ pkgs.hareThirdParty.hare-compress ];
+          thirdPartyLibs = [ pkgs.hareThirdParty.hare-png ];
           vendoredLibs = [ "./vendor/lib" ];
         };
       };
@@ -49,9 +47,13 @@ pkgs.lib.optionalAttrs (!pkgs.hostPlatform.isDarwin) {
       # Check for the stdlib being included in HAREPATH
       [[ "$HAREPATH" =~ "src/hare/stdlib" ]] || die 'HAREPATH lacks `stdlib`'
 
-      # Check for hare-ev being included in HAREPATH
+      # Check for hare-compress being included in HAREPATH (propagatedBuildInputs of hare-png)
       [[ "$HAREPATH" =~ /nix/store/[a-z0-9]{32}-hare-compress-.*/src/hare/third-party ]] \
         || die 'HAREPATH lacks `hare-compress`'
+
+      # Check for hare-png being included in HAREPATH
+      [[ "$HAREPATH" =~ /nix/store/[a-z0-9]{32}-hare-png-.*/src/hare/third-party ]] \
+        || die 'HAREPATH lacks `hare-png`'
 
       # Check for ./vendor/lib being included in HAREPATH
       [[ "$HAREPATH" =~ $PWD/vendor/lib ]] || die "HAREPATH lacks \`$PWD/vendor/lib\`"
