@@ -8,14 +8,16 @@ let
   cfg = config.language.hare;
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
   makeHareFullPath =
-    thirdParty:
+    userHareLibs:
     let
-      allHareThirdPartyPkgs = builtins.attrValues (pkgs.hareThirdParty.packages pkgs);
-      isPropagatedLib = drv: builtins.any (x: drv == x) allHareThirdPartyPkgs;
-      pkgsPropagatedBuildInputs = builtins.foldl' (acc: e: acc ++ e.propagatedBuildInputs) [ ] thirdParty;
-      propagatedLibs = builtins.filter isPropagatedLib pkgsPropagatedBuildInputs;
+      allHareThirdPartyLibs = builtins.attrValues (pkgs.hareThirdParty.packages pkgs);
+      propagatedLibs = lib.unique (
+        builtins.foldl' (
+          acc: userLib: acc ++ (lib.intersectLists userLib.propagatedBuildInputs allHareThirdPartyLibs)
+        ) [ ] userHareLibs
+      );
     in
-    lib.makeSearchPath "src/hare/third-party" (thirdParty ++ propagatedLibs);
+    lib.makeSearchPath "src/hare/third-party" (userHareLibs ++ propagatedLibs);
 in
 with lib;
 {
@@ -42,10 +44,10 @@ with lib;
 
   config = {
     env = [
-      (mkIf (cfg.thirdPartyLibs != [ ] || cfg.vendoredLibs != [ ]) {
+      {
         name = "HAREPATH";
         value = lib.makeSearchPath "src/hare/stdlib" [ cfg.package ];
-      })
+      }
       (mkIf (cfg.thirdPartyLibs != [ ]) {
         name = "HAREPATH";
         prefix = makeHareFullPath cfg.thirdPartyLibs;
