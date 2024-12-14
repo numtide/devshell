@@ -73,7 +73,9 @@ let
             pid=$!
             echo $pid > "$PRJ_DATA_DIR/pids/${gName}.pid"
             on_stop() {
-                kill -TERM $pid
+                if ps -p $pid > /dev/null; then
+                  kill -TERM $pid
+                fi
                 rm "$PRJ_DATA_DIR/pids/${gName}.pid"
                 wait $pid
             }
