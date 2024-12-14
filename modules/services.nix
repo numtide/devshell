@@ -77,7 +77,7 @@ let
                 rm "$PRJ_DATA_DIR/pids/${gName}.pid"
                 wait $pid
             }
-            trap "on_stop" SIGINT SIGTERM SIGHUP
+            trap "on_stop" SIGINT SIGTERM SIGHUP EXIT
             wait $pid
           '').outPath;
       }
