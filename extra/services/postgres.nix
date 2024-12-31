@@ -80,8 +80,6 @@ in
   config = {
     packages = [
       cfg.package
-      setup-postgres
-      start-postgres
     ];
 
     env = [
@@ -98,5 +96,19 @@ in
     devshell.startup.setup-postgres.text = lib.optionalString cfg.setupPostgresOnStartup ''
       ${setup-postgres}/bin/setup-postgres
     '';
+
+    commands = [
+      {
+        name = "setup-postgres";
+        package = setup-postgres;
+        help = "Setup the postgres data directory";
+      }
+      {
+        name = "start-postgres";
+        package = start-postgres;
+        help = "Start the postgres server";
+        category = "databases";
+      }
+    ];
   };
 }
