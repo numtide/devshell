@@ -1,0 +1,1540 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>devshell</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/pagetoc.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Intro</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">2.</strong> Getting started</a></li><li class="chapter-item expanded "><a href="ci.html"><strong aria-hidden="true">3.</strong> Continuous Integration setup</a></li><li class="chapter-item expanded "><a href="extending.html"><strong aria-hidden="true">4.</strong> Extending devshell</a></li><li class="chapter-item expanded "><a href="modules_schema.html"><strong aria-hidden="true">5.</strong> devshell.toml schema</a></li><li class="chapter-item expanded "><a href="env.html"><strong aria-hidden="true">6.</strong> env vars</a></li><li class="chapter-item expanded "><a href="99_todo.html"><strong aria-hidden="true">7.</strong> TODO</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">devshell</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/numtide/devshell" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <div class="content-wrap">
+                            <h1 id="introducing-devshell-like-virtualenv-for-every-language"><a class="header" href="#introducing-devshell-like-virtualenv-for-every-language">Introducing Devshell: like virtualenv, for every language</a></h1>
+<p><strong>STATUS: unstable</strong></p>
+<p>It should not take more than 10 minutes from the time you clone a repo and can
+start contributing.</p>
+<p>Unfortunately, an unbounded amount of time is usually spent installing build
+dependencies on the system. If you are lucky, it's a pure $LANG project and
+all it takes is to install that language and its dedicated package manager. On
+bigger projects it's quite common to need more than one language to be
+installed. The side-effect of that is that it creates silos withing companies,
+and less contributors in the open-source world.</p>
+<p>It should be possible to run a single command that loads and makes those
+dependencies available to the developer.</p>
+<p>And it should keep the scope of these dependencies at the project level, just
+like virtualenv.</p>
+<p>These are the goals of this project.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started"><a class="header" href="#getting-started">Getting started</a></h1>
+<p>This project has a single dependency; Nix. It will be used to pull in all
+other dependencies. It can be installed by following the instructions
+over there: https://nixos.org/download.html#nix-quick-install</p>
+<p>Now that's done, got to your project root and create an empty <code>devshell.toml</code>.</p>
+<p>There are different ways to load that config depending on your preferences:</p>
+<h3 id="nix-non-flake"><a class="header" href="#nix-non-flake">Nix (non-flake)</a></h3>
+<p>Add another file called <code>shell.nix</code> with the following content. This file will
+contain some nix code. Don't worry about the details.</p>
+<pre><code class="language-nix">{ system ? builtins.currentSystem }:
+let
+  src = fetchTarball "https://github.com/numtide/devshell/archive/main.tar.gz";
+  devshell = import src { inherit system; };
+in
+devshell.fromTOML ./devshell.toml
+</code></pre>
+<blockquote>
+<p>NOTE: it's probably a good idea to pin the dependency by replacing <code>main</code> with a git commit ID.</p>
+</blockquote>
+<p>Now you can enter the developer shell for the project:</p>
+<pre><code class="language-console">$ nix-shell
+warning: you did not specify '--add-root'; the result might be removed by the garbage collector
+these 4 derivations will be built:
+  /nix/store/nvbfq9h68r63k5jkfnbimny3b35sx0fs-devshell-bashrc.drv
+  /nix/store/ppfyf9zv023an8477hcbjlj0rbyvmwq7-devshell.env.drv
+  /nix/store/8027cgy3xcinb59aaynh899q953dnzms-devshell-bin.drv
+  /nix/store/w33zl180ni880p18sls5ykih88zkmkqk-devshell.drv
+building '/nix/store/nvbfq9h68r63k5jkfnbimny3b35sx0fs-devshell-bashrc.drv'...
+building '/nix/store/ppfyf9zv023an8477hcbjlj0rbyvmwq7-devshell-env.drv'...
+created 1 symlinks in user environment
+building '/nix/store/8027cgy3xcinb59aaynh899q953dnzms-devshell-bin.drv'...
+building '/nix/store/w33zl180ni880p18sls5ykih88zkmkqk-devshell.drv'...
+warning: you did not specify '--add-root'; the result might be removed by the garbage collector
+🔨 Welcome to devshell
+
+[general commands]
+
+  menu - prints this menu
+
+[devshell]$
+</code></pre>
+<h3 id="nix-flakes"><a class="header" href="#nix-flakes">Nix Flakes</a></h3>
+<p>For users of nix flakes, a default template is provided to get you up and
+running.</p>
+<pre><code class="language-sh">nix flake new -t "github:numtide/devshell" project/
+
+cd project/
+
+# enter the shell
+nix develop # or `direnv allow` if you want to use direnv
+</code></pre>
+<p>Find <code>templates/gettingStartedExample</code> in this repository for a working example of the additional configuration below: <code>env</code>, <code>packages</code>, and <code>serviceGroups</code>.</p>
+<h2 id="adding-environment-variables"><a class="header" href="#adding-environment-variables">Adding environment variables</a></h2>
+<p>Environment variables that are specific to the project can be added with the
+<code>[[env]]</code> declaration. Each environment variable is an entry in an array, and
+will be set in the order that they are declared.</p>
+<p>Eg:</p>
+<pre><code class="language-toml">[[env]]
+name = "GO111MODULE"
+value = "on"
+</code></pre>
+<p>There are different ways to set the environment variables. Look at the schema
+to find all the ways. But in short:</p>
+<ul>
+<li>Use the <code>value</code> key to set a fixed env var.</li>
+<li>Use the <code>eval</code> key to evaluate the value. This is useful when one env var
+depends on the value of another.</li>
+<li>Use the <code>prefix</code> key to prepend a path to an environment variable that uses
+the path separator. Like <code>PATH</code>.</li>
+</ul>
+<h2 id="adding-new-commands"><a class="header" href="#adding-new-commands">Adding new commands</a></h2>
+<p>Devshell also supports adding new commands to the environment. Those are
+displayed on devshell entry so that the user knows what commands are available
+to them.</p>
+<p>In order to bring in new dependencies, you can either add them to
+<code>devshell.packages</code> or as an entry in the <code>[[commands]]</code> list (see <a href="https://toml.io/en/v1.0.0#array-of-tables">TOML docs</a>). Commands are also added to the
+menu so they might be preferable for discoverability.</p>
+<p>As an exercise, add the following snippet to your <code>devshell.toml</code>:</p>
+<pre><code class="language-toml">[[commands]]
+package = "go"
+</code></pre>
+<p>Then re-enter the shell with <code>nix-shell</code>/<code>nix develop</code>/<code>direnv reload</code>. You should see something like this:</p>
+<pre><code class="language-console">$ nix-shell
+warning: you did not specify '--add-root'; the result might be removed by the garbage collector
+these 4 derivations will be built:
+  /nix/store/nvbfq9h68r63k5jkfnbimny3b35sx0fs-devshell-bashrc.drv
+  /nix/store/ppfyf9zv023an8477hcbjlj0rbyvmwq7-devshell.env.drv
+  /nix/store/8027cgy3xcinb59aaynh899q953dnzms-devshell-bin.drv
+  /nix/store/w33zl180ni880p18sls5ykih88zkmkqk-devshell.drv
+building '/nix/store/nvbfq9h68r63k5jkfnbimny3b35sx0fs-devshell-bashrc.drv'...
+building '/nix/store/ppfyf9zv023an8477hcbjlj0rbyvmwq7-devshell-env.drv'...
+created 1 symlinks in user environment
+building '/nix/store/8027cgy3xcinb59aaynh899q953dnzms-devshell-bin.drv'...
+building '/nix/store/w33zl180ni880p18sls5ykih88zkmkqk-devshell.drv'...
+warning: you did not specify '--add-root'; the result might be removed by the garbage collector
+🔨 Welcome to devshell
+
+[general commands]
+
+  menu - prints this menu
+  go   - The Go Programming language
+
+[devshell]$
+</code></pre>
+<p>Now the <code>go</code> program is available in the environment and can be used to
+develop Go programs. This can easily be adapted to any language.</p>
+<p>Similarly, you could also add go to the packages list, in which case it would
+not appear in the menu:</p>
+<pre><code class="language-toml">[devshell]
+packages = [
+  "go"
+]
+</code></pre>
+<h3 id="finding-packages"><a class="header" href="#finding-packages">Finding packages</a></h3>
+<p>Check out the <a href="https://search.nixos.org/packages">Nix package repository</a>.</p>
+<p>Note that it is also possible to <strong>use specific versions</strong> for some packages - e.g. for NodeJS, <a href="https://search.nixos.org/packages?type=packages&amp;query=nodejs">search the repo</a> &amp; use like this:</p>
+<pre><code class="language-toml">[[commands]]
+package = "nodejs-17_x" # https://search.nixos.org/packages?type=packages&amp;query=nodejs
+name = "node"
+help = "NodeJS"
+</code></pre>
+<p>Or another example:</p>
+<pre><code class="language-toml">[devshell]
+packages = [
+  "python27", # 2.7
+  "python311", # 3.11
+]
+</code></pre>
+<h2 id="adding-background-services"><a class="header" href="#adding-background-services">Adding background services</a></h2>
+<p>Many projects need background services to be running during development or to
+run tests (e.g. a database, caching server, webserver, ...). This is supported
+in devshell through the concept of service groups.</p>
+<p>A service group defines a collection of long-running processes that can be
+started and stopped.</p>
+<p>An example service group could be configured like this:</p>
+<pre><code class="language-toml">[serviceGroups.database]
+description = "Runs a database in the backgroup"
+[serviceGroups.database.services.postgres]
+command = "postgres"
+[serviceGroups.database.services.memcached]
+command = "memcached"
+</code></pre>
+<p>This will add two commands to the devshell: <code>database:start</code> and
+<code>database:stop</code>. <code>database:start</code> starts the defined services in the <code>database</code>
+group in the foreground and shows their output. <code>database:stop</code> can be executed
+in a different shell to stop the processes (or press Ctrl-C in the main shell).</p>
+<h2 id="wrapping-up"><a class="header" href="#wrapping-up">Wrapping up</a></h2>
+<p><strong>devshell</strong> is extensible in many different ways. In the next chapters we will
+discuss the various ways in which it can be adapted to your project's needs.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="continuous-integration-setup-ci"><a class="header" href="#continuous-integration-setup-ci">Continuous Integration setup (CI)</a></h1>
+<p>Traditionally, the CI build environment has to be kept in sync with the
+project. If the project needs <code>make</code> to build, the CI has to be configured to
+have it available. This can become quite tricky whenever a version requirement
+changes.</p>
+<p>With devshell, the only dependency is Nix. Once the devshell is built, all the
+dependencies are loaded into scope and automatically are in sync with the
+current code checkout.</p>
+<h2 id="general-approach"><a class="header" href="#general-approach">General approach</a></h2>
+<p>The only dependency we need installed in the CI environment is Nix.</p>
+<p>Assuming that the <code>shell.nix</code> file exists, the general approach is to build it
+with nix to get back the entrypoint script. And then executed that script with
+the commands.</p>
+<p>For example, let's say that <code>make</code> is being used to build the project.</p>
+<p>The <code>devshell.toml</code> would have it as part of its commands:</p>
+<pre><code class="language-toml">[[commands]]
+package = "gnumake"
+</code></pre>
+<p>All the CI has to do, is this: <code>nix-shell --run "$(nix-build shell.nix)/entrypoint make"</code>.</p>
+<ol>
+<li><code>$(nix-build shell.nix)/entrypoint</code> outputs a path to the entrypoint script</li>
+<li><code>nix-shell --run</code> sets the required environment variables for the entrypoint script to work.</li>
+<li>The entrypoint script is executed with <code>make</code> as an argument. It loads the
+environment.</li>
+<li>Finally make is executed in the context of the project environment, with
+all the same dependencies as the developer's.</li>
+</ol>
+<h2 id="hercules-ci"><a class="header" href="#hercules-ci">Hercules CI</a></h2>
+<p><a href="https://hercules-ci.com">Hercules CI</a> is a Nix-based continuous integration and deployment service.</p>
+<h3 id="build"><a class="header" href="#build">Build</a></h3>
+<p>If you haven't packaged your project with Nix or if a check can't run in the Nix sandbox, you can run it as an <a href="https://docs.hercules-ci.com/hercules-ci/effects/">effect</a>.</p>
+<p><code>ci.nix</code></p>
+<pre><code>let
+  shell = import ./shell.nix {};
+  pkgs = shell.pkgs;
+  effectsSrc =
+    builtins.fetchTarball "https://github.com/hercules-ci/hercules-ci-effects/archive/COMMIT_HASH.tar.gz";
+  inherit (import effectsSrc { inherit pkgs; }) effects;
+in
+{
+  inherit shell;
+  build = effects.mkEffect {
+    src = ./.;
+    effectScript = ''
+      go build
+    '';
+    inputs = [
+      shell.hook
+    ];
+  };
+}
+</code></pre>
+<p>Replace COMMIT_HASH by the latest git sha from <a href="https://github.com/hercules-ci/hercules-ci-effects/commit/master"><code>hercules-ci-effects</code></a>,
+or, if you prefer, you can bring <code>effects</code> into scope <a href="https://docs.hercules-ci.com/hercules-ci-effects/guide/import-or-pin/">using another pinning method</a>.</p>
+<h3 id="run-locally"><a class="header" href="#run-locally">Run locally</a></h3>
+<p>The <a href="https://docs.hercules-ci.com/hercules-ci-agent/hci/"><code>hci</code> command</a> is available in <code>nixos-21.05</code> and <code>nixos-unstable</code>.</p>
+<p><code>devshell.toml</code></p>
+<pre><code>[[commands]]
+package = "hci"
+</code></pre>
+<p>Use <a href="https://docs.hercules-ci.com/hercules-ci-agent/hci/"><code>hci effect run</code></a>. Following the previous example:</p>
+<pre><code class="language-console">hci effect run build --no-token
+</code></pre>
+<h3 id="shell-only"><a class="header" href="#shell-only">Shell only</a></h3>
+<p>To build the shell itself on <code>x86_64-linux</code>:</p>
+<p><code>ci.nix</code></p>
+<pre><code>{
+  shell = import ./shell.nix {};
+
+  # ... any extra Nix packages you want to build; perhaps
+  # pkgs = import ./default.nix {} // { recurseForDerivations = true; };
+}
+</code></pre>
+<h3 id="system"><a class="header" href="#system"><code>system</code></a></h3>
+<p>If you build for <a href="https://docs.hercules-ci.com/hercules-ci/guides/multi-platform/">multiple systems</a>, pass <code>system</code>:</p>
+<pre><code>import ./shell.nix { inherit system; };
+</code></pre>
+<h2 id="github-actions"><a class="header" href="#github-actions">GitHub Actions</a></h2>
+<p>Add the following file to your project. Replace the <code>&lt;your build command&gt;</code>
+part with whatever is needed to build the project.</p>
+<p><code>.github/workflows/devshell.yml</code></p>
+<pre><code class="language-yaml">name: devshell
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v12
+      - uses: cachix/cachix-action@v8
+        with:
+          name: "&lt;your cache here&gt;"
+          signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+      - run: |
+          source "$(nix-build shell.nix)"
+          &lt;your build command&gt;
+</code></pre>
+<h2 id="todo"><a class="header" href="#todo">TODO</a></h2>
+<p>Add more CI-specific examples.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="extending-devshell"><a class="header" href="#extending-devshell">Extending devshell</a></h1>
+<p>When the base modules that are provided by devshell are not enough, it is
+possible to extend it.</p>
+<h2 id="extra-modules"><a class="header" href="#extra-modules">Extra modules</a></h2>
+<p>All the <code>devshell.toml</code> schema options that are <code>Declared in:</code> the <code>extra/</code>
+folder in the schema documentation are loaded on demand.</p>
+<p>In order to load an extra module, use the <code>&lt;name&gt;</code> in the import section. For
+example to make the <code>locale</code> options available, import <code>locale</code>:</p>
+<p><code>devshell.toml</code>:</p>
+<pre><code class="language-toml">imports = ["locale"]
+</code></pre>
+<p>Make sure to add this at the first statement in the file.</p>
+<p>Now that the module has been loaded, the <code>devshell.toml</code> understands the
+<code>locale</code> prefix:</p>
+<pre><code class="language-toml">imports = ["locale"]
+
+[locale]
+lang = "en_US.UTF-8"
+</code></pre>
+<p>From a nix flake you would import it like</p>
+<pre><code class="language-nix">imports = ["${devshell}/extra/locale.nix"];
+</code></pre>
+<h2 id="building-your-own-modules"><a class="header" href="#building-your-own-modules">Building your own modules</a></h2>
+<p>Building your own modules requires to understand the Nix language. If
+this is too complicated, please reach out to the issue tracker and describe
+your use-case. We want to be able to support a wide variety of development
+scenario.</p>
+<p>In the same way as previously introduced, devshell will also load files that
+are relative to the <code>devshell.toml</code>. For example:</p>
+<pre><code class="language-toml">imports = ["mymodule.nix"]
+</code></pre>
+<p>Will load the <code>mymodule.nix</code> file in the project repository and extend the
+<code>devshell.toml</code> schema accordingly.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="options"><a class="header" href="#options">Options</a></h2>
+<h3 id="commands"><a class="header" href="#commands"><code>commands</code></a></h3>
+<p>Add commands to the environment.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">list of (submodule)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">[
+  {
+    help = "print hello";
+    name = "hello";
+    command = "echo hello";
+  }
+
+  {
+    package = "nixpkgs-fmt";
+    category = "formatter";
+  }
+]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/commands.nix">modules/commands.nix</a></li>
+</ul>
+<h3 id="commandspackage"><a class="header" href="#commandspackage"><code>commands.*.package</code></a></h3>
+<p>Used to bring in a specific package. This package will be added to the
+environment.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or (package or string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/commands.nix">modules/commands.nix</a></li>
+</ul>
+<h3 id="commandscategory"><a class="header" href="#commandscategory"><code>commands.*.category</code></a></h3>
+<p>Set a free text category under which this command is grouped
+and shown in the help menu.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"[general commands]"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/commands.nix">modules/commands.nix</a></li>
+</ul>
+<h3 id="commandscommand"><a class="header" href="#commandscommand"><code>commands.*.command</code></a></h3>
+<p>If defined, it will add a script with the name of the command, and the
+content of this value.</p>
+<p>By default it generates a bash script, unless a different shebang is
+provided.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">''
+  #!/usr/bin/env python
+  print("Hello")
+''
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/commands.nix">modules/commands.nix</a></li>
+</ul>
+<h3 id="commandshelp"><a class="header" href="#commandshelp"><code>commands.*.help</code></a></h3>
+<p>Describes what the command does in one line of text.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/commands.nix">modules/commands.nix</a></li>
+</ul>
+<h3 id="commandsname"><a class="header" href="#commandsname"><code>commands.*.name</code></a></h3>
+<p>Name of this command. Defaults to attribute name in commands.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/commands.nix">modules/commands.nix</a></li>
+</ul>
+<h3 id="devshellpackages"><a class="header" href="#devshellpackages"><code>devshell.packages</code></a></h3>
+<p>The set of packages to appear in the project environment.</p>
+<p>Those packages come from <a href="https://nixos.org/NixOS/nixpkgs">https://nixos.org/NixOS/nixpkgs</a> and can be
+searched by going to <a href="https://search.nixos.org/packages">https://search.nixos.org/packages</a></p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">list of (package or string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellpackagesfrom"><a class="header" href="#devshellpackagesfrom"><code>devshell.packagesFrom</code></a></h3>
+<p>Add all the build dependencies from the listed packages to the
+environment.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">list of (package or string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellinteractivenamedeps"><a class="header" href="#devshellinteractivenamedeps"><code>devshell.interactive.&lt;name&gt;.deps</code></a></h3>
+<p>A list of other steps that this one depends on.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">list of string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellinteractivenametext"><a class="header" href="#devshellinteractivenametext"><code>devshell.interactive.&lt;name&gt;.text</code></a></h3>
+<p>Script to run.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellload_profiles"><a class="header" href="#devshellload_profiles"><code>devshell.load_profiles</code></a></h3>
+<p>Whether to enable load etc/profiles.d/*.sh in the shell.
+<strong>Type</strong>:</p>
+<pre><code class="language-console">boolean
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">false
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">true
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellmeta"><a class="header" href="#devshellmeta"><code>devshell.meta</code></a></h3>
+<p>Metadata, such as 'meta.description'. Can be useful as metadata for downstream tooling.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">attribute set of anything
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">{ }
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellmotd"><a class="header" href="#devshellmotd"><code>devshell.motd</code></a></h3>
+<p>Message Of The Day.</p>
+<p>This is the welcome message that is being printed when the user opens
+the shell.</p>
+<p>You may use any valid ansi color from the 8-bit ansi color table. For example, to use a green color you would use something like {106}. You may also use {bold}, {italic}, {underline}. Use {reset} to turn off all attributes.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">''
+  {202}🔨 Welcome to devshell{reset}
+  $(type -p menu &amp;&gt;/dev/null &amp;&amp; menu)
+''
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellname"><a class="header" href="#devshellname"><code>devshell.name</code></a></h3>
+<p>Name of the shell environment. It usually maps to the project name.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"devshell"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellprj_root_fallback"><a class="header" href="#devshellprj_root_fallback"><code>devshell.prj_root_fallback</code></a></h3>
+<p>If IN_NIX_SHELL is nonempty, or DIRENV_IN_ENVRC is set to '1', then
+PRJ_ROOT is set to the value of PWD.</p>
+<p>This option specifies the path to use as the value of PRJ_ROOT in case
+IN_NIX_SHELL is empty or unset and DIRENV_IN_ENVRC is any value other
+than '1'.</p>
+<p>Set this to null to force PRJ_ROOT to be defined at runtime (except if
+IN_NIX_SHELL or DIRENV_IN_ENVRC are defined as described above).</p>
+<p>Otherwise, you can set this to a string representing the desired
+default path, or to a submodule of the same type valid in the 'env'
+options list (except that the 'name' field is ignored).</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or ((submodule) or non-empty string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">{
+  eval = "$PWD";
+}
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">{
+  # Use the top-level directory of the working tree
+  eval = "$(git rev-parse --show-toplevel)";
+};
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellprj_root_fallbackeval"><a class="header" href="#devshellprj_root_fallbackeval"><code>devshell.prj_root_fallback.eval</code></a></h3>
+<p>Like value but not evaluated by Bash. This allows to inject other
+variable names or even commands using the <code>$()</code> notation.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">"$OTHER_VAR"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="devshellprj_root_fallbackname"><a class="header" href="#devshellprj_root_fallbackname"><code>devshell.prj_root_fallback.name</code></a></h3>
+<p>Name of the environment variable
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="devshellprj_root_fallbackprefix"><a class="header" href="#devshellprj_root_fallbackprefix"><code>devshell.prj_root_fallback.prefix</code></a></h3>
+<p>Prepend to PATH-like environment variables.</p>
+<p>For example name = "PATH"; prefix = "bin"; will expand the path of
+./bin and prepend it to the PATH, separated by ':'.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">"bin"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="devshellprj_root_fallbackunset"><a class="header" href="#devshellprj_root_fallbackunset"><code>devshell.prj_root_fallback.unset</code></a></h3>
+<p>Whether to enable unsets the variable.
+<strong>Type</strong>:</p>
+<pre><code class="language-console">boolean
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">false
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">true
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="devshellprj_root_fallbackvalue"><a class="header" href="#devshellprj_root_fallbackvalue"><code>devshell.prj_root_fallback.value</code></a></h3>
+<p>Shell-escaped value to set
+<strong>Type</strong>:</p>
+<pre><code class="language-console">null or string or signed integer or boolean or package
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="devshellstartupnamedeps"><a class="header" href="#devshellstartupnamedeps"><code>devshell.startup.&lt;name&gt;.deps</code></a></h3>
+<p>A list of other steps that this one depends on.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">list of string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="devshellstartupnametext"><a class="header" href="#devshellstartupnametext"><code>devshell.startup.&lt;name&gt;.text</code></a></h3>
+<p>Script to run.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/devshell.nix">modules/devshell.nix</a></li>
+</ul>
+<h3 id="env"><a class="header" href="#env"><code>env</code></a></h3>
+<p>Add environment variables to the shell.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">list of (submodule)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">[
+  {
+    name = "HTTP_PORT";
+    value = 8080;
+  }
+  {
+    name = "PATH";
+    prefix = "bin";
+  }
+  {
+    name = "XDG_CACHE_DIR";
+    eval = "$PRJ_ROOT/.cache";
+  }
+  {
+    name = "CARGO_HOME";
+    unset = true;
+  }
+]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="enveval"><a class="header" href="#enveval"><code>env.*.eval</code></a></h3>
+<p>Like value but not evaluated by Bash. This allows to inject other
+variable names or even commands using the <code>$()</code> notation.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">"$OTHER_VAR"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="envname"><a class="header" href="#envname"><code>env.*.name</code></a></h3>
+<p>Name of the environment variable
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="envprefix"><a class="header" href="#envprefix"><code>env.*.prefix</code></a></h3>
+<p>Prepend to PATH-like environment variables.</p>
+<p>For example name = "PATH"; prefix = "bin"; will expand the path of
+./bin and prepend it to the PATH, separated by ':'.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">"bin"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="envunset"><a class="header" href="#envunset"><code>env.*.unset</code></a></h3>
+<p>Whether to enable unsets the variable.
+<strong>Type</strong>:</p>
+<pre><code class="language-console">boolean
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">false
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">true
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="envvalue"><a class="header" href="#envvalue"><code>env.*.value</code></a></h3>
+<p>Shell-escaped value to set
+<strong>Type</strong>:</p>
+<pre><code class="language-console">null or string or signed integer or boolean or package
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/env.nix">modules/env.nix</a></li>
+</ul>
+<h3 id="extralocalepackage"><a class="header" href="#extralocalepackage"><code>extra.locale.package</code></a></h3>
+<p>Set the glibc locale package that will be used on Linux
+<strong>Type</strong>:</p>
+<pre><code class="language-console">package
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"pkgs.glibcLocales"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/locale.nix">extra/locale.nix</a></li>
+</ul>
+<h3 id="extralocalelang"><a class="header" href="#extralocalelang"><code>extra.locale.lang</code></a></h3>
+<p>Set the language of the project
+<strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">"en_GB.UTF-8"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/locale.nix">extra/locale.nix</a></li>
+</ul>
+<h3 id="githooksenable"><a class="header" href="#githooksenable"><code>git.hooks.enable</code></a></h3>
+<p>Whether to enable install .git/hooks on shell entry.
+<strong>Type</strong>:</p>
+<pre><code class="language-console">boolean
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">false
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">true
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githooksapplypatch-msgtext"><a class="header" href="#githooksapplypatch-msgtext"><code>git.hooks.applypatch-msg.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githookscommit-msgtext"><a class="header" href="#githookscommit-msgtext"><code>git.hooks.commit-msg.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githooksfsmonitor-watchmantext"><a class="header" href="#githooksfsmonitor-watchmantext"><code>git.hooks.fsmonitor-watchman.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githookspost-updatetext"><a class="header" href="#githookspost-updatetext"><code>git.hooks.post-update.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githookspre-applypatchtext"><a class="header" href="#githookspre-applypatchtext"><code>git.hooks.pre-applypatch.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githookspre-committext"><a class="header" href="#githookspre-committext"><code>git.hooks.pre-commit.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githookspre-merge-committext"><a class="header" href="#githookspre-merge-committext"><code>git.hooks.pre-merge-commit.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githookspre-pushtext"><a class="header" href="#githookspre-pushtext"><code>git.hooks.pre-push.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githookspre-rebasetext"><a class="header" href="#githookspre-rebasetext"><code>git.hooks.pre-rebase.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="githooksprepare-commit-msgtext"><a class="header" href="#githooksprepare-commit-msgtext"><code>git.hooks.prepare-commit-msg.text</code></a></h3>
+<p>Text of the script to install
+<strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">""
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/git/hooks.nix">extra/git/hooks.nix</a></li>
+</ul>
+<h3 id="languageccompiler"><a class="header" href="#languageccompiler"><code>language.c.compiler</code></a></h3>
+<p>Which C compiler to use
+<strong>Type</strong>:</p>
+<pre><code class="language-console">package or string convertible to it
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"pkgs.clang"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/c.nix">extra/language/c.nix</a></li>
+</ul>
+<h3 id="languagecincludes"><a class="header" href="#languagecincludes"><code>language.c.includes</code></a></h3>
+<p>C dependencies from nixpkgs
+<strong>Type</strong>:</p>
+<pre><code class="language-console">list of (package or string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/c.nix">extra/language/c.nix</a></li>
+</ul>
+<h3 id="languageclibraries"><a class="header" href="#languageclibraries"><code>language.c.libraries</code></a></h3>
+<p>Use this when another language dependens on a dynamic library
+<strong>Type</strong>:</p>
+<pre><code class="language-console">list of (package or string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/c.nix">extra/language/c.nix</a></li>
+</ul>
+<h3 id="languagegopackage"><a class="header" href="#languagegopackage"><code>language.go.package</code></a></h3>
+<p>Which go package to use
+<strong>Type</strong>:</p>
+<pre><code class="language-console">package or string convertible to it
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">&lt;derivation go-1.22.5&gt;
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">pkgs.go
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/go.nix">extra/language/go.nix</a></li>
+</ul>
+<h3 id="languagegogo111module"><a class="header" href="#languagegogo111module"><code>language.go.GO111MODULE</code></a></h3>
+<p>Enable Go modules
+<strong>Type</strong>:</p>
+<pre><code class="language-console">one of "on", "off", "auto"
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"on"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/go.nix">extra/language/go.nix</a></li>
+</ul>
+<h3 id="languageharepackage"><a class="header" href="#languageharepackage"><code>language.hare.package</code></a></h3>
+<p>Which Hare package to use
+<strong>Type</strong>:</p>
+<pre><code class="language-console">package or string convertible to it
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">&lt;derivation hare-0.24.2&gt;
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">pkgs.hare
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/hare.nix">extra/language/hare.nix</a></li>
+</ul>
+<h3 id="languageharethirdpartylibs"><a class="header" href="#languageharethirdpartylibs"><code>language.hare.thirdPartyLibs</code></a></h3>
+<p>List of extra packages (coming from hareThirdParty) to add
+<strong>Type</strong>:</p>
+<pre><code class="language-console">list of (package or string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">[ hareThirdParty.hare-compress ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/hare.nix">extra/language/hare.nix</a></li>
+</ul>
+<h3 id="languageharevendoredlibs"><a class="header" href="#languageharevendoredlibs"><code>language.hare.vendoredLibs</code></a></h3>
+<p>List of paths to add to HAREPATH
+<strong>Type</strong>:</p>
+<pre><code class="language-console">list of string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">[ ./vendor/lib ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/hare.nix">extra/language/hare.nix</a></li>
+</ul>
+<h3 id="languageperlpackage"><a class="header" href="#languageperlpackage"><code>language.perl.package</code></a></h3>
+<p>Which Perl package to use
+<strong>Type</strong>:</p>
+<pre><code class="language-console">package or string convertible to it
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">&lt;derivation perl-5.38.2&gt;
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">pkgs.perl538
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/perl.nix">extra/language/perl.nix</a></li>
+</ul>
+<h3 id="languageperlextrapackages"><a class="header" href="#languageperlextrapackages"><code>language.perl.extraPackages</code></a></h3>
+<p>List of extra packages (coming from perl5XXPackages) to add
+<strong>Type</strong>:</p>
+<pre><code class="language-console">list of (package or string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">[ perl538Packages.FileNext ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/perl.nix">extra/language/perl.nix</a></li>
+</ul>
+<h3 id="languageperllibrarypaths"><a class="header" href="#languageperllibrarypaths"><code>language.perl.libraryPaths</code></a></h3>
+<p>List of paths to add to PERL5LIB
+<strong>Type</strong>:</p>
+<pre><code class="language-console">list of string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">[ ./lib ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/perl.nix">extra/language/perl.nix</a></li>
+</ul>
+<h3 id="languagerubypackage"><a class="header" href="#languagerubypackage"><code>language.ruby.package</code></a></h3>
+<p>Ruby version used by your project
+<strong>Type</strong>:</p>
+<pre><code class="language-console">package or string convertible to it
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"pkgs.ruby_3_2"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/ruby.nix">extra/language/ruby.nix</a></li>
+</ul>
+<h3 id="languagerubynativedeps"><a class="header" href="#languagerubynativedeps"><code>language.ruby.nativeDeps</code></a></h3>
+<p>Use this when your gems depend on a dynamic library
+<strong>Type</strong>:</p>
+<pre><code class="language-console">list of (package or string convertible to it)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[ ]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/ruby.nix">extra/language/ruby.nix</a></li>
+</ul>
+<h3 id="languagerustenabledefaulttoolchain"><a class="header" href="#languagerustenabledefaulttoolchain"><code>language.rust.enableDefaultToolchain</code></a></h3>
+<p>Enable the default rust toolchain coming from nixpkgs
+<strong>Type</strong>:</p>
+<pre><code class="language-console">boolean
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"true"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/rust.nix">extra/language/rust.nix</a></li>
+</ul>
+<h3 id="languagerustpackageset"><a class="header" href="#languagerustpackageset"><code>language.rust.packageSet</code></a></h3>
+<p>Which rust package set to use
+<strong>Type</strong>:</p>
+<pre><code class="language-console">attribute set
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"pkgs.rustPlatform"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/rust.nix">extra/language/rust.nix</a></li>
+</ul>
+<h3 id="languagerusttools"><a class="header" href="#languagerusttools"><code>language.rust.tools</code></a></h3>
+<p>Which rust tools to pull from the platform package set
+<strong>Type</strong>:</p>
+<pre><code class="language-console">list of string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[
+  "rustc"
+  "cargo"
+  "clippy"
+  "rustfmt"
+]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/language/rust.nix">extra/language/rust.nix</a></li>
+</ul>
+<h3 id="servicegroups"><a class="header" href="#servicegroups"><code>serviceGroups</code></a></h3>
+<p>Add services to the environment. Services can be used to group long-running processes.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">attribute set of (submodule)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">{ }
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/services.nix">modules/services.nix</a></li>
+</ul>
+<h3 id="servicegroupsnamedescription"><a class="header" href="#servicegroupsnamedescription"><code>serviceGroups.&lt;name&gt;.description</code></a></h3>
+<p>Short description of the service group, shown in generated commands</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/services.nix">modules/services.nix</a></li>
+</ul>
+<h3 id="servicegroupsnamename"><a class="header" href="#servicegroupsnamename"><code>serviceGroups.&lt;name&gt;.name</code></a></h3>
+<p>Name of the service group. Defaults to attribute name in groups.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/services.nix">modules/services.nix</a></li>
+</ul>
+<h3 id="servicegroupsnameservices"><a class="header" href="#servicegroupsnameservices"><code>serviceGroups.&lt;name&gt;.services</code></a></h3>
+<p>Attrset of services that should be run in this group.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">attribute set of (submodule)
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">{ }
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/services.nix">modules/services.nix</a></li>
+</ul>
+<h3 id="servicegroupsnameservicesnamecommand"><a class="header" href="#servicegroupsnameservicesnamecommand"><code>serviceGroups.&lt;name&gt;.services.&lt;name&gt;.command</code></a></h3>
+<p>Command to execute.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">string
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/services.nix">modules/services.nix</a></li>
+</ul>
+<h3 id="servicegroupsnameservicesnamename"><a class="header" href="#servicegroupsnameservicesnamename"><code>serviceGroups.&lt;name&gt;.services.&lt;name&gt;.name</code></a></h3>
+<p>Name of this service. Defaults to attribute name in group services.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">null or string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">null
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/modules/services.nix">modules/services.nix</a></li>
+</ul>
+<h3 id="servicespostgrespackage"><a class="header" href="#servicespostgrespackage"><code>services.postgres.package</code></a></h3>
+<p>Which version of postgres to use
+<strong>Type</strong>:</p>
+<pre><code class="language-console">package or string convertible to it
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">"pkgs.postgresql"
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/services/postgres.nix">extra/services/postgres.nix</a></li>
+</ul>
+<h3 id="servicespostgrescreateuserdb"><a class="header" href="#servicespostgrescreateuserdb"><code>services.postgres.createUserDB</code></a></h3>
+<p>Create a database named like current user on startup.
+This option only makes sense when <code>setupPostgresOnStartup</code> is true.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">boolean
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">true
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/services/postgres.nix">extra/services/postgres.nix</a></li>
+</ul>
+<h3 id="servicespostgresinitdbargs"><a class="header" href="#servicespostgresinitdbargs"><code>services.postgres.initdbArgs</code></a></h3>
+<p>Additional arguments passed to <code>initdb</code> during data dir
+initialisation.</p>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">list of string
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">[
+  "--no-locale"
+]
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">[
+  "--data-checksums"
+  "--allow-group-access"
+]
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/services/postgres.nix">extra/services/postgres.nix</a></li>
+</ul>
+<h3 id="servicespostgressetuppostgresonstartup"><a class="header" href="#servicespostgressetuppostgresonstartup"><code>services.postgres.setupPostgresOnStartup</code></a></h3>
+<p>Whether to enable call setup-postgres on startup.
+<strong>Type</strong>:</p>
+<pre><code class="language-console">boolean
+</code></pre>
+<p><strong>Default value</strong>:</p>
+<pre><code class="language-nix">false
+</code></pre>
+<p><strong>Example value</strong>:</p>
+<pre><code class="language-nix">true
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="https://github.com/numtide/devshell/tree/main/extra/services/postgres.nix">extra/services/postgres.nix</a></li>
+</ul>
+<h2 id="extra-options"><a class="header" href="#extra-options">Extra options</a></h2>
+<h3 id="_moduleargs"><a class="header" href="#_moduleargs"><code>_module.args</code></a></h3>
+<p>Additional arguments passed to each module in addition to ones
+like <code>lib</code>, <code>config</code>,
+and <code>pkgs</code>, <code>modulesPath</code>.</p>
+<p>This option is also available to all submodules. Submodules do not
+inherit args from their parent module, nor do they provide args to
+their parent module or sibling submodules. The sole exception to
+this is the argument <code>name</code> which is provided by
+parent modules to a submodule and contains the attribute name
+the submodule is bound to, or a unique generated name if it is
+not bound to an attribute.</p>
+<p>Some arguments are already passed by default, of which the
+following <em>cannot</em> be changed with this option:</p>
+<ul>
+<li>
+<p>{var}<code>lib</code>: The nixpkgs library.</p>
+</li>
+<li>
+<p>{var}<code>config</code>: The results of all options after merging the values from all modules together.</p>
+</li>
+<li>
+<p>{var}<code>options</code>: The options declared in all modules.</p>
+</li>
+<li>
+<p>{var}<code>specialArgs</code>: The <code>specialArgs</code> argument passed to <code>evalModules</code>.</p>
+</li>
+<li>
+<p>All attributes of {var}<code>specialArgs</code></p>
+<p>Whereas option values can generally depend on other option values
+thanks to laziness, this does not apply to <code>imports</code>, which
+must be computed statically before anything else.</p>
+<p>For this reason, callers of the module system can provide <code>specialArgs</code>
+which are available during import resolution.</p>
+<p>For NixOS, <code>specialArgs</code> includes
+{var}<code>modulesPath</code>, which allows you to import
+extra modules from the nixpkgs package tree without having to
+somehow make the module aware of the location of the
+<code>nixpkgs</code> or NixOS directories.</p>
+<pre><code>{ modulesPath, ... }: {
+  imports = [
+    (modulesPath + "/profiles/minimal.nix")
+  ];
+}
+</code></pre>
+</li>
+</ul>
+<p>For NixOS, the default value for this option includes at least this argument:</p>
+<ul>
+<li>{var}<code>pkgs</code>: The nixpkgs package set according to
+the {option}<code>nixpkgs.pkgs</code> option.</li>
+</ul>
+<p><strong>Type</strong>:</p>
+<pre><code class="language-console">lazy attribute set of raw value
+</code></pre>
+<p><strong>Declared in</strong>:</p>
+<ul>
+<li><a href="">lib/modules.nix</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="env-vars"><a class="header" href="#env-vars">Env vars</a></h1>
+<p>This section describes a few environment variables that can influence the
+behaviour of devshell.</p>
+<h2 id="devshell_no_motd1"><a class="header" href="#devshell_no_motd1"><code>DEVSHELL_NO_MOTD=1</code></a></h2>
+<p>When that variable is set, devshell will not display the menu that is executed
+on entrypoint.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="todo-1"><a class="header" href="#todo-1">TODO</a></h1>
+<ul>
+<li>How to add a new dependency</li>
+<li>Using with CI</li>
+<li>Extending devshell</li>
+<li>Contributing</li>
+</ul>
+
+                        </div>
+                        <div class="sidetoc">
+                            <nav class="pagetoc"></nav>
+                        </div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="theme/pagetoc.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
