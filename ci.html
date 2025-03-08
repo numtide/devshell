@@ -1,0 +1,347 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Continuous Integration setup - devshell</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/pagetoc.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Intro</a></li><li class="chapter-item expanded "><a href="getting_started.html"><strong aria-hidden="true">2.</strong> Getting started</a></li><li class="chapter-item expanded "><a href="ci.html" class="active"><strong aria-hidden="true">3.</strong> Continuous Integration setup</a></li><li class="chapter-item expanded "><a href="extending.html"><strong aria-hidden="true">4.</strong> Extending devshell</a></li><li class="chapter-item expanded "><a href="modules_schema.html"><strong aria-hidden="true">5.</strong> devshell.toml schema</a></li><li class="chapter-item expanded "><a href="env.html"><strong aria-hidden="true">6.</strong> env vars</a></li><li class="chapter-item expanded "><a href="99_todo.html"><strong aria-hidden="true">7.</strong> TODO</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">devshell</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/numtide/devshell" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/numtide/devshell/edit/main/docs/src/ci.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <div class="content-wrap">
+                            <h1 id="continuous-integration-setup-ci"><a class="header" href="#continuous-integration-setup-ci">Continuous Integration setup (CI)</a></h1>
+<p>Traditionally, the CI build environment has to be kept in sync with the
+project. If the project needs <code>make</code> to build, the CI has to be configured to
+have it available. This can become quite tricky whenever a version requirement
+changes.</p>
+<p>With devshell, the only dependency is Nix. Once the devshell is built, all the
+dependencies are loaded into scope and automatically are in sync with the
+current code checkout.</p>
+<h2 id="general-approach"><a class="header" href="#general-approach">General approach</a></h2>
+<p>The only dependency we need installed in the CI environment is Nix.</p>
+<p>Assuming that the <code>shell.nix</code> file exists, the general approach is to build it
+with nix to get back the entrypoint script. And then executed that script with
+the commands.</p>
+<p>For example, let's say that <code>make</code> is being used to build the project.</p>
+<p>The <code>devshell.toml</code> would have it as part of its commands:</p>
+<pre><code class="language-toml">[[commands]]
+package = "gnumake"
+</code></pre>
+<p>All the CI has to do, is this: <code>nix-shell --run "$(nix-build shell.nix)/entrypoint make"</code>.</p>
+<ol>
+<li><code>$(nix-build shell.nix)/entrypoint</code> outputs a path to the entrypoint script</li>
+<li><code>nix-shell --run</code> sets the required environment variables for the entrypoint script to work.</li>
+<li>The entrypoint script is executed with <code>make</code> as an argument. It loads the
+environment.</li>
+<li>Finally make is executed in the context of the project environment, with
+all the same dependencies as the developer's.</li>
+</ol>
+<h2 id="hercules-ci"><a class="header" href="#hercules-ci">Hercules CI</a></h2>
+<p><a href="https://hercules-ci.com">Hercules CI</a> is a Nix-based continuous integration and deployment service.</p>
+<h3 id="build"><a class="header" href="#build">Build</a></h3>
+<p>If you haven't packaged your project with Nix or if a check can't run in the Nix sandbox, you can run it as an <a href="https://docs.hercules-ci.com/hercules-ci/effects/">effect</a>.</p>
+<p><code>ci.nix</code></p>
+<pre><code>let
+  shell = import ./shell.nix {};
+  pkgs = shell.pkgs;
+  effectsSrc =
+    builtins.fetchTarball "https://github.com/hercules-ci/hercules-ci-effects/archive/COMMIT_HASH.tar.gz";
+  inherit (import effectsSrc { inherit pkgs; }) effects;
+in
+{
+  inherit shell;
+  build = effects.mkEffect {
+    src = ./.;
+    effectScript = ''
+      go build
+    '';
+    inputs = [
+      shell.hook
+    ];
+  };
+}
+</code></pre>
+<p>Replace COMMIT_HASH by the latest git sha from <a href="https://github.com/hercules-ci/hercules-ci-effects/commit/master"><code>hercules-ci-effects</code></a>,
+or, if you prefer, you can bring <code>effects</code> into scope <a href="https://docs.hercules-ci.com/hercules-ci-effects/guide/import-or-pin/">using another pinning method</a>.</p>
+<h3 id="run-locally"><a class="header" href="#run-locally">Run locally</a></h3>
+<p>The <a href="https://docs.hercules-ci.com/hercules-ci-agent/hci/"><code>hci</code> command</a> is available in <code>nixos-21.05</code> and <code>nixos-unstable</code>.</p>
+<p><code>devshell.toml</code></p>
+<pre><code>[[commands]]
+package = "hci"
+</code></pre>
+<p>Use <a href="https://docs.hercules-ci.com/hercules-ci-agent/hci/"><code>hci effect run</code></a>. Following the previous example:</p>
+<pre><code class="language-console">hci effect run build --no-token
+</code></pre>
+<h3 id="shell-only"><a class="header" href="#shell-only">Shell only</a></h3>
+<p>To build the shell itself on <code>x86_64-linux</code>:</p>
+<p><code>ci.nix</code></p>
+<pre><code>{
+  shell = import ./shell.nix {};
+
+  # ... any extra Nix packages you want to build; perhaps
+  # pkgs = import ./default.nix {} // { recurseForDerivations = true; };
+}
+</code></pre>
+<h3 id="system"><a class="header" href="#system"><code>system</code></a></h3>
+<p>If you build for <a href="https://docs.hercules-ci.com/hercules-ci/guides/multi-platform/">multiple systems</a>, pass <code>system</code>:</p>
+<pre><code>import ./shell.nix { inherit system; };
+</code></pre>
+<h2 id="github-actions"><a class="header" href="#github-actions">GitHub Actions</a></h2>
+<p>Add the following file to your project. Replace the <code>&lt;your build command&gt;</code>
+part with whatever is needed to build the project.</p>
+<p><code>.github/workflows/devshell.yml</code></p>
+<pre><code class="language-yaml">name: devshell
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cachix/install-nix-action@v12
+      - uses: cachix/cachix-action@v8
+        with:
+          name: "&lt;your cache here&gt;"
+          signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+      - run: |
+          source "$(nix-build shell.nix)"
+          &lt;your build command&gt;
+</code></pre>
+<h2 id="todo"><a class="header" href="#todo">TODO</a></h2>
+<p>Add more CI-specific examples.</p>
+
+                        </div>
+                        <div class="sidetoc">
+                            <nav class="pagetoc"></nav>
+                        </div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="getting_started.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="extending.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="getting_started.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="extending.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="theme/pagetoc.js"></script>
+
+
+    </div>
+    </body>
+</html>
