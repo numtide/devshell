@@ -41,7 +41,15 @@ jobs:
           name: numtide
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: nix flake check
-      - run: nix develop -c echo OK
+      - name: Run devshell entry sanity checks
+        run: |
+          nix develop -c echo OK
+          for tmpl in ./templates/*; do
+            if ! [ -d "$tmpl" ]; then
+              continue
+            fi
+            nix develop --override-input devshell . "$tmpl" -c echo OK
+          done
       - name: Run nix flake archive
         run: nix flake archive
   docs:

@@ -33,14 +33,17 @@ let
 in
 rec {
   # Folder that contains all the extra modules
-  extraModulesDir = toString ./extra;
+  extraModulesPath = toString ./extra;
+
+  # Alias for backward compatibility.
+  extraModulesDir = extraModulesPath;
 
   # Get the modules documentation from an empty evaluation
   modules-docs =
     (eval {
       configuration = {
         # Load all of the extra modules so they appear in the docs
-        imports = importTree extraModulesDir;
+        imports = importTree extraModulesPath;
       };
     }).config.modules-docs;
 

@@ -31,7 +31,9 @@ lang = "en_US.UTF-8"
 From a nix flake you would import it like
 
 ```nix
-imports = ["${devshell}/extra/locale.nix"];
+devshell.mkShell ({ extraModulesPath, ... }: {
+  imports = ["${extraModulesPath}/locale.nix"];
+})
 ```
 
 ## Building your own modules
