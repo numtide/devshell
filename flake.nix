@@ -108,7 +108,7 @@
         default = toml;
       };
 
-      lib.importTOML = import ./nix/importTOML.nix;
+      lib = devshell;
 
       flakeModule = ./flake-module.nix;
     };
