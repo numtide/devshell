@@ -52,6 +52,10 @@ with lib;
           name = "LDFLAGS";
           eval = "-L$DEVSHELL_DIR/lib";
         }
+        {
+          name = "LIBRARY_PATH";
+          eval = "-L$DEVSHELL_DIR/lib";
+        }
       ])
       ++ lib.optionals hasIncludes [
         {
