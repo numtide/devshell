@@ -43,7 +43,7 @@ category = "formatters"
 [[commands]]
 help = "github utility"
 name = "hub"
-package = "gitAndTools.hub"
+package = "hub"
 category = "utilites"
 
 [[commands]]
