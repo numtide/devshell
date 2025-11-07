@@ -34,7 +34,7 @@ with lib;
     devshell.packages = with pkgs; [
       cfg.package
       # Used by mkmf, the standard gem build tool
-      (lowPrio binutils)
+      (lib.lowPrio binutils)
       file
       findutils
       gnumake
