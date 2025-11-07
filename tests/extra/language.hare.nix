@@ -3,7 +3,7 @@
   devshell,
   runTest,
 }:
-pkgs.lib.optionalAttrs (!pkgs.hostPlatform.isDarwin) {
+pkgs.lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
   # Basic test
   language-hare-1 =
     let
