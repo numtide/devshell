@@ -25,7 +25,12 @@ in
           );
           default = { };
         };
-        config.devShells = lib.mapAttrs (_name: devshell: devshell.devshell.shell) config.devshells;
+        config = {
+          devShells = lib.mapAttrs (_name: devshell: devshell.devshell.shell) config.devshells;
+          checks = lib.mapAttrs' (
+            name: devshell: lib.nameValuePair "devshells/${name}" devshell.devshell.shell
+          ) config.devshells;
+        };
       }
     );
   };
