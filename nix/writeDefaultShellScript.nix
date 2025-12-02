@@ -24,6 +24,7 @@ writeTextFile (
     inherit name;
     text = script;
     executable = true;
+    meta.mainProgram = name;
   }
   // (lib.optionalAttrs (checkPhase != null) { inherit checkPhase; })
   // (lib.optionalAttrs binPrefix { destination = "/bin/${name}"; })
