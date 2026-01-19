@@ -1,5 +1,6 @@
 imports = [
-  "language.go"
+  "language.go",
+  "dns.hostctl"
 ]
 
 [devshell]
@@ -50,3 +51,8 @@ category = "utilites"
 help = "golang linter"
 package = "golangci-lint"
 category = "linters"
+
+[hostctl]
+enable = true
+dns."test.domain.local" = "172.0.0.1"
+dns."shared.domain.link-local" = "169.254.0.5"
