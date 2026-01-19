@@ -56,13 +56,12 @@ in
   };
 
   # Copy the values over to the devshell module
-  config.devshell =
-    {
-      packages = config.packages;
-      packagesFrom = config.packagesFrom;
-      startup.bash_extra = noDepEntry config.bash.extra;
-      interactive.bash_interactive = noDepEntry config.bash.interactive;
-    }
-    // (lib.optionalAttrs (config.motd != null) { motd = config.motd; })
-    // (lib.optionalAttrs (config.name != null) { name = config.name; });
+  config.devshell = {
+    packages = config.packages;
+    packagesFrom = config.packagesFrom;
+    startup.bash_extra = noDepEntry config.bash.extra;
+    interactive.bash_interactive = noDepEntry config.bash.interactive;
+  }
+  // (lib.optionalAttrs (config.motd != null) { motd = config.motd; })
+  // (lib.optionalAttrs (config.name != null) { name = config.name; });
 }

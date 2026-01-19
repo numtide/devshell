@@ -1,4 +1,6 @@
 {
+  lib,
+  runCommand,
   bashInteractive,
   coreutils,
   stdenv,
@@ -6,12 +8,22 @@
 }:
 let
   bashPath = "${bashInteractive}/bin/bash";
+  rmCommand = runCommand "coreutils-rm" { } ''
+    mkdir -p $out/bin
+    ln -s ${coreutils}/bin/rm $out/bin/rm
+  '';
   nakedStdenv = writeTextFile {
     name = "naked-stdenv";
     destination = "/setup";
     text = ''
       # Fix for `nix develop`
       : ''${outputs:=out}
+
+      # Fix for `nix-shell --pure` line 1: rm: command not found
+      # occurs at `_nix_shell_clean_tmpdir` in `nixos/nix`
+      ${lib.optionalString (builtins.getEnv "IN_NIX_SHELL" == "pure") ''
+        export PATH=${rmCommand}/bin:$PATH
+      ''}
 
       runHook() {
         eval "$shellHook"

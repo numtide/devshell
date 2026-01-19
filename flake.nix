@@ -36,7 +36,7 @@
         {
           docs = pkgs.writeShellApplication {
             name = "docs";
-            meta.description = ''Run mdBook server at http://localhost:3000'';
+            meta.description = "Run mdBook server at http://localhost:3000";
             runtimeInputs = [ pkgs.mdbook ];
             text = ''
               cd docs
@@ -46,7 +46,7 @@
           };
           bench = pkgs.writeShellApplication {
             name = "benchmark";
-            meta.description = ''Run benchmark'';
+            meta.description = "Run benchmark";
             runtimeInputs = [ pkgs.hyperfine ];
             text = ''
               cd benchmark

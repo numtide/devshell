@@ -96,7 +96,7 @@ let
         command =
           (pkgs.writeShellScript "${gName}-services-stop" ''
             if [ -e "$PRJ_DATA_DIR/pids/${gName}.pid" ]; then
-              pid=$(cat "$PRJ_DATA_DIR/pids/${gName}.pid")
+              pid=$(${pkgs.coreutils}/bin/cat "$PRJ_DATA_DIR/pids/${gName}.pid")
               kill -TERM $pid
               rm "$PRJ_DATA_DIR/pids/${gName}.pid"
             fi
