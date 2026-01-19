@@ -9,14 +9,19 @@
   config,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    mkOption
+    types
+    mkEnableOption
+    ;
+
   # Because we want to be able to push pure JSON-like data into the
   # environment.
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
 
   cfg = config.services.postgres;
-  createDB = optionalString cfg.createUserDB ''
+  createDB = lib.optionalString cfg.createUserDB ''
     echo "CREATE DATABASE ''${USER:-$(id -nu)};" | postgres --single -E postgres
   '';
 
@@ -27,7 +32,7 @@ let
     # Abort if the data dir already exists
     [[ ! -d "$PGDATA" ]] || exit 0
 
-    initdb ${concatStringsSep " " cfg.initdbArgs}
+    initdb ${lib.concatStringsSep " " cfg.initdbArgs}
 
     cat >> "$PGDATA/postgresql.conf" <<EOF
       listen_addresses = '''

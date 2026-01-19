@@ -4,24 +4,23 @@
   pkgs,
   ...
 }:
-with lib;
 let
   cfg = config.git.hooks;
 
   # These are all the options available for a git hook.
   hookOptions = desc: {
-    text = mkOption {
+    text = lib.mkOption {
       description = "Text of the script to install";
       default = "";
-      type = types.str;
+      type = lib.types.str;
     };
   };
 
   # All of the hook types supported by this module.
-  allHooks = filterAttrs (k: v: k != "enable") cfg;
+  allHooks = lib.filterAttrs (k: v: k != "enable") cfg;
 
   # Only keep all the hooks that have a value set.
-  hooksWithData = filterAttrs (k: v: v.text != "") allHooks;
+  hooksWithData = lib.filterAttrs (k: v: v.text != "") allHooks;
 
   # Shims for all the hooks that this module supports.  The shims cause git
   # hooks to be ignored:
@@ -70,7 +69,7 @@ let
     in
     pkgs.buildEnv {
       name = "git.hooks";
-      paths = mapAttrsToList mkHookScript hooksWithData;
+      paths = lib.mapAttrsToList mkHookScript hooksWithData;
     };
 
   # Execute this script to update the project's git hooks
@@ -116,7 +115,7 @@ let
     mkdir -pv "$target_hook_dir"
 
     # Iterate over all the hooks enabled for this environment
-    for name in ${toString (attrNames hooksWithData)}; do
+    for name in ${toString (lib.attrNames hooksWithData)}; do
       # Resolve all the symlinks
       src_hook=$(readlink -f "$source_hook_dir/$name" || true)
       dst_hook=$(readlink -f "$target_hook_dir/$name" || true)
@@ -137,7 +136,7 @@ let
 in
 {
   options.git.hooks = {
-    enable = mkEnableOption "install .git/hooks on shell entry";
+    enable = lib.mkEnableOption "install .git/hooks on shell entry";
 
     # TODO: add proper description for each hook.
     applypatch-msg = hookOptions "";
@@ -157,7 +156,7 @@ in
     # update = hookOptions "";
   };
 
-  config.devshell = optionalAttrs cfg.enable {
+  config.devshell = lib.optionalAttrs cfg.enable {
     packages = [ install-git-hooks ];
 
     startup.install-git-hooks.text = "
@@ -165,7 +164,7 @@ in
     ";
   };
 
-  config.env = optional cfg.enable {
+  config.env = lib.optional cfg.enable {
     name = "DEVSHELL_GIT_HOOKS_DIR";
     value = hooksDir;
   };

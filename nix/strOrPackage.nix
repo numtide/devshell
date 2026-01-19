@@ -1,5 +1,4 @@
 { lib, pkgs }:
-with lib;
 let
   resolveKey =
     key:
@@ -10,4 +9,4 @@ let
     builtins.foldl' op pkgs attrs;
 in
 # Because we want to be able to push pure JSON-like data into the environment.
-types.coercedTo types.str resolveKey types.package
+lib.types.coercedTo lib.types.str resolveKey lib.types.package

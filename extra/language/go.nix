@@ -8,9 +8,8 @@ let
   cfg = config.language.go;
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
 in
-with lib;
 {
-  options.language.go = {
+  options.language.go = with lib; {
     GO111MODULE = mkOption {
       type = types.enum [
         "on"

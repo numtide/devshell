@@ -11,9 +11,8 @@ let
   hasLibraries = lib.length cfg.libraries > 0;
   hasIncludes = lib.length cfg.includes > 0;
 in
-with lib;
 {
-  options.language.c = {
+  options.language.c = with lib; {
     libraries = mkOption {
       type = types.listOf strOrPackage;
       default = [ ];

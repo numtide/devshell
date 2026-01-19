@@ -19,9 +19,8 @@ let
     in
     lib.makeSearchPath "src/hare/third-party" (userHareLibs ++ propagatedLibs);
 in
-with lib;
 {
-  options.language.hare = {
+  options.language.hare = with lib; {
     thirdPartyLibs = mkOption {
       type = types.listOf strOrPackage;
       default = [ ];
@@ -48,13 +47,13 @@ with lib;
         name = "HAREPATH";
         value = lib.makeSearchPath "src/hare/stdlib" [ cfg.package ];
       }
-      (mkIf (cfg.thirdPartyLibs != [ ]) {
+      (lib.mkIf (cfg.thirdPartyLibs != [ ]) {
         name = "HAREPATH";
         prefix = makeHareFullPath cfg.thirdPartyLibs;
       })
-      (mkIf (cfg.vendoredLibs != [ ]) {
+      (lib.mkIf (cfg.vendoredLibs != [ ]) {
         name = "HAREPATH";
-        prefix = concatStringsSep ":" cfg.vendoredLibs;
+        prefix = lib.concatStringsSep ":" cfg.vendoredLibs;
       })
     ];
     devshell.packages = [ cfg.package ];

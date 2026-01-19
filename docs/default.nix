@@ -4,7 +4,6 @@
   stdenv,
   lib,
 }:
-with lib;
 stdenv.mkDerivation {
   name = "devshell-docs";
   buildInputs = [ mdbook ];

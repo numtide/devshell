@@ -9,9 +9,20 @@
   modulesPath,
   ...
 }:
-with lib;
 let
   cfg = config.modules-docs;
+
+  inherit (lib)
+    mkOption
+    isFunction
+    isString
+    isList
+    concatStringsSep
+    optionalAttrs
+    removePrefix
+    removeSuffix
+    types
+    ;
 
   # Generate some meta data for a list of packages. This is what
   # `relatedPackages` option of `mkOption` lib/options.nix influences.
@@ -42,7 +53,7 @@ let
               let
                 bail = throw "Invalid package attribute path '${toString path}'";
               in
-              attrByPath path bail pkgs
+              lib.attrByPath path bail pkgs
             );
         in
         {
@@ -85,16 +96,16 @@ let
     let
       isEnable = lib.hasPrefix "enable";
       isPackage = lib.hasPrefix "package";
-      compareWithPrio = pred: cmp: splitByAndCompare pred compare cmp;
-      moduleCmp = compareWithPrio isEnable (compareWithPrio isPackage compare);
+      compareWithPrio = pred: cmp: lib.splitByAndCompare pred lib.compare cmp;
+      moduleCmp = compareWithPrio isEnable (compareWithPrio isPackage lib.compare);
     in
-    compareLists moduleCmp a.loc b.loc < 0;
+    lib.compareLists moduleCmp a.loc b.loc < 0;
 
   # Replace functions by the string <function>
   substFunction =
     x:
     if builtins.isAttrs x then
-      mapAttrs (name: substFunction) x
+      lib.mapAttrs (name: substFunction) x
     else if builtins.isList x then
       map substFunction x
     else if isFunction x then
@@ -105,7 +116,7 @@ let
   cleanUpOption =
     opt:
     let
-      applyOnAttr = n: f: optionalAttrs (hasAttr n opt) { ${n} = f opt.${n}; };
+      applyOnAttr = n: f: optionalAttrs (lib.hasAttr n opt) { ${n} = f opt.${n}; };
     in
     opt
     // applyOnAttr "declarations" (map mkDeclaration)
@@ -115,14 +126,16 @@ let
     // applyOnAttr "relatedPackages" mkRelatedPackages;
 
   optionsDocs = map cleanUpOption (
-    sort moduleDocCompare (filter (opt: opt.visible && !opt.internal) (optionAttrSetToDocList options))
+    lib.sort moduleDocCompare (
+      lib.filter (opt: opt.visible && !opt.internal) (lib.optionAttrSetToDocList options)
+    )
   );
 
   # TODO: display values like TOML instead.
   toMarkdown =
     optionsDocs:
     let
-      optionsDocsPartitioned = partition (opt: head opt.loc != "_module") optionsDocs;
+      optionsDocsPartitioned = lib.partition (opt: lib.head opt.loc != "_module") optionsDocs;
 
       # TODO: handle opt.relatedPackages. What is it for?
       optToMd =

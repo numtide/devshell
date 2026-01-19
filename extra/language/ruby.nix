@@ -8,10 +8,9 @@ let
   cfg = config.language.ruby;
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
 in
-with lib;
 {
   imports = [ ./c.nix ];
-  options.language.ruby = {
+  options.language.ruby = with lib; {
     nativeDeps = mkOption {
       type = types.listOf strOrPackage;
       default = [ ];

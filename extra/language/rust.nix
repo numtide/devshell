@@ -7,9 +7,8 @@
 let
   cfg = config.language.rust;
 in
-with lib;
 {
-  options.language.rust = {
+  options.language.rust = with lib; {
     packageSet = mkOption {
       # FIXME: how to make the selection possible in TOML?
       type = types.attrs;
