@@ -173,7 +173,7 @@ let
     done
 
     if [[ -n "''${help:-}" ]]; then
-      cat <<USAGE
+      ${pkgs.coreutils}/bin/cat <<USAGE
     Usage: ${cfg.name}
       $0 -h | --help          # show this help
       $0 [--pure]             # start a bash sub-shell
@@ -397,7 +397,7 @@ in
       {
         motd = lib.noDepEntry ''
           __devshell-motd() {
-            cat <<DEVSHELL_PROMPT
+            ${pkgs.coreutils}/bin/cat <<DEVSHELL_PROMPT
           ${cfg.motd}
           DEVSHELL_PROMPT
           }

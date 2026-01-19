@@ -39,7 +39,7 @@ let
     mkdir -p $out/bin
 
     ${lib.concatMapStringsSep "\n" (k: ''
-      cat <<'WRAPPER' > $out/bin/${k}
+      ${pkgs.coreutils}/bin/cat <<'WRAPPER' > $out/bin/${k}
       #!${pkgs.bash}/bin/bash
       set -euo pipefail
 

@@ -179,7 +179,7 @@ in
       help = "prints this menu";
       name = "menu";
       command = ''
-        cat <<'DEVSHELL_MENU'
+        ${pkgs.coreutils}/bin/cat <<'DEVSHELL_MENU'
         ${commandsToMenu config.commands}
         DEVSHELL_MENU
       '';
