@@ -13,5 +13,6 @@ in
   specialArgs = {
     modulesPath = builtins.toString ./.;
     extraModulesPath = builtins.toString ../extra;
-  } // extraSpecialArgs;
+  }
+  // extraSpecialArgs;
 }

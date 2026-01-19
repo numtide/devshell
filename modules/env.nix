@@ -98,7 +98,7 @@ let
     else if valType == "prefix" then
       ''export ${name}=$(${pkgs.coreutils}/bin/realpath --canonicalize-missing "${prefix}")''${${name}+:''${${name}}}''
     else if valType == "unset" then
-      ''unset ${name}''
+      "unset ${name}"
     else
       throw "BUG in the env.nix module. This should never be reached.";
 in
@@ -143,7 +143,7 @@ in
       # This is used by bash-completions to find new completions on demand
       {
         name = "XDG_DATA_DIRS";
-        eval = ''$DEVSHELL_DIR/share:''${XDG_DATA_DIRS:-/usr/local/share:/usr/share}'';
+        eval = "$DEVSHELL_DIR/share:\${XDG_DATA_DIRS:-/usr/local/share:/usr/share}";
       }
 
       # A per-project data directory for runtime information.

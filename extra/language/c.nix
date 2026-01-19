@@ -34,12 +34,13 @@ in
   };
 
   config = {
-    devshell.packages =
-      [ cfg.compiler ]
-      ++ (lib.optionals hasLibraries (map lib.getLib cfg.libraries))
-      ++
-        # Assume we want pkg-config, because it's good
-        (lib.optionals hasIncludes ([ pkgs.pkg-config ] ++ (map lib.getDev cfg.includes)));
+    devshell.packages = [
+      cfg.compiler
+    ]
+    ++ (lib.optionals hasLibraries (map lib.getLib cfg.libraries))
+    ++
+      # Assume we want pkg-config, because it's good
+      (lib.optionals hasIncludes ([ pkgs.pkg-config ] ++ (map lib.getDev cfg.includes)));
 
     env =
       (lib.optionals hasLibraries [
