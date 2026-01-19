@@ -8,11 +8,9 @@
 let
   cfg = config.language.perl;
   strOrPackage = import ../../nix/strOrPackage.nix { inherit lib pkgs; };
-
 in
-with lib;
 {
-  options.language.perl = {
+  options.language.perl = with lib; {
     extraPackages = mkOption {
       type = types.listOf strOrPackage;
       default = [ ];
@@ -35,13 +33,13 @@ with lib;
 
   config = {
     env = [
-      (mkIf (cfg.extraPackages != [ ]) {
+      (lib.mkIf (cfg.extraPackages != [ ]) {
         name = "PERL5LIB";
         prefix = pkgs.perlPackages.makeFullPerlPath cfg.extraPackages;
       })
-      (mkIf (cfg.libraryPaths != [ ]) {
+      (lib.mkIf (cfg.libraryPaths != [ ]) {
         name = "PERL5LIB";
-        prefix = concatStringsSep ":" cfg.libraryPaths;
+        prefix = lib.concatStringsSep ":" cfg.libraryPaths;
       })
     ];
     devshell.packages = [ cfg.package ] ++ cfg.extraPackages;

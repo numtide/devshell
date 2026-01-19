@@ -4,8 +4,12 @@
   pkgs,
   ...
 }:
-with lib;
 let
+  inherit (lib)
+    mkOption
+    types
+    ;
+
   serviceOptions = {
     name = mkOption {
       type = types.nullOr types.str;
@@ -47,8 +51,10 @@ let
   groupToProcfile =
     name: g:
     pkgs.writeText "Procfile.${name}" (
-      concatLines (
-        mapAttrsToList (sName: s: "${if s.name == null then sName else s.name}: ${s.command}") g.services
+      lib.concatLines (
+        lib.mapAttrsToList (
+          sName: s: "${if s.name == null then sName else s.name}: ${s.command}"
+        ) g.services
       )
     );
   groupToCommands =
@@ -107,8 +113,8 @@ in
     '';
   };
 
-  config.commands = foldl (l: r: l ++ r) [ ] (
-    mapAttrsToList (
+  config.commands = lib.foldl (l: r: l ++ r) [ ] (
+    lib.mapAttrsToList (
       gName: g: groupToCommands (if g.name == null then gName else g.name) g
     ) config.serviceGroups
   );

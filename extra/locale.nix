@@ -4,12 +4,11 @@
   config,
   ...
 }:
-with lib;
 let
   cfg = config.extra.locale;
 in
 {
-  options.extra.locale = {
+  options.extra.locale = with lib; {
     lang = mkOption {
       type = types.nullOr types.str;
       default = null;

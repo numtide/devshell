@@ -4,7 +4,6 @@
   pkgs,
   ...
 }:
-with lib;
 let
   ansi = import ../nix/ansi.nix;
 
@@ -65,7 +64,7 @@ let
       maxCommandLength = builtins.foldl' (max: v: if v > max then v else max) 0 commandLengths;
 
       commandCategories = lib.unique (
-        (zipAttrsWithNames [ "category" ] (name: vs: vs) commands).category
+        (lib.zipAttrsWithNames [ "category" ] (name: vs: vs) commands).category
       );
 
       commandByCategoriesSorted = builtins.attrValues (
@@ -92,6 +91,12 @@ let
         "\n${ansi.bold}[${category}]${ansi.reset}\n\n" + builtins.concatStringsSep "\n" (map opCmd cmd);
     in
     builtins.concatStringsSep "\n" (map opCat commandByCategoriesSorted) + "\n";
+
+  inherit (lib)
+    types
+    mkOption
+    literalExpression
+    ;
 
   # These are all the options available for the commands.
   commandOptions = {

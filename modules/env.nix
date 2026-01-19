@@ -4,8 +4,15 @@
   pkgs,
   ...
 }:
-with lib;
 let
+
+  inherit (lib)
+    mkOption
+    mkEnableOption
+    types
+    assertMsg
+    ;
+
   envOptions = {
     name = mkOption {
       type = types.str;
@@ -68,24 +75,24 @@ let
       ...
     }@args:
     let
-      vals = filter (key: args.${key} != null && args.${key} != false) [
+      vals = lib.filter (key: args.${key} != null && args.${key} != false) [
         "eval"
         "prefix"
         "unset"
         "value"
       ];
-      valType = head vals;
+      valType = lib.head vals;
     in
     assert assertMsg (
-      (length vals) > 0
+      (lib.length vals) > 0
     ) "[[environ]]: ${name} expected one of (value|eval|prefix|unset) to be set.";
-    assert assertMsg ((length vals) < 2)
+    assert assertMsg ((lib.length vals) < 2)
       "[[environ]]: ${name} expected only one of (value|eval|prefix|unset) to be set. Not ${toString vals}";
     assert assertMsg (
       !(name == "PATH" && valType == "value")
     ) "[[environ]]: ${name} should not override the value. Use 'prefix' instead.";
     if valType == "value" then
-      "export ${name}=${escapeShellArg (toString value)}"
+      "export ${name}=${lib.escapeShellArg (toString value)}"
     else if valType == "eval" then
       "export ${name}=${eval}"
     else if valType == "prefix" then
@@ -102,7 +109,7 @@ in
     description = ''
       Add environment variables to the shell.
     '';
-    example = literalExpression ''
+    example = lib.literalExpression ''
       [
         {
           name = "HTTP_PORT";
@@ -146,6 +153,6 @@ in
       }
     ];
 
-    devshell.startup_env = concatStringsSep "\n" config.env;
+    devshell.startup_env = lib.concatStringsSep "\n" config.env;
   };
 }

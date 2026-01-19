@@ -5,10 +5,9 @@
   options,
   ...
 }:
-with lib;
 let
   cfg = config.devshell;
-  sanitizedName = strings.sanitizeDerivationName cfg.name;
+  sanitizedName = lib.strings.sanitizeDerivationName cfg.name;
 
   ansi = import ../nix/ansi.nix;
 
@@ -41,7 +40,7 @@ let
 
   addAttributeName =
     prefix:
-    mapAttrs (
+    lib.mapAttrs (
       k: v:
       v
       // {
@@ -51,6 +50,17 @@ let
         '';
       }
     );
+
+  inherit (lib)
+    mkOption
+    mkEnableOption
+    attrNames
+    attrValues
+    textClosureMap
+    replaceStrings
+    types
+    id
+    ;
 
   entryOptions = {
     text = mkOption {
@@ -228,7 +238,7 @@ let
   # Returns a list of all the input derivation ... for a derivation.
   inputsOf =
     drv:
-    filter lib.isDerivation (
+    lib.filter lib.isDerivation (
       (drv.buildInputs or [ ])
       ++ (drv.nativeBuildInputs or [ ])
       ++ (drv.propagatedBuildInputs or [ ])
@@ -381,11 +391,11 @@ in
   config.devshell = {
     package = devshell_dir;
 
-    packages = foldl' (sum: drv: sum ++ (inputsOf drv)) [ ] cfg.packagesFrom;
+    packages = lib.foldl' (sum: drv: sum ++ (inputsOf drv)) [ ] cfg.packagesFrom;
 
     startup =
       {
-        motd = noDepEntry ''
+        motd = lib.noDepEntry ''
           __devshell-motd() {
             cat <<DEVSHELL_PROMPT
           ${cfg.motd}
@@ -411,7 +421,7 @@ in
           fi
         '';
       }
-      // (optionalAttrs cfg.load_profiles {
+      // (lib.optionalAttrs cfg.load_profiles {
         load_profiles = lib.noDepEntry ''
           # Load installed profiles
           for file in "$DEVSHELL_DIR/etc/profile.d/"*.sh; do
@@ -422,7 +432,7 @@ in
       });
 
     interactive = {
-      PS1_util = noDepEntry ''
+      PS1_util = lib.noDepEntry ''
         if [[ -n "''${PRJ_ROOT:-}" ]]; then
           # Print the path relative to $PRJ_ROOT
           rel_root() {
@@ -441,7 +451,7 @@ in
       '';
 
       # Set a cool PS1
-      PS1 = stringAfter [ "PS1_util" ] (
+      PS1 = lib.stringAfter [ "PS1_util" ] (
         lib.mkDefault ''
           __set_prompt() {
             PS1='\[\033[38;5;202m\][${cfg.name}]$(rel_root)\$\[\033[0m\] '
