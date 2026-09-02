@@ -48,10 +48,10 @@ in
         # some *-sys crates require additional includes
         name = "CFLAGS";
         # append in case it needs to be modified
-        eval = "\"-I $DEVSHELL_DIR/include ${lib.optionalString pkgs.stdenv.isDarwin "-iframework $DEVSHELL_DIR/Library/Frameworks"}\"";
+        eval = "\"-I $DEVSHELL_DIR/include ${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin "-iframework $DEVSHELL_DIR/Library/Frameworks"}\"";
       }
     ]
-    ++ lib.optionals pkgs.stdenv.isDarwin [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       {
         # On darwin for example required for some *-sys crate compilation
         name = "RUSTFLAGS";

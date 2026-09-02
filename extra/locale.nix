@@ -24,7 +24,7 @@ in
     };
   };
   config.env =
-    lib.optional pkgs.stdenv.isLinux {
+    lib.optional pkgs.stdenv.hostPlatform.isLinux {
       name = "LOCALE_ARCHIVE";
       value = "${cfg.package}/lib/locale/locale-archive";
     }
