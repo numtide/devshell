@@ -1284,6 +1284,86 @@ attribute set of (submodule)
 
 - [modules/services.nix](https://github.com/numtide/devshell/tree/main/modules/services.nix)
 
+### `serviceGroups.<name>.beforeStart`
+
+Shell command to run before starting the service group.
+
+**Type**:
+
+```console
+string
+```
+
+**Default value**:
+
+```nix
+""
+```
+
+**Declared in**:
+
+- [modules/services.nix](https://github.com/numtide/devshell/tree/main/modules/services.nix)
+
+### `serviceGroups.<name>.afterStart`
+
+Shell command to run after starting the service group.
+
+**Type**:
+
+```console
+string
+```
+
+**Default value**:
+
+```nix
+""
+```
+
+**Declared in**:
+
+- [modules/services.nix](https://github.com/numtide/devshell/tree/main/modules/services.nix)
+
+### `serviceGroups.<name>.beforeStop`
+
+Shell command to run before stopping the service group.
+
+**Type**:
+
+```console
+string
+```
+
+**Default value**:
+
+```nix
+""
+```
+
+**Declared in**:
+
+- [modules/services.nix](https://github.com/numtide/devshell/tree/main/modules/services.nix)
+
+### `serviceGroups.<name>.afterStop`
+
+Shell command to run after stopping the service group.
+
+**Type**:
+
+```console
+string
+```
+
+**Default value**:
+
+```nix
+""
+```
+
+**Declared in**:
+
+- [modules/services.nix](https://github.com/numtide/devshell/tree/main/modules/services.nix)
+
 ### `serviceGroups.<name>.services.<name>.command`
 
 Command to execute.
