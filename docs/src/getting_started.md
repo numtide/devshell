@@ -188,6 +188,25 @@ This will add two commands to the devshell: `database:start` and
 group in the foreground and shows their output. `database:stop` can be executed
 in a different shell to stop the processes (or press Ctrl-C in the main shell).
 
+You can also run commands before and after starting/stopping a service group.
+For example, to run database migrations before starting and cleanup after stopping:
+```toml
+[serviceGroups.api]
+description = "API server and related services"
+beforeStart = """
+echo "Running database migrations..."
+./manage.py migrate
+"""
+afterStop = """
+echo "Cleaning up temp files..."
+rm -rf /tmp/api_*
+"""
+[serviceGroups.api.services.django]
+command = "python manage.py runserver 0.0.0.0:8000"
+[serviceGroups.api.services.redis]
+command = "redis-server"
+```
+
 ## Wrapping up
 
 **devshell** is extensible in many different ways. In the next chapters we will
