@@ -128,7 +128,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
-      - uses: cachix/install-nix-action@v12
+      - uses: NixOS/nix-installer-action@main
       - uses: cachix/cachix-action@v8
         with:
           name: "<your cache here>"
