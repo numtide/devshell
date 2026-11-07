@@ -18,8 +18,8 @@ in
     };
     package = mkOption {
       type = strOrPackage;
-      default = pkgs.ruby_3_2;
-      defaultText = "pkgs.ruby_3_2";
+      default = pkgs.ruby_3_4;
+      defaultText = "pkgs.ruby_3_4";
       description = "Ruby version used by your project";
     };
   };
@@ -33,7 +33,7 @@ in
     devshell.packages = with pkgs; [
       cfg.package
       # Used by mkmf, the standard gem build tool
-      (lib.lowPrio binutils)
+      (lib.setPrio 20 binutils)
       file
       findutils
       gnumake
